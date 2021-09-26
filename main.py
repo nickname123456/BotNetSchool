@@ -1,10 +1,14 @@
 import asyncio
 from netschoolapi import NetSchoolAPI
 from vkbottle.bot import Bot, Message
+from vkbottle import Keyboard, KeyboardButtonColor, Text, OpenLink, Location, EMPTY_KEYBOARD
 import sqlite3
 
+from vkbottle.tools.dev_tools import keyboard
+from vkbottle.tools.dev_tools.keyboard.action import Payload
 
-bot = Bot(token="19ce7bdfe981c0498b7e4e0ebc2118367182fc4d9859869a89167b534481d9e55615b906f208aa3ba7729")
+
+bot = Bot(token="фиг вам, а не токен!")
 
 
 ns = NetSchoolAPI('https://sgo.edu-74.ru')
@@ -24,8 +28,22 @@ db.commit()
 
 
 
+@bot.on.message(text="Меню")
+@bot.on.message(payload={'cmd': 'menu'})
+async def test(message: Message):
+    keyboard = (
+        Keyboard()
+        .add(Text('Войти', {'cmd': 'login'}), color = KeyboardButtonColor.POSITIVE)
+        .add(Text('Расписание на неделю', {'cmd': 'schedule'}), color = KeyboardButtonColor.PRIMARY)
+    )
+
+    await message.answer('Менюшка', keyboard=keyboard)
+
+
+
 
 @bot.on.message(text=["вход <userLogin> <userPassword>", "вход"])
+@bot.on.message(payload={'cmd': 'login'})
 async def login(message: Message, userLogin = None, userPassword = None):
     userInfo = await bot.api.users.get(message.from_id)
 
@@ -55,9 +73,31 @@ async def login(message: Message, userLogin = None, userPassword = None):
         school,
     )
 
+    global diary
     diary = await ns.diary()
     print(diary.schedule[0].lessons[0])
+
     
+
+
+
+@bot.on.message(text="Расписание")
+@bot.on.message(payload={'cmd': 'schedule'})
+async def schedule(message: Message):
+
+    keyboard=(
+        Keyboard()
+        .add(Text('Назад', {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
+    )
+
+    lessons =''
+    for day in diary.schedule:
+        for lesson in day.lessons:
+            lessons += lesson.subject + '\n'
+        lessons += '\n\n'
+    await message.answer(lessons, keyboard=keyboard)
+
+
 
 
 

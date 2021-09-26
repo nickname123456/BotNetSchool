@@ -4,6 +4,11 @@ from netschoolapi import NetSchoolAPI
 
 async def main():
 
+    print('```````````````````````````````````````````')
+    print('```````````````````````````````````````````')
+    print('```````````````````````````````````````````')
+
+
     # Создаём клиент. Через него мы будем обращаться
     # к АПИ электронного дневника
     ns = NetSchoolAPI('https://sgo.edu-74.ru')
@@ -17,8 +22,25 @@ async def main():
 
     # Печатаем дневник на текущую неделю
     # О полях дневника в "Справочнике"
+
+    Monday =''
+    Tuesday =''
+    Wednesday=''
+    Thursday=''
+    Friday=''
+
+    
+
     diary = await ns.diary()
-    print(diary.schedule[0].lessons[0].assignments[1].mark)
+    #print(diary.schedule)
+    lessons= ''
+    for day in diary.schedule:
+        for lesson in day.lessons:
+            lessons += lesson.subject + '\n'
+        lessons +='\n\n'
+        print(lessons)
+
+
 
     # Выходим из сессии
     # Если этого не делать, то при заходе на сайт
