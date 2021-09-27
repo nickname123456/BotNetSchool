@@ -32,14 +32,21 @@ async def main():
     
 
     diary = await ns.diary()
-    #print(diary.schedule)
+    print(diary.schedule[0].lessons)
+    """
     lessons= ''
     for day in diary.schedule:
         for lesson in day.lessons:
-            lessons += lesson.subject + '\n'
+            for assignment in lesson.assignments:
+                if assignment.mark != None:
+                    lessons += lesson.subject + '   ' + str(assignment.mark) + '\n'
+                else:
+                    lessons += lesson.subject + '\n'
+
+
         lessons +='\n\n'
         print(lessons)
-
+    """
 
 
     # Выходим из сессии
