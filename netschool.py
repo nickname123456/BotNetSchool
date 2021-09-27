@@ -1,5 +1,6 @@
 import asyncio
 from netschoolapi import NetSchoolAPI
+from netschoolapi.data import announcement
 
 
 async def main():
@@ -47,6 +48,8 @@ async def main():
         lessons +='\n\n'
         print(lessons)
     """
+
+    announcements = ns.announcements
 
 
     # Выходим из сессии
