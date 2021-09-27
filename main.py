@@ -9,7 +9,7 @@ from vkbottle.tools.dev_tools import keyboard
 from vkbottle.tools.dev_tools.keyboard.action import Payload
 
 
-bot = Bot(token="фиг вам, а не токен!")
+bot = Bot(token="фиг вам")
 
 
 ns = NetSchoolAPI('https://sgo.edu-74.ru')
@@ -78,7 +78,7 @@ async def login(message: Message, userLogin = None, userPassword = None):
 
     global diary
     diary = await ns.diary()
-    await message.answer(f'{userInfo.first_name}, ты успешно зашел в систему под логином: {userLogin}')
+    await message.answer(f'{userInfo[0].first_name}, ты успешно зашел в систему под логином: {userLogin}')
 
     
 
