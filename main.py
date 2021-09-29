@@ -10,7 +10,7 @@ from vkbottle.tools.dev_tools.keyboard.action import Payload
 
 
 #Входим в группу
-bot = Bot(token="19ce7bdfe981c0498b7e4e0ebc2118367182fc4d9859869a89167b534481d9e55615b906f208aa3ba7729")
+bot = Bot(token="")
 
 
 #Список дневников учеников
@@ -179,11 +179,17 @@ try:
                                     ' ' + str(assignment.mark), {'cmd': f'lesson_information_{numberOfTimes}'}))
                         keyboard.row()
                         break
-
                     else:
+                        if assignment == lesson.assignments[0] and len(lesson.assignments) > 1:
+                            continue
                         numberOfTimes += 1
                         keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject, {'cmd': f'lesson_information_{numberOfTimes}'}))
                         keyboard.row()
+
+                if len(lesson.assignments) == 0:
+                    numberOfTimes += 1
+                    keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject, {'cmd': f'lesson_information_{numberOfTimes}'}))
+                    keyboard.row()
 
         
         if 'Вторник' in message.text:
@@ -201,9 +207,16 @@ try:
                         break
 
                     else:
+                        if assignment == lesson.assignments[0] and len(lesson.assignments) > 1:
+                            continue
                         numberOfTimes += 1
                         keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject, {'cmd': f'lesson_information_{numberOfTimes}'}))
                         keyboard.row()
+
+                if len(lesson.assignments) == 0:
+                    numberOfTimes += 1
+                    keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject, {'cmd': f'lesson_information_{numberOfTimes}'}))
+                    keyboard.row()
 
         
         if 'Среда' in message.text:
@@ -220,9 +233,16 @@ try:
                         break
 
                     else:
+                        if assignment == lesson.assignments[0] and len(lesson.assignments) > 1:
+                            continue
                         numberOfTimes += 1
                         keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject, {'cmd': f'lesson_information_{numberOfTimes}'}))
                         keyboard.row()
+
+                if len(lesson.assignments) == 0:
+                    numberOfTimes += 1
+                    keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject, {'cmd': f'lesson_information_{numberOfTimes}'}))
+                    keyboard.row()
 
 
         if 'Четверг' in message.text:
@@ -240,9 +260,16 @@ try:
                         break
 
                     else:
+                        if assignment == lesson.assignments[0] and len(lesson.assignments) > 1:
+                            continue
                         numberOfTimes += 1
                         keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject, {'cmd': f'lesson_information_{numberOfTimes}'}))
                         keyboard.row()
+
+                if len(lesson.assignments) == 0:
+                    numberOfTimes += 1
+                    keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject, {'cmd': f'lesson_information_{numberOfTimes}'}))
+                    keyboard.row()
 
 
         if 'Пятница' in message.text:
@@ -260,9 +287,16 @@ try:
                         break
 
                     else:
+                        if assignment == lesson.assignments[0] and len(lesson.assignments) > 1:
+                            continue
                         numberOfTimes += 1
                         keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject, {'cmd': f'lesson_information_{numberOfTimes}'}))
                         keyboard.row()
+
+                if len(lesson.assignments) == 0:
+                    numberOfTimes += 1
+                    keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject, {'cmd': f'lesson_information_{numberOfTimes}'}))
+                    keyboard.row()
 
 
 
