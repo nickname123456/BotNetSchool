@@ -1,7 +1,8 @@
 from vkbottle import Bot
 from plugins import bps
+from settings import token
 
-bot = Bot(token="cbe860721ab36e8e5431d82aa7a45978bfef412294cc1bbdbd652c0f8318578ee24161ee054ad30593bbf")
+bot = Bot(token=token)
 
 #Список дневников учеников
 #diarys = {}
