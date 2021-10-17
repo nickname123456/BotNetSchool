@@ -13,11 +13,28 @@ class SQLighter:
                 day INT,
                 lesson INT,
                 correctData INT)""")
+        
+        self.cursor.execute("""CREATE TABLE IF NOT EXISTS schedule ( 
+                day INT,
+                photo INT)""")
 
     
 
     def commit(self):
         self.connection.commit()
+    
+
+
+
+    def get_schedule(self, day):
+        with self.connection:
+            return self.cursor.execute('SELECT photo FROM `schedule` WHERE `day` = ?', (day,)).fetchone()
+    
+    def edit_schedule(self, day, photo):
+        with self.connection:
+            return self.cursor.execute("UPDATE `schedule` SET `photo` = ? WHERE `day` = ?", (photo, day))
+
+
 
 
     
