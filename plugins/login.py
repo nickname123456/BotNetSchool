@@ -1,7 +1,7 @@
-from vkbottle.bot import Bot, Message
-from vkbottle import Keyboard, KeyboardButtonColor, Text
+from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
 from netschoolapi import NetSchoolAPI
+import netschoolapi
 from sqlighter import SQLighter
 
 
@@ -38,6 +38,7 @@ async def login(message: Message, userLogin=None, userPassword=None):
         #Записать их в бд
         db.edit_account_login(userInfo[0].id, userLogin)
         db.edit_account_password(userInfo[0].id, userPassword)
+        db.edit_account_correctData(userInfo[0].id, 0)
         db.commit()
 
     
@@ -48,12 +49,19 @@ async def login(message: Message, userLogin=None, userPassword=None):
     userPassword = db.get_account_password(userInfo[0].id)
     print(userPassword)
 
-    #Авторезируемся в Сетевом Городе
-    await ns.login(
-        userLogin,
-        userPassword,
-        'МАОУ "СОШ № 47 г. Челябинска"',
-    )
+    try:
+        #Авторезируемся в Сетевом Городе
+        await ns.login(
+            userLogin,
+            userPassword,
+            'МАОУ "СОШ № 47 г. Челябинска"',
+        )
+    except netschoolapi.errors.AuthError:
+        await message.answer('Неправильный логин или пароль!')
+        return
+
+    db.edit_account_correctData(userInfo[0].id, 1)
+    db.commit()
 
     await message.answer(f'{userInfo[0].first_name}, ты успешно зашел в систему под логином: {userLogin}')
     #Выходим из СГ

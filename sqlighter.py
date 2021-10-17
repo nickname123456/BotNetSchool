@@ -11,7 +11,8 @@ class SQLighter:
                 password TEXT,
                 isFirstLogin BIT,
                 day INT,
-                lesson INT);""")
+                lesson INT,
+                correctData INT)""")
 
     
 
@@ -34,7 +35,7 @@ class SQLighter:
 
     def get_account_isFirstLogin(self, account_id):
         with self.connection:
-            return self.cursor.execute('SELECT isFirstLogin FROM `students` WHERE `id` = ?', (account_id,)).fetchone()[0]
+            return self.cursor.execute('SELECT isFirstLogin FROM `students` WHERE `id` = ?', (account_id,)).fetchone()
 
     def get_account_day(self, account_id):
         with self.connection:
@@ -44,11 +45,15 @@ class SQLighter:
         with self.connection:
             return self.cursor.execute('SELECT lesson FROM `students` WHERE `id` = ?', (account_id,)).fetchone()[0]
     
+    def get_account_correctData(self, account_id):
+        with self.connection:
+            return self.cursor.execute('SELECT correctData FROM `students` WHERE `id` = ?', (account_id,)).fetchone()[0]
+    
 
 
     def add_user(self, user_id, login, password):
 	    with self.connection:
-	        return self.cursor.execute('INSERT INTO students VALUES (?,?,?,?,?,?)',(user_id, login, password, 1, 0, 0))
+	        return self.cursor.execute('INSERT INTO students VALUES (?,?,?,?,?,?,?)',(user_id, login, password, 1, 0, 0, 0))
     
 
 
@@ -75,6 +80,10 @@ class SQLighter:
     def edit_account_lesson(self, account_id, lesson):
         with self.connection:
             return self.cursor.execute("UPDATE `students` SET `lesson` = ? WHERE `id` = ?", (lesson,account_id))
+    
+    def edit_account_correctData(self, account_id, correctData):
+        with self.connection:
+            return self.cursor.execute("UPDATE `students` SET `correctData` = ? WHERE `id` = ?", (correctData, account_id))
             
 
 

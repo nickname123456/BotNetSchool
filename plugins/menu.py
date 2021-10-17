@@ -1,9 +1,10 @@
-from vkbottle.bot import Bot, Message
+from vkbottle.bot import Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
 
 
 bp = Blueprint('menu')
+
 
 
 
