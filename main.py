@@ -1,4 +1,7 @@
 import asyncio
+import re
+import sys
+from datetime import datetime
 import json
 from netschoolapi import NetSchoolAPI
 from vkbottle.bot import Bot, Message
@@ -6,12 +9,21 @@ from vkbottle import Keyboard, KeyboardButtonColor, Text, OpenLink, Location, EM
 import sqlite3
 
 from vkbottle.tools.dev_tools import keyboard
+from vkbottle_types import BaseStateGroup, state
+from vkbottle import CtxStorage
 from vkbottle.tools.dev_tools.keyboard.action import Payload
 
 
 #Входим в группу
 bot = Bot(token="")
+ctx = CtxStorage()
 
+
+class ScheduleData(BaseStateGroup):
+    DAY = 0
+    PHOTO = 1
+
+schedule = {}
 
 #Список дневников учеников
 diarys = {}
@@ -49,6 +61,8 @@ print('')
 
 
 try:
+
+
     #Если написали "Меню" или нажали на соответствующую кнопку
     @bot.on.message(text="Меню")
     @bot.on.message(payload={'cmd': 'menu'})
@@ -58,6 +72,8 @@ try:
             Keyboard()
             #Добавить кнопки
             .add(Text('Войти', {'cmd': 'login'}), color = KeyboardButtonColor.POSITIVE)
+            .row()
+            .add(Text('Дневник', {'cmd': 'keyboard_diary'}), color=KeyboardButtonColor.PRIMARY)
             .add(Text('Расписание', {'cmd': 'keyboard_schedule'}), color=KeyboardButtonColor.PRIMARY)
         )
 
@@ -84,10 +100,17 @@ try:
                 await message.answer('Напиши "вход <твой логин> <пароль>"')
                 return
             
+            #Если пароль и логин введены
+            if userLogin != None and userPassword != None:
+                #Записать их в бд
+                cursor.execute('INSERT INTO students VALUES (?,?,?,?,?,?)', (userInfo[0].id, userLogin, userPassword, 1, 0, 0))
+                db.commit()
+        
         #Если пароль и логин введены
         if userLogin != None and userPassword != None:
             #Записать их в бд
-            cursor.execute('INSERT INTO students VALUES (?,?,?,?,?,?)', (userInfo[0].id, userLogin, userPassword, 1, 0, 0))
+            cursor.execute(f'UPDATE students SET login = ? WHERE id = ?', (userLogin, userInfo[0].id))
+            cursor.execute(f'UPDATE students SET password = ? WHERE id = ?', (userPassword, userInfo[0].id))
             db.commit()
 
         #ВЫБРАТЬ логин ИЗ ТАБЛИЦЫ ГДЕ айди РАВЕН айди отправителя
@@ -111,7 +134,7 @@ try:
         diarys[userInfo[0].id] = await ns.diary()
         await message.answer(f'{userInfo[0].first_name}, ты успешно зашел в систему под логином: {userLogin}')
         #Выходим из СГ
-        await ns.logout()
+        #await ns.logout()
 
 
         #Спустя 10 минут удаляем из памяти дневник ученика
@@ -119,13 +142,71 @@ try:
         diarys.pop(userInfo[0].id)
         await message.answer('Ты был отключен от системы, из-за длительного пребывания в ней')
 
+
+
+
+
+    @bot.on.message(lev = '/Загрузить')
+    async def keyboard_schedule_download(message: Message):
+        await bot.state_dispenser.set(message.peer_id, ScheduleData.DAY)
+        return "Введи день"
         
 
+    @bot.on.message(state = ScheduleData.DAY)
+    async def schedule_for_day(message: Message):
+        ctx.set('day', message.text)
+        await bot.state_dispenser.set(message.peer_id, ScheduleData.PHOTO)
+        return 'Введи фото'
 
+
+    @bot.on.message(state=ScheduleData.PHOTO)
+    async def schedule_for_day(message: Message):
+        await bot.state_dispenser.delete(message.peer_id)
+        day = ctx.get('day')
+        photo = message.text
+
+        if 'Понедельник' == day:
+            schedule[0] = photo
+        elif 'Вторник' == day:
+            schedule[1] = photo
+        elif 'Среда' == day:
+            schedule[2] = photo
+        elif 'Четверг' == day:
+            schedule[3] = photo
+        elif 'Пятница' == day:
+            schedule[4] = photo
+
+        await message.answer(f'{day} {photo}', attachment={photo})
+        return 'ура победа'
+
+
+
+
+
+
+    @bot.on.message(payload={'cmd': 'schedule_for_day'})
+    async def schedule_for_day(message: Message):
+        
+        if 'Понедельник' in message.text and 0 in schedule:
+            await message.answer(attachment=schedule[0])
+
+        elif 'Вторник' in message.text and 1 in schedule:
+            await message.answer(attachment=schedule[1])
+
+        elif 'Среда' in message.text and 2 in schedule:
+            await message.answer(attachment=schedule[2])
+
+        elif 'Четверг' in message.text and 3 in schedule:
+            await message.answer(attachment=schedule[3])
+
+        elif 'Пятница' in message.text and 4 in schedule:
+            await message.answer(attachment=schedule[4])
+        
+        else:
+            await message.answer('На этот день еще нет расписания')
 
     @bot.on.message(payload={'cmd': 'keyboard_schedule'})
     async def keyboard_schedule(message: Message):
-
         keyboard = (
             Keyboard()
             #Добавить кнопку
@@ -148,8 +229,34 @@ try:
 
 
 
-    @bot.on.message(payload={'cmd': 'schedule_for_day'})
-    async def schedule_for_day(message: Message):
+
+
+
+    @bot.on.message(payload={'cmd': 'keyboard_diary'})
+    async def keyboard_diary(message: Message):
+
+        keyboard = (
+            Keyboard()
+            #Добавить кнопку
+            .add(Text('Понедельник', {"cmd": "diary_for_day"}))
+            #Начать с новой строки
+            .row()
+            .add(Text('Вторник', {'cmd': 'diary_for_day'}))
+            .row()
+            .add(Text('Среда', {'cmd': 'diary_for_day'}))
+            .row()
+            .add(Text('Четверг', {'cmd': 'diary_for_day'}))
+            .row()
+            .add(Text('Пятница', {'cmd': 'diary_for_day'}))
+            .row()
+            .add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
+        )
+
+        await message.answer('На какой день хочешь узнать расписание?', keyboard=keyboard)
+
+
+    @bot.on.message(payload={'cmd': 'diary_for_day'})
+    async def diary_for_day(message: Message):
         userInfo = await bot.api.users.get(message.from_id)
 
         #Если дневника нет в списке
@@ -303,7 +410,7 @@ try:
 
 
 
-        keyboard.add(Text("Назад", {'cmd': 'keyboard_schedule'}), color=KeyboardButtonColor.NEGATIVE)
+        keyboard.add(Text("Назад", {'cmd': 'keyboard_diary'}), color=KeyboardButtonColor.NEGATIVE)
         await message.answer('Нажми на предмет для того, чтобы увидеть информацию о нем', keyboard=keyboard)
 
 
@@ -359,12 +466,31 @@ try:
         """)
 
 
+
+
         
+
 
 
 
 
     bot.run_forever()
 
+
+
+
 except Exception as e:
-    print(e.message, e.args)
+    #print(e.message, e.args)
+
+    errorsFile = r"C:\Users\Дмитрий\Desktop\work\питонец\netschool\errors.txt"
+    with open(errorsFile, 'a') as f:
+        f.write(f"""
+````````````
+{datetime.now()}
+{e.args}\n\n""")
+
+        f.close()
+    
+
+except:
+    print("exception occurred key")
