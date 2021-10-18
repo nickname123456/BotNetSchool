@@ -10,9 +10,11 @@ class SQLighter:
                 login TEXT,
                 password TEXT,
                 isFirstLogin BIT,
+                week INT,
                 day INT,
                 lesson INT,
-                correctData INT)""")
+                correctData INT
+                )""")
         
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS schedule ( 
                 day INT,
@@ -70,7 +72,7 @@ class SQLighter:
 
     def add_user(self, user_id, login, password):
 	    with self.connection:
-	        return self.cursor.execute('INSERT INTO students VALUES (?,?,?,?,?,?,?)',(user_id, login, password, 1, 0, 0, 0))
+	        return self.cursor.execute('INSERT INTO students VALUES (?,?,?,?,?,?,?,?)',(user_id, login, password, 1, 0, 0, 0, 0))
     
 
 
@@ -97,10 +99,14 @@ class SQLighter:
     def edit_account_lesson(self, account_id, lesson):
         with self.connection:
             return self.cursor.execute("UPDATE `students` SET `lesson` = ? WHERE `id` = ?", (lesson,account_id))
-    
+
     def edit_account_correctData(self, account_id, correctData):
         with self.connection:
             return self.cursor.execute("UPDATE `students` SET `correctData` = ? WHERE `id` = ?", (correctData, account_id))
+    
+    def edit_account_week(self, account_id, week):
+        with self.connection:
+            return self.cursor.execute("UPDATE `students` SET `week` = ? WHERE `id` = ?", (week, account_id))
             
 
 

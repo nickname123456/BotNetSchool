@@ -3,6 +3,7 @@ from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
 from ns import get_diary
+from ns import get_period
 import netschoolapi
 
 
@@ -33,7 +34,8 @@ async def lesson_information(message: Message):
 
     diary = await get_diary(
         db.get_account_login(userInfo[0].id),
-        db.get_account_password(userInfo[0].id)
+        db.get_account_password(userInfo[0].id),
+        get_period()
     )
 
     lesson = diary.schedule[day].lessons[int(message.payload[27::29])]
