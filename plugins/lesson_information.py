@@ -50,9 +50,9 @@ async def lesson_information(message: Message):
         #Если тип задание = дз, то записываем
         if i.type == 'Домашнее задание':
             homework = i.content
-            pass
         else:
-            homework = 'не задано'
+            if homework == '':
+                homework = 'не задано'
 
     #print(lesson.subject)
     #print(lesson.room)
@@ -109,9 +109,9 @@ async def back_lesson_information(message: Message):
         #Если тип задание = дз, то записываем
         if i.type == 'Домашнее задание':
             homework = i.content
-            pass
         else:
-            homework = 'не задано'
+            if homework == '':
+                homework = 'не задано'
 
     #print(lesson.subject)
     #print(lesson.room)
@@ -168,9 +168,9 @@ async def next_lesson_information(message: Message):
         #Если тип задание = дз, то записываем
         if i.type == 'Домашнее задание':
             homework = i.content
-            pass
         else:
-            homework = 'не задано'
+            if homework == '':
+                homework = 'не задано'
 
     #print(lesson.subject)
     #print(lesson.room)
