@@ -1,4 +1,4 @@
-from . import menu, login, keyboard_diary, diary_for_day, lesson_information, schedule_download, keyboard_schedule, schedule_for_day
+from . import menu, login, keyboard_diary, diary_for_day, lesson_information, schedule_download, keyboard_schedule, schedule_for_day, announcements
 
 
 bps = [menu.bp,
@@ -8,4 +8,5 @@ bps = [menu.bp,
        lesson_information.bp,
        schedule_download.bp,
        keyboard_schedule.bp,
-       schedule_for_day.bp]
+       schedule_for_day.bp,
+       announcements.bp]

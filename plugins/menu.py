@@ -20,6 +20,7 @@ async def menu(message: Message):
         .row()
         .add(Text('Дневник', {'cmd': 'keyboard_diary'}), color=KeyboardButtonColor.PRIMARY)
         .add(Text('Расписание', {'cmd': 'keyboard_schedule'}), color=KeyboardButtonColor.PRIMARY)
+        .add(Text('Объявления', {'cmd': 'announcements'}), color=KeyboardButtonColor.PRIMARY)
     )
 
     #Ответ в чат
