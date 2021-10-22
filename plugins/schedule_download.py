@@ -9,6 +9,8 @@ from vkbottle_types import BaseStateGroup
 
 
 bp = Blueprint('schedule_download')
+bp.on.vbml_ignore_case = True
+
 db = SQLighter('database.db')
 
 ctx = CtxStorage()

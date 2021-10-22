@@ -6,6 +6,8 @@ from ns import get_announcements
 
 
 bp = Blueprint('announcements')
+bp.on.vbml_ignore_case = True
+
 db = SQLighter('database.db')
 
 

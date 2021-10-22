@@ -6,6 +6,8 @@ from sqlighter import SQLighter
 
 
 bp = Blueprint('login')
+bp.on.vbml_ignore_case = True
+
 db = SQLighter('database.db')
 ns = NetSchoolAPI('https://sgo.edu-74.ru')
 

@@ -7,6 +7,7 @@ bp = Blueprint('keyboard_schedule')
 
 
 
+
 @bp.on.message(payload={'cmd': 'keyboard_schedule'})
 async def keyboard_schedule(message: Message):
     keyboard = (
