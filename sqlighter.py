@@ -13,7 +13,9 @@ class SQLighter:
                 week INT,
                 day INT,
                 lesson INT,
-                correctData INT
+                correctData INT,
+                link TEXT,
+                school TEXT
                 )""")
         
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS schedule ( 
@@ -67,12 +69,20 @@ class SQLighter:
     def get_account_correctData(self, account_id):
         with self.connection:
             return self.cursor.execute('SELECT correctData FROM `students` WHERE `id` = ?', (account_id,)).fetchone()[0]
-    
+
+    def get_account_link(self, account_id):
+        with self.connection:
+            return self.cursor.execute('SELECT link FROM `students` WHERE `id` = ?', (account_id,)).fetchone()[0]
+
+    def get_account_school(self, account_id):
+        with self.connection:
+            return self.cursor.execute('SELECT school FROM `students` WHERE `id` = ?', (account_id,)).fetchone()[0]
 
 
-    def add_user(self, user_id, login, password):
+
+    def add_user(self, user_id, login, password, link, school):
 	    with self.connection:
-	        return self.cursor.execute('INSERT INTO students VALUES (?,?,?,?,?,?,?,?)',(user_id, login, password, 1, 0, 0, 0, 0))
+	        return self.cursor.execute('INSERT INTO students VALUES (?,?,?,?,?,?,?,?,?,?)',(user_id, login, password, 1, 0, 0, 0, 0, link, school))
     
 
 
@@ -107,6 +117,14 @@ class SQLighter:
     def edit_account_week(self, account_id, week):
         with self.connection:
             return self.cursor.execute("UPDATE `students` SET `week` = ? WHERE `id` = ?", (week, account_id))
+    
+    def edit_account_link(self, account_id, link):
+        with self.connection:
+            return self.cursor.execute("UPDATE `students` SET `link` = ? WHERE `id` = ?", (link, account_id))
+    
+    def edit_account_school(self, account_id, school):
+        with self.connection:
+            return self.cursor.execute("UPDATE `students` SET `school` = ? WHERE `id` = ?", (school, account_id))
             
 
 

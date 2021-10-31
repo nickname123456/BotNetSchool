@@ -3,6 +3,21 @@ import datetime
 import html2markdown
 import re
 
+
+
+async def login(login, password, school, link):
+    api = NetSchoolAPI(link)
+    await api.login(
+        login,
+        password,
+        school)
+
+
+async def logout(link):
+    api = NetSchoolAPI(link)
+    await api.logout()
+
+
 def get_period():
     today = datetime.date.today()
     monday = today - datetime.timedelta(days=today.weekday())
@@ -39,17 +54,23 @@ def get_back_period():
     return period
 
 
-async def get_diary(login, password, period):
-    api = NetSchoolAPI('https://sgo.edu-74.ru')
-    await api.login(login, password, 'МАОУ "СОШ № 47 г. Челябинска"')
+async def get_diary(login, password, period, school, link):
+    api = NetSchoolAPI(link)
+    await api.login(
+        login,
+        password,
+        school)
     diary = await api.diary(period[0], period[1])
     await api.logout()
     return diary
 
 
-async def get_announcements(login, password, amount):
-    api = NetSchoolAPI('https://sgo.edu-74.ru')
-    await api.login(login, password, 'МАОУ "СОШ № 47 г. Челябинска"')
+async def get_announcements(login, password, amount, school, link):
+    api = NetSchoolAPI(link)
+    await api.login(
+        login,
+        password,
+        school)
     announcements = await api.announcements()
     await api.logout()
 

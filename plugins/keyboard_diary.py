@@ -91,7 +91,7 @@ async def keyboard_diary(message: Message):
         .row()
         .add(Text('◀', {'cmd': 'keyboard_diary'}))
         .add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
-        .add(Text('🟦', {'cmd': ''}))
+        .add(Text('🟦'))
     )
 
     await message.answer(f'Текущая неделя: \n{get_next_period()[0]}\n-\n{get_next_period()[1]} \nНа какой день хочешь узнать расписание?', keyboard=keyboard)

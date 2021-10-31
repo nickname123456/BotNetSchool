@@ -10,7 +10,7 @@ bp.on.vbml_ignore_case = True
 
 
 #Если написали "Меню" или нажали на соответствующую кнопку
-@bp.on.message(text=["Меню", "Начать"])
+@bp.on.message(text=["Меню"])
 @bp.on.message(payload={'cmd': 'menu'})
 async def menu(message: Message):
     #Создаем клавиатуру

@@ -18,7 +18,9 @@ async def announcements(message: Message, amount=3):
 
     announcements = await get_announcements(db.get_account_login(userInfo[0].id),
                                   db.get_account_password(userInfo[0].id),
-                                  amount)
+                                  amount,
+                                  db.get_account_school(userInfo[0].id),
+                                  db.get_account_link(userInfo[0].id))
 
     for i in announcements:
         await message.answer(i)

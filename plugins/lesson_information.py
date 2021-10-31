@@ -34,7 +34,9 @@ async def lesson_information(message: Message):
     diary = await get_diary(
         db.get_account_login(userInfo[0].id),
         db.get_account_password(userInfo[0].id),
-        get_period()
+        get_period(),
+        db.get_account_school(userInfo[0].id),
+        db.get_account_link(userInfo[0].id)
     )
 
     lesson = diary.schedule[day].lessons[int(message.payload[27::29])]
@@ -93,7 +95,9 @@ async def back_lesson_information(message: Message):
     diary = await get_diary(
         db.get_account_login(userInfo[0].id),
         db.get_account_password(userInfo[0].id),
-        get_back_period()
+        get_period(),
+        db.get_account_school(userInfo[0].id),
+        db.get_account_link(userInfo[0].id)
     )
 
     lesson = diary.schedule[day].lessons[int(message.payload[32::34])]
@@ -152,7 +156,9 @@ async def next_lesson_information(message: Message):
     diary = await get_diary(
         db.get_account_login(userInfo[0].id),
         db.get_account_password(userInfo[0].id),
-        get_next_period()
+        get_period(),
+        db.get_account_school(userInfo[0].id),
+        db.get_account_link(userInfo[0].id)
     )
 
     lesson = diary.schedule[day].lessons[int(message.payload[32::34])]

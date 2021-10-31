@@ -29,8 +29,9 @@ async def diary_for_day(message: Message):
         diary = await get_diary(
             db.get_account_login(userInfo[0].id),
             db.get_account_password(userInfo[0].id),
-            get_period()
-            
+            get_period(),
+            db.get_account_school(userInfo[0].id),
+            db.get_account_link(userInfo[0].id)
         )
     except netschoolapi.errors.AuthError:
         await message.answer('Неправильный логин или пароль!')
@@ -192,7 +193,7 @@ async def diary_for_day(message: Message):
 
 
 @bp.on.message(payload={'cmd': 'back_diary_for_day'})
-async def diary_for_day(message: Message):
+async def back_diary_for_day(message: Message):
     userInfo = await bp.api.users.get(message.from_id)
 
     #Если дневника нет в списке
@@ -208,8 +209,9 @@ async def diary_for_day(message: Message):
         diary = await get_diary(
             db.get_account_login(userInfo[0].id),
             db.get_account_password(userInfo[0].id),
-            get_next_period()
-            
+            get_back_period(),
+            db.get_account_school(userInfo[0].id),
+            db.get_account_link(userInfo[0].id)
         )
     except netschoolapi.errors.AuthError:
         await message.answer('Неправильный логин или пароль!')
@@ -375,7 +377,7 @@ async def diary_for_day(message: Message):
 
 
 @bp.on.message(payload={'cmd': 'next_diary_for_day'})
-async def diary_for_day(message: Message):
+async def next_diary_for_day(message: Message):
     userInfo = await bp.api.users.get(message.from_id)
 
     #Если дневника нет в списке
@@ -391,8 +393,9 @@ async def diary_for_day(message: Message):
         diary = await get_diary(
             db.get_account_login(userInfo[0].id),
             db.get_account_password(userInfo[0].id),
-            get_next_period()
-            
+            get_next_period(),
+            db.get_account_school(userInfo[0].id),
+            db.get_account_link(userInfo[0].id)
         )
     except netschoolapi.errors.AuthError:
         await message.answer('Неправильный логин или пароль!')
@@ -549,7 +552,7 @@ async def diary_for_day(message: Message):
                 keyboard.row()
 
     keyboard.add(
-        Text("Назад", {'cmd': 'keyboard_diary'}), color=KeyboardButtonColor.NEGATIVE)
+        Text("Назад", {'cmd': 'keyboard_diary_next'}), color=KeyboardButtonColor.NEGATIVE)
     await message.answer('Нажми на предмет для того, чтобы увидеть информацию о нем', keyboard=keyboard)
 
 

@@ -3,13 +3,13 @@ from vkbottle.bot import Blueprint
 from netschoolapi import NetSchoolAPI
 import netschoolapi
 from sqlighter import SQLighter
+import ns
 
 
 bp = Blueprint('login')
 bp.on.vbml_ignore_case = True
 
 db = SQLighter('database.db')
-ns = NetSchoolAPI('https://sgo.edu-74.ru')
 
 
 
@@ -26,13 +26,13 @@ async def login(message: Message, userLogin=None, userPassword=None):
         #Если не введены пароль и логин
         if userLogin == None and userPassword == None:
             await message.answer("Так... Смотрю тебя теще нет в моей бд. Но ничего страшного сейчас все будет!")
-            await message.answer('Напиши "вход <твой логин> <пароль>"')
+            await message.answer('Напиши "Начать')
             return
 
         #Если пароль и логин введены
         if userLogin != None and userPassword != None:
             #Записать их в бд
-            db.add_user(userInfo[0].id, userLogin, userPassword)
+            db.add_user(userInfo[0].id, userLogin, userPassword, 'https://sgo.edu-74.ru', 'МАОУ "СОШ № 47 г. Челябинска"')
             db.commit()
 
     #Если пароль и логин введены
@@ -51,12 +51,19 @@ async def login(message: Message, userLogin=None, userPassword=None):
     userPassword = db.get_account_password(userInfo[0].id)
     print(userPassword)
 
+    userSchool = db.get_account_school(userInfo[0].id)
+    print(userSchool)
+
+    userLink = db.get_account_link(userInfo[0].id)
+    print(userLink)
+
     try:
         #Авторезируемся в Сетевом Городе
         await ns.login(
             userLogin,
             userPassword,
-            'МАОУ "СОШ № 47 г. Челябинска"',
+            userSchool,
+            userLink
         )
     except netschoolapi.errors.AuthError:
         await message.answer('Неправильный логин или пароль!')
