@@ -22,18 +22,9 @@ async def login(message: Message, userLogin=None, userPassword=None):
 
     
     if db.get_account_isFirstLogin(userInfo[0].id) is None:
-
-        #Если не введены пароль и логин
-        if userLogin == None and userPassword == None:
-            await message.answer("Так... Смотрю тебя теще нет в моей бд. Но ничего страшного сейчас все будет!")
-            await message.answer('Напиши "Начать')
-            return
-
-        #Если пароль и логин введены
-        if userLogin != None and userPassword != None:
-            #Записать их в бд
-            db.add_user(userInfo[0].id, userLogin, userPassword, 'https://sgo.edu-74.ru', 'МАОУ "СОШ № 47 г. Челябинска"')
-            db.commit()
+        await message.answer("Так... Смотрю тебя теще нет в моей бд. Но ничего страшного сейчас все будет!")
+        await message.answer('Напиши "Начать')
+        return
 
     #Если пароль и логин введены
     if userLogin != None and userPassword != None:
@@ -65,7 +56,7 @@ async def login(message: Message, userLogin=None, userPassword=None):
             userSchool,
             userLink
         )
-    except netschoolapi.errors.AuthError:
+    except:
         await message.answer('Неправильный логин или пароль!')
         return
 

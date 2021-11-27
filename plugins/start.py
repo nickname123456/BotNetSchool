@@ -23,7 +23,13 @@ class StartData(BaseStateGroup):
     password = 13
 
 
-@bp.on.message(lev='Начать')
+@bp.on.chat_message(text='Начать')
+async def start(message: Message):
+    await message.answer('Доступно только в ЛС!')
+
+
+
+@bp.on.private_message(lev='Начать')
 async def city_selection(message: Message):
     await bp.state_dispenser.set(message.peer_id, StartData.city)
 
@@ -42,7 +48,7 @@ async def city_selection(message: Message):
 
 
 
-@bp.on.message(state=StartData.city)
+@bp.on.private_message(state=StartData.city)
 async def school_selection(message: Message):
     ctx.set('city', message.text)
     await bp.state_dispenser.set(message.peer_id, StartData.school)
@@ -61,7 +67,7 @@ async def school_selection(message: Message):
     await message.answer('Выбери свою школу', keyboard=keyboard)
 
 
-@bp.on.message(state=StartData.school)
+@bp.on.private_message(state=StartData.school)
 async def login_selection(message: Message):
     ctx.set('school', message.text)
     await bp.state_dispenser.set(message.peer_id, StartData.login)
@@ -69,7 +75,7 @@ async def login_selection(message: Message):
     await message.answer('Спасибо.\nТеперь введи свой логин', keyboard=EMPTY_KEYBOARD)
 
 
-@bp.on.message(state=StartData.login)
+@bp.on.private_message(state=StartData.login)
 async def password_selection(message: Message):
     ctx.set('login', message.text)
     await bp.state_dispenser.set(message.peer_id, StartData.password)
@@ -77,19 +83,27 @@ async def password_selection(message: Message):
     await message.answer('Окей, теперь пароль', keyboard=EMPTY_KEYBOARD)
     
 
-@bp.on.message(state=StartData.password)
+@bp.on.private_message(state=StartData.password)
 async def end_of_start(message: Message):
+    await bp.state_dispenser.delete(message.peer_id)
     userInfo = await bp.api.users.get(message.from_id)
     city = ctx.get('city')
     school = ctx.get('school')
     login = ctx.get('login')
-    password = ctx.get('password')
+    password = message.text
 
-    if city == 'Челябинск':
+    if 'Челябинск' in city:
         link = 'https://sgo.edu-74.ru'
-    elif city == 'Волгоград':
+    elif 'Волгоград' in city:
         link = 'https://sgo.volganet.ru'
-    if city == 'Сан Фиерро' or school == 'Автошкола SF':
+
+    if 'ФГКОУ «Волгоградский кадетский корпус...' in school:
+        school = 'ФГКОУ «Волгоградский кадетский корпус Следственного комитета Российской Федерации имени Ф.Ф. Слипченко»'
+    elif 'МАОУ "СОШ № 47 г. Челябинска"' in school:
+        school = 'МАОУ "СОШ № 47 г. Челябинска"'
+
+
+    if 'Сан Фиерро' in city or 'Автошкола SF' in school:
         return 'Давай теперь без рофлов.\nНапиши "Начать"'
 
     if db.get_account_isFirstLogin(userInfo[0].id) is None:
@@ -120,7 +134,7 @@ async def end_of_start(message: Message):
             school,
             link
         )
-    except netschoolapi.errors.AuthError:
+    except:
         await message.answer('Неправильный логин или пароль!')
         return
 

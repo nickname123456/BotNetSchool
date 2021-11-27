@@ -21,18 +21,18 @@ class ScheduleData(BaseStateGroup):
 
 
 
-@bp.on.message(lev='/Загрузить')
+@bp.on.private_message(lev='/Загрузить')
 async def keyboard_schedule_download(message: Message):
     await bp.state_dispenser.set(message.peer_id, ScheduleData.DAY)
     return "Введи день"
 
-@bp.on.message(state=ScheduleData.DAY)
+@bp.on.private_message(state=ScheduleData.DAY)
 async def schedule_for_day(message: Message):
     ctx.set('day', message.text)
     await bp.state_dispenser.set(message.peer_id, ScheduleData.PHOTO)
     return 'Введи фото'
 
-@bp.on.message(state=ScheduleData.PHOTO)
+@bp.on.private_message(state=ScheduleData.PHOTO)
 async def schedule_for_day(message: Message):
     await bp.state_dispenser.delete(message.peer_id)
     day = ctx.get('day')
