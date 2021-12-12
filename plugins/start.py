@@ -19,8 +19,9 @@ ctx = CtxStorage()
 class StartData(BaseStateGroup):
     city = 10
     school = 11
-    login = 12
-    password = 13
+    clas = 12
+    login = 13
+    password = 14
 
 
 
@@ -47,7 +48,7 @@ async def city_selection(message: Message):
 @bp.on.message(state=StartData.city)
 async def school_selection(message: Message):
     ctx.set('city', message.text)
-    await bp.state_dispenser.set(message.peer_id, StartData.school)
+    await bp.state_dispenser.set(message.peer_id, StartData.clas)
 
     keyboard = (
         Keyboard()
@@ -63,9 +64,17 @@ async def school_selection(message: Message):
     await message.answer('Выбери свою школу', keyboard=keyboard)
 
 
+@bp.on.message(state=StartData.clas)
+async def class_selection(message: Message):
+    ctx.set('school', message.text)
+    await bp.state_dispenser.set(message.peer_id, StartData.school)
+
+    await message.answer('Окей, теперь напиши в каком ты классе (буква обязательно в нижнем регистре!). \nНапример: 8б.', keyboard=EMPTY_KEYBOARD)
+
+
 @bp.on.message(state=StartData.school)
 async def login_selection(message: Message):
-    ctx.set('school', message.text)
+    ctx.set('class', message.text)
     await bp.state_dispenser.set(message.peer_id, StartData.login)
 
     await message.answer('Спасибо.\nТеперь введи свой логин', keyboard=EMPTY_KEYBOARD)
@@ -86,6 +95,7 @@ async def end_of_start(message: Message):
     city = ctx.get('city')
     school = ctx.get('school')
     login = ctx.get('login')
+    clas = ctx.get('class')
     password = message.text
 
     if 'Челябинск' in city:
@@ -102,8 +112,12 @@ async def end_of_start(message: Message):
     if 'Сан Фиерро' in city or 'Автошкола SF' in school:
         return 'Давай теперь без рофлов.\nНапиши "Начать"'
 
-    if db.get_account_isFirstLogin(userInfo[0].id) is None:
-        db.add_user(userInfo[0].id, login, password, link, school)
+    try:
+        if db.get_account_isFirstLogin(userInfo[0].id) is None:
+            db.add_user(userInfo[0].id, login, password, link, school, clas)
+            db.commit()
+    except TypeError:
+        db.add_user(userInfo[0].id, login, password, link, school, clas)
         db.commit()
 
     else:
@@ -111,6 +125,7 @@ async def end_of_start(message: Message):
         db.edit_account_school(userInfo[0].id, school)
         db.edit_account_login(userInfo[0].id, login)
         db.edit_account_password(userInfo[0].id, password)
+        db.edit_account_class(userInfo[0].id, clas)
         db.commit()
 
     login = db.get_account_login(userInfo[0].id)
@@ -154,6 +169,7 @@ async def end_of_start(message: Message):
     city = ctx.get('city')
     school = ctx.get('school')
     login = ctx.get('login')
+    clas = ctx.get('class')
     password = message.text
 
     if 'Челябинск' in city:
@@ -172,10 +188,10 @@ async def end_of_start(message: Message):
 
     try:
         if db.get_chat_login(chat_id) is None:
-            db.add_chat(chat_id, login, password, link, school)
+            db.add_chat(chat_id, login, password, link, school, clas)
             db.commit()
     except TypeError:
-        db.add_chat(chat_id, login, password, link, school)
+        db.add_chat(chat_id, login, password, link, school, clas)
         db.commit()
 
     else:
@@ -183,6 +199,7 @@ async def end_of_start(message: Message):
         db.edit_chat_school(chat_id, school)
         db.edit_chat_login(chat_id, login)
         db.edit_chat_password(chat_id, password)
+        db.edit_chat_class(chat_id, clas)
         db.commit()
 
     login = db.get_chat_login(chat_id)

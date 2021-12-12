@@ -15,12 +15,14 @@ class SQLighter:
                 lesson INT,
                 correctData INT,
                 link TEXT,
-                school TEXT
+                school TEXT,
+                class TEXT
                 )""")
         
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS schedule ( 
                 day INT,
-                photo INT)""")
+                photo INT
+                )""")
         
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS chats ( 
                 id INT,
@@ -30,13 +32,42 @@ class SQLighter:
                 login TEXT,
                 password TEXT,
                 link TEXT,
-                school TEXT)""")
+                school TEXT,
+                class TEXT
+                )""")
+        
+        self.cursor.execute("""CREATE TABLE IF NOT EXISTS homeworks ( 
+                lesson TEXT,
+                school TEXT,
+                class TEXT,
+                homework TEXT,
+                upd_date TEXT
+                )""")
 
     
 
     def commit(self):
         self.connection.commit()
+
+
+
+
+    def get_homework(self, school, clas, lesson):
+        with self.connection:
+            return self.cursor.execute('SELECT homework FROM `homeworks` WHERE `school` = ? AND `class` = ? AND `lesson` = ?', (school, clas, lesson)).fetchone()[0]
     
+    def get_upd_date(self, school, clas, lesson):
+        with self.connection:
+            return self.cursor.execute('SELECT upd_date FROM `homeworks` WHERE `school` = ? AND `class` = ? AND `lesson` = ?', (school, clas, lesson)).fetchone()[0]
+
+
+    def edit_homework(self, school, clas, lesson, homework):
+        with self.connection:
+            return self.cursor.execute("UPDATE `homeworks` SET `homework` = ? WHERE `school` = ? AND `class` = ? AND `lesson` = ?", (homework, school, clas, lesson))
+
+    def edit_upd_date(self, school, clas, lesson, upd_date):
+        with self.connection:
+            return self.cursor.execute("UPDATE `homeworks` SET `upd_date` = ? WHERE `school` = ? AND `class` = ? AND `lesson` = ?", (upd_date, school, clas, lesson))
 
 
 
@@ -88,11 +119,15 @@ class SQLighter:
         with self.connection:
             return self.cursor.execute('SELECT school FROM `students` WHERE `id` = ?', (account_id,)).fetchone()[0]
 
-
-
-    def add_user(self, user_id, login, password, link, school):
+    def get_account_class(self, account_id):
         with self.connection:
-            return self.cursor.execute('INSERT INTO students VALUES (?,?,?,?,?,?,?,?,?,?)',(user_id, login, password, 1, 0, 0, 0, 0, link, school))
+            return self.cursor.execute('SELECT class FROM `students` WHERE `id` = ?', (account_id,)).fetchone()[0]
+
+
+
+    def add_user(self, user_id, login, password, link, school, clas):
+        with self.connection:
+            return self.cursor.execute('INSERT INTO students VALUES (?,?,?,?,?,?,?,?,?,?,?)',(user_id, login, password, 1, 0, 0, 0, 0, link, school, clas))
 
 
 
@@ -135,6 +170,10 @@ class SQLighter:
     def edit_account_school(self, account_id, school):
         with self.connection:
             return self.cursor.execute("UPDATE `students` SET `school` = ? WHERE `id` = ?", (school, account_id))
+    
+    def edit_account_class(self, account_id, account_class):
+        with self.connection:
+            return self.cursor.execute("UPDATE `students` SET `class` = ? WHERE `id` = ?", (account_class, account_id))
             
 
 
@@ -168,11 +207,15 @@ class SQLighter:
         with self.connection:
             return self.cursor.execute('SELECT school FROM `chats` WHERE `id` = ?', (chat_id,)).fetchone()[0]
 
-
-
-    def add_chat(self, chat_id, login, password, link, school):
+    def get_chat_class(self, chat_id):
         with self.connection:
-            return self.cursor.execute('INSERT INTO chats VALUES (?,?,?,?,?,?,?,?)',(chat_id, 0, 0, 0, login, password, link, school))
+            return self.cursor.execute('SELECT class FROM `chats` WHERE `id` = ?', (chat_id,)).fetchone()[0]
+
+
+
+    def add_chat(self, chat_id, login, password, link, school, clas):
+        with self.connection:
+            return self.cursor.execute('INSERT INTO chats VALUES (?,?,?,?,?,?,?,?,?)',(chat_id, 0, 0, 0, login, password, link, school, clas))
 
 
 
@@ -207,6 +250,7 @@ class SQLighter:
     def edit_chat_school(self, chat_id, school):
         with self.connection:
             return self.cursor.execute("UPDATE `chats` SET `school` = ? WHERE `id` = ?", (school, chat_id))
-            
-
-
+    
+    def edit_chat_class(self, chat_id, chat_class):
+        with self.connection:
+            return self.cursor.execute("UPDATE `chats` SET `class` = ? WHERE `id` = ?", (chat_class, chat_id))
