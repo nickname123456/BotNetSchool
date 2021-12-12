@@ -146,7 +146,7 @@ async def lesson_information(message: Message):
     try:
         day = db.get_chat_day(chat_id)
     except:
-        await message.answer('Произошла ошибка.')
+        await message.answer('К этой беседе не подключен аккаунт. \nДля подключение напишите "Вход <логин> <пароль>"')
         return
 
 
@@ -180,8 +180,8 @@ async def lesson_information(message: Message):
                 db.get_chat_link(chat_id))
             
             lesson = diary.schedule[day].lessons[int(message.payload[27::29])]
-    except netschoolapi.errors.AuthError:
-        await message.answer('Неправильный логин или пароль!')
+    except:
+        await message.answer('К этой беседе не подключен аккаунт. \nДля подключение напишите "Вход <логин> <пароль>"')
         return
         
 

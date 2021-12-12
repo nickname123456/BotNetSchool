@@ -14,8 +14,8 @@ db = SQLighter('database.db')
 
 
 #Если написали "Вход" или нажали на соответствующую кнопку
-@bp.on.message(text=["Вход <userLogin> <userPassword>", "Вход"])
-@bp.on.message(payload={'cmd': 'login'})
+@bp.on.private_message(text=["Вход <userLogin> <userPassword>", "Вход"])
+@bp.on.private_message(payload={'cmd': 'login'})
 async def login(message: Message, userLogin=None, userPassword=None):
     #Собираем инфу о пользователе
     userInfo = await bp.api.users.get(message.from_id)
@@ -64,6 +64,61 @@ async def login(message: Message, userLogin=None, userPassword=None):
     db.commit()
 
     await message.answer(f'{userInfo[0].first_name}, ты успешно зашел в систему под логином: {userLogin}')
+    #Выходим из СГ
+    #await ns.logout()
+
+    #Спустя 10 минут удаляем из памяти дневник ученика
+    #await asyncio.sleep(600)
+    #diarys.pop(userInfo[0].id)
+    #await message.answer('Ты был отключен от системы, из-за длительного пребывания в ней')
+
+
+
+
+@bp.on.chat_message(text=["Вход <userLogin> <userPassword>", "Вход"])
+@bp.on.chat_message(payload={'cmd': 'login'})
+async def login(message: Message, userLogin=None, userPassword=None):
+    chat_id = message.chat_id
+
+    try:
+
+        #Если пароль и логин введены
+        if userLogin != None and userPassword != None:
+            #Записать их в бд
+            db.edit_chat_login(chat_id, userLogin)
+            db.edit_chat_password(chat_id, userPassword)
+            db.commit()
+
+        
+        #Записываем логин из бд в переменную
+        chatLogin = db.get_chat_login(chat_id)
+        print(chatLogin)
+
+        chatPassword = db.get_chat_password(chat_id)
+        print(chatPassword)
+
+        chatSchool = db.get_chat_school(chat_id)
+        print(chatSchool)
+
+        chatLink = db.get_chat_link(chat_id)
+        print(chatLink)
+
+        #Авторезируемся в Сетевом Городе
+        await ns.login(
+            chatLogin,
+            chatPassword,
+            chatSchool,
+            chatLink)
+            
+    except TypeError:
+        await message.answer('Нужно зарегистрировать беседу. \nНапиши "Начать"')
+        return
+
+    except:
+        await message.answer('Неправильный логин или пароль!')
+        return
+
+    await message.answer(f'Эта беседа успешно зашла в систему под логином: {chatLogin}')
     #Выходим из СГ
     #await ns.logout()
 

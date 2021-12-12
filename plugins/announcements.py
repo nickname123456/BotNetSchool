@@ -34,12 +34,16 @@ async def announcements(message: Message, amount=3):
     chat_id = message.chat_id
     print(chat_id)
 
-    announcements = await get_announcements(
-                                db.get_chat_login(chat_id),
-                                db.get_chat_password(chat_id),
-                                amount,
-                                db.get_chat_school(chat_id),
-                                db.get_chat_link(chat_id))
+    try:
+        announcements = await get_announcements(
+                                    db.get_chat_login(chat_id),
+                                    db.get_chat_password(chat_id),
+                                    amount,
+                                    db.get_chat_school(chat_id),
+                                    db.get_chat_link(chat_id))
+    except:
+        await message.answer('К этой беседе не подключен аккаунт. \nДля подключение напишите "Вход <логин> <пароль>"')
+        return
 
     for i in announcements:
         await message.answer(i)

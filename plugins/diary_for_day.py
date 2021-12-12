@@ -164,9 +164,9 @@ async def diary_for_day(message: Message):
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id))
             
-    except netschoolapi.errors.AuthError:
-                await message.answer('Неправильный логин или пароль!')
-                return
+    except:
+        await message.answer('К этой беседе не подключен аккаунт. \nДля подключение напишите "Вход <логин> <пароль>"')
+        return
     
 
     if 'Понедельник' in message.text:

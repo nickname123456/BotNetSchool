@@ -23,13 +23,9 @@ class StartData(BaseStateGroup):
     password = 13
 
 
-@bp.on.chat_message(text='Начать')
-async def start(message: Message):
-    await message.answer('Доступно только в ЛС!')
 
 
-
-@bp.on.private_message(lev='Начать')
+@bp.on.message(lev='Начать')
 async def city_selection(message: Message):
     await bp.state_dispenser.set(message.peer_id, StartData.city)
 
@@ -48,7 +44,7 @@ async def city_selection(message: Message):
 
 
 
-@bp.on.private_message(state=StartData.city)
+@bp.on.message(state=StartData.city)
 async def school_selection(message: Message):
     ctx.set('city', message.text)
     await bp.state_dispenser.set(message.peer_id, StartData.school)
@@ -67,7 +63,7 @@ async def school_selection(message: Message):
     await message.answer('Выбери свою школу', keyboard=keyboard)
 
 
-@bp.on.private_message(state=StartData.school)
+@bp.on.message(state=StartData.school)
 async def login_selection(message: Message):
     ctx.set('school', message.text)
     await bp.state_dispenser.set(message.peer_id, StartData.login)
@@ -75,7 +71,7 @@ async def login_selection(message: Message):
     await message.answer('Спасибо.\nТеперь введи свой логин', keyboard=EMPTY_KEYBOARD)
 
 
-@bp.on.private_message(state=StartData.login)
+@bp.on.message(state=StartData.login)
 async def password_selection(message: Message):
     ctx.set('login', message.text)
     await bp.state_dispenser.set(message.peer_id, StartData.password)
@@ -147,3 +143,75 @@ async def end_of_start(message: Message):
     )
 
     await message.answer(f'{userInfo[0].first_name}, ты успешно зашел в систему под логином: {login}', keyboard=keyboard)
+
+
+
+
+@bp.on.chat_message(state=StartData.password)
+async def end_of_start(message: Message):
+    await bp.state_dispenser.delete(message.peer_id)
+    chat_id = message.chat_id
+    city = ctx.get('city')
+    school = ctx.get('school')
+    login = ctx.get('login')
+    password = message.text
+
+    if 'Челябинск' in city:
+        link = 'https://sgo.edu-74.ru'
+    elif 'Волгоград' in city:
+        link = 'https://sgo.volganet.ru'
+
+    if 'ФГКОУ «Волгоградский кадетский корпус...' in school:
+        school = 'ФГКОУ «Волгоградский кадетский корпус Следственного комитета Российской Федерации имени Ф.Ф. Слипченко»'
+    elif 'МАОУ "СОШ № 47 г. Челябинска"' in school:
+        school = 'МАОУ "СОШ № 47 г. Челябинска"'
+
+
+    if 'Сан Фиерро' in city or 'Автошкола SF' in school:
+        return 'Давай теперь без рофлов.\nНапиши "Начать"'
+
+    try:
+        if db.get_chat_login(chat_id) is None:
+            db.add_chat(chat_id, login, password, link, school)
+            db.commit()
+    except TypeError:
+        db.add_chat(chat_id, login, password, link, school)
+        db.commit()
+
+    else:
+        db.edit_chat_link(chat_id, link)
+        db.edit_chat_school(chat_id, school)
+        db.edit_chat_login(chat_id, login)
+        db.edit_chat_password(chat_id, password)
+        db.commit()
+
+    login = db.get_chat_login(chat_id)
+    print(login)
+
+    password = db.get_chat_password(chat_id)
+    print(password)
+
+    school = db.get_chat_school(chat_id)
+    print(school)
+
+    link = db.get_chat_link(chat_id)
+    print(link)
+
+    try:
+        #Авторезируемся в Сетевом Городе
+        await ns.login(
+            login,
+            password,
+            school,
+            link
+        )
+    except:
+        await message.answer('Неправильный логин или пароль!')
+        return
+
+    keyboard = (
+        Keyboard()
+        .add(Text('Назад', {'cmd': 'menu'}))
+    )
+
+    await message.answer(f'Эта беседа успешно зашла в систему под логином: {login}', keyboard=keyboard)
