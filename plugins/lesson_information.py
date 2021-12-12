@@ -141,44 +141,48 @@ async def lesson_information(message: Message):
                         {'cmd': 'next_lesson_information_6'},
                         {'cmd': 'next_lesson_information_7'}])
 async def lesson_information(message: Message):
-    userInfo = await bp.api.users.get(message.from_id)
+    chat_id = message.chat_id
 
     try:
-        day = db.get_account_day(userInfo[0].id)
-    except TypeError:
-        await message.answer('Для того, чтобы посмотреть эту информацию нужно войти. \nНапиши "Начать"')
+        day = db.get_chat_day(chat_id)
+    except:
+        await message.answer('Произошла ошибка.')
         return
 
 
-    if 'back_' in message.payload:
-        diary = await get_diary(
-            admin_login,
-            admin_password,
-            get_back_period(),
-            admin_school,
-            admin_link)
+    try:
+        if 'back_' in message.payload:
+            diary = await get_diary(
+                db.get_chat_login(chat_id),
+                db.get_chat_password(chat_id),
+                get_back_period(),
+                db.get_chat_school(chat_id),
+                db.get_chat_link(chat_id))
 
-        lesson = diary.schedule[day].lessons[int(message.payload[32::34])]
+            lesson = diary.schedule[day].lessons[int(message.payload[32::34])]
 
-    elif 'next_' in message.payload:
-        diary = await get_diary(
-            admin_login,
-            admin_password,
-            get_next_period(),
-            admin_school,
-            admin_link) 
-        
-        lesson = diary.schedule[day].lessons[int(message.payload[32::34])]
+        elif 'next_' in message.payload:
+            diary = await get_diary(
+                db.get_chat_login(chat_id),
+                db.get_chat_password(chat_id),
+                get_next_period(),
+                db.get_chat_school(chat_id),
+                db.get_chat_link(chat_id))
+            
+            lesson = diary.schedule[day].lessons[int(message.payload[32::34])]
 
-    else:
-        diary = await get_diary(
-            admin_login,
-            admin_password,
-            get_period(),
-            admin_school,
-            admin_link)
-        
-        lesson = diary.schedule[day].lessons[int(message.payload[27::29])]
+        else:
+            diary = await get_diary(
+                db.get_chat_login(chat_id),
+                db.get_chat_password(chat_id),
+                get_period(),
+                db.get_chat_school(chat_id),
+                db.get_chat_link(chat_id))
+            
+            lesson = diary.schedule[day].lessons[int(message.payload[27::29])]
+    except netschoolapi.errors.AuthError:
+        await message.answer('Неправильный логин или пароль!')
+        return
         
 
 
@@ -209,5 +213,4 @@ async def lesson_information(message: Message):
 Кабинет: {lesson.room}
 Время проведения урока: {lesson.start:%H.%M} - {lesson.end:%H.%M}
 Домашние задание: {homework}
-Оценка: {marks}
     """)

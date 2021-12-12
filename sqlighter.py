@@ -21,6 +21,16 @@ class SQLighter:
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS schedule ( 
                 day INT,
                 photo INT)""")
+        
+        self.cursor.execute("""CREATE TABLE IF NOT EXISTS chats ( 
+                id INT,
+                week INT,
+                day INT,
+                lesson INT,
+                login TEXT,
+                password TEXT,
+                link TEXT,
+                school TEXT)""")
 
     
 
@@ -81,9 +91,9 @@ class SQLighter:
 
 
     def add_user(self, user_id, login, password, link, school):
-	    with self.connection:
-	        return self.cursor.execute('INSERT INTO students VALUES (?,?,?,?,?,?,?,?,?,?)',(user_id, login, password, 1, 0, 0, 0, 0, link, school))
-    
+        with self.connection:
+            return self.cursor.execute('INSERT INTO students VALUES (?,?,?,?,?,?,?,?,?,?)',(user_id, login, password, 1, 0, 0, 0, 0, link, school))
+
 
 
     def edit_account_id(self, new_id, account_id):
@@ -125,6 +135,78 @@ class SQLighter:
     def edit_account_school(self, account_id, school):
         with self.connection:
             return self.cursor.execute("UPDATE `students` SET `school` = ? WHERE `id` = ?", (school, account_id))
+            
+
+
+
+    
+    def get_chat_id(self, chat_id):
+        with self.connection:
+            return self.cursor.execute('SELECT id FROM `chats` WHERE `id` = ?', (chat_id,)).fetchone()[0]
+
+    def get_chat_login(self, chat_id):
+        with self.connection:
+            return self.cursor.execute('SELECT login FROM `chats` WHERE `id` = ?', (chat_id,)).fetchone()[0]
+
+    def get_chat_password(self, chat_id):
+        with self.connection:
+            return self.cursor.execute('SELECT password FROM `chats` WHERE `id` = ?', (chat_id,)).fetchone()[0]
+
+    def get_chat_day(self, chat_id):
+        with self.connection:
+            return self.cursor.execute('SELECT day FROM `chats` WHERE `id` = ?', (chat_id,)).fetchone()[0]
+
+    def get_chat_lesson(self, chat_id):
+        with self.connection:
+            return self.cursor.execute('SELECT lesson FROM `chats` WHERE `id` = ?', (chat_id,)).fetchone()[0]
+
+    def get_chat_link(self, chat_id):
+        with self.connection:
+            return self.cursor.execute('SELECT link FROM `chats` WHERE `id` = ?', (chat_id,)).fetchone()[0]
+
+    def get_chat_school(self, chat_id):
+        with self.connection:
+            return self.cursor.execute('SELECT school FROM `chats` WHERE `id` = ?', (chat_id,)).fetchone()[0]
+
+
+
+    def add_chat(self, chat_id, login, password, link, school):
+        with self.connection:
+            return self.cursor.execute('INSERT INTO chats VALUES (?,?,?,?,?,?,?,?)',(chat_id, 0, 0, 0, login, password, link, school))
+
+
+
+    def edit_chat_id(self, new_id, chat_id):
+        with self.connection:
+            return self.cursor.execute("UPDATE `chats` SET `id` = ? WHERE `id` = ?", (new_id, chat_id))
+
+    def edit_chat_login(self, chat_id, login):
+        with self.connection:
+            return self.cursor.execute("UPDATE `chats` SET `login` = ? WHERE `id` = ?", (login, chat_id))
+
+    def edit_chat_password(self, chat_id, password):
+        with self.connection:
+            return self.cursor.execute("UPDATE `chats` SET `password` = ? WHERE `id` = ?", ( password, chat_id))
+
+    def edit_chat_day(self, chat_id, day):
+        with self.connection:
+            return self.cursor.execute("UPDATE `chats` SET `day` = ? WHERE `id` = ?", (day, chat_id))
+
+    def edit_chat_lesson(self, chat_id, lesson):
+        with self.connection:
+            return self.cursor.execute("UPDATE `chats` SET `lesson` = ? WHERE `id` = ?", (lesson,chat_id))
+
+    def edit_chat_week(self, chat_id, week):
+        with self.connection:
+            return self.cursor.execute("UPDATE `chats` SET `week` = ? WHERE `id` = ?", (week, chat_id))
+    
+    def edit_chat_link(self, chat_id, link):
+        with self.connection:
+            return self.cursor.execute("UPDATE `chats` SET `link` = ? WHERE `id` = ?", (link, chat_id))
+    
+    def edit_chat_school(self, chat_id, school):
+        with self.connection:
+            return self.cursor.execute("UPDATE `chats` SET `school` = ? WHERE `id` = ?", (school, chat_id))
             
 
 

@@ -31,13 +31,15 @@ async def announcements(message: Message, amount=3):
 @bp.on.chat_message(text=["Объявления <amount>", "Объявления"])
 @bp.on.chat_message(payload={'cmd': 'announcements'})
 async def announcements(message: Message, amount=3):
-    userInfo = await bp.api.users.get(message.from_id)
+    chat_id = message.chat_id
+    print(chat_id)
 
-    announcements = await get_announcements(admin_login,
-                                  admin_password,
-                                  amount,
-                                  admin_school,
-                                  admin_link)
+    announcements = await get_announcements(
+                                db.get_chat_login(chat_id),
+                                db.get_chat_password(chat_id),
+                                amount,
+                                db.get_chat_school(chat_id),
+                                db.get_chat_link(chat_id))
 
     for i in announcements:
         await message.answer(i)

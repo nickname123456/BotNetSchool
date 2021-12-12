@@ -128,6 +128,7 @@ async def diary_for_day(message: Message):
                         {'cmd': 'next_diary_for_day'}])
 async def diary_for_day(message: Message):
     userInfo = await bp.api.users.get(message.from_id)
+    chat_id = message.chat_id
 
 
     keyboard = (
@@ -135,47 +136,37 @@ async def diary_for_day(message: Message):
     )
 
 
-    if message.payload == '{"cmd":"diary_for_day"}':
-        period = ''
-        try:
+    try:
+        if message.payload == '{"cmd":"diary_for_day"}':
+            period = ''
             diary = await get_diary(
-                admin_login,
-                admin_password,
+                db.get_chat_login(chat_id),
+                db.get_chat_password(chat_id),
                 get_period(),
-                admin_school,
-                admin_link
-            )
-        except netschoolapi.errors.AuthError:
-            await message.answer('Неправильный логин или пароль!')
-            return
-    
-    elif message.payload == '{"cmd":"back_diary_for_day"}':
-        period = 'back_'
-        try:
+                db.get_chat_school(chat_id),
+                db.get_chat_link(chat_id))
+            
+        elif message.payload == '{"cmd":"back_diary_for_day"}':
+            period = 'back_'
             diary = await get_diary(
-                admin_login,
-                admin_password,
+                db.get_chat_login(chat_id),
+                db.get_chat_password(chat_id),
                 get_back_period(),
-                admin_school,
-                admin_link
-            )
-        except netschoolapi.errors.AuthError:
-            await message.answer('Неправильный логин или пароль!')
-            return
+                db.get_chat_school(chat_id),
+                db.get_chat_link(chat_id))
 
-    elif message.payload == '{"cmd":"next_diary_for_day"}':
-        period = 'next_'
-        try:
+        elif message.payload == '{"cmd":"next_diary_for_day"}':
+            period = 'next_'
             diary = await get_diary(
-                admin_login,
-                admin_password,
+                db.get_chat_login(chat_id),
+                db.get_chat_password(chat_id),
                 get_next_period(),
-                admin_school,
-                admin_link
-            )
-        except netschoolapi.errors.AuthError:
-            await message.answer('Неправильный логин или пароль!')
-            return
+                db.get_chat_school(chat_id),
+                db.get_chat_link(chat_id))
+            
+    except netschoolapi.errors.AuthError:
+                await message.answer('Неправильный логин или пароль!')
+                return
     
 
     if 'Понедельник' in message.text:
@@ -194,7 +185,7 @@ async def diary_for_day(message: Message):
     #Если сообщение содержит
 
     #ОБНОВИТЬ ТАБЛИЦУ students ЗАДАТЬ ПЕРЕМЕННОЙ day ЗНАЧЕНИЕ 0 ГДЕ айди РАВЕН айди ОТПРАВИТЕЛЯ
-    db.edit_account_day(userInfo[0].id, day)
+    db.edit_chat_day(chat_id, day)
     db.commit()
 
     
