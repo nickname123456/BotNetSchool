@@ -19,17 +19,21 @@ db = SQLighter('database.db')
 async def keyboard_schedule(message: Message):
     userInfo = await bp.api.users.get(message.from_id)
     
-    homework = db.get_homework(
-        db.get_account_school(userInfo[0].id),
-        db.get_account_class(userInfo[0].id),
-        message.text
-    )
+    try:
+        homework = db.get_homework(
+            db.get_account_school(userInfo[0].id),
+            db.get_account_class(userInfo[0].id),
+            message.text
+        )
 
-    upd_date = db.get_upd_date(
-        db.get_account_school(userInfo[0].id),
-        db.get_account_class(userInfo[0].id),
-        message.text
-    )
+        upd_date = db.get_upd_date(
+            db.get_account_school(userInfo[0].id),
+            db.get_account_class(userInfo[0].id),
+            message.text
+        )
+    except TypeError:
+        await message.answer('Ты не зарегистрирован! \nНапиши "Начать"')
+        return
 
     await message.answer(f'Урок: {message.text} \nБыло обновлено: {upd_date} \nЗадание: {homework}')
 
@@ -39,16 +43,20 @@ async def keyboard_schedule(message: Message):
 async def keyboard_schedule(message: Message):
     chat_id = message.chat_id
 
-    homework = db.get_homework(
-        db.get_chat_school(chat_id),
-        db.get_chat_class(chat_id),
-        message.text[33:]
-    )
+    try:
+        homework = db.get_homework(
+            db.get_chat_school(chat_id),
+            db.get_chat_class(chat_id),
+            message.text[30:] #'[club207442693|@botnetschool] Инф.'
+        )
 
-    upd_date = db.get_upd_date(
-        db.get_chat_school(chat_id),
-        db.get_chat_class(chat_id),
-        message.text[33:]
-    )
+        upd_date = db.get_upd_date(
+            db.get_chat_school(chat_id),
+            db.get_chat_class(chat_id),
+            message.text[30:]
+        )
+    except Exception as e:
+        await message.answer(f'Ошибка: {e} \nСообщи админу!')
+        return
 
-    await message.answer(f'Урок: {message.text[33:]} \nБыло обновлено: {upd_date} \nЗадание: {homework}')
+    await message.answer(f'Урок: {message.text[30:]} \nБыло обновлено: {upd_date} \nЗадание: {homework}')
