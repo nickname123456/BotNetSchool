@@ -2,10 +2,10 @@ from vkbottle import Bot
 from plugins import bps
 from settings import token
 
+# Подключаем бота к нашему токену
 bot = Bot(token=token)
 
-#Список дневников учеников
-#diarys = {}
+
 
 print('')
 print('-------------------------------')
@@ -15,7 +15,9 @@ print('  https://vk.com/kirillarz')
 print('-------------------------------')
 print('')
 
+# Загружаем команды из папки plugins
 for bp in bps:
     bp.load(bot)
 
+# Запускаем бота
 bot.run_forever()

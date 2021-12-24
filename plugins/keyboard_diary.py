@@ -5,15 +5,15 @@ from sqlighter import SQLighter
 from ns import get_next_period, get_back_period, get_period
 
 
-bp = Blueprint('keyboard_diary')
-db = SQLighter('database.db')
+bp = Blueprint('keyboard_diary')# Объявляем команду
+db = SQLighter('database.db') # Подключаемся к базе данных
 
 
 @bp.on.message(payload={'cmd': 'keyboard_diary'})
 async def keyboard_diary(message: Message):
-    userInfo = await bp.api.users.get(message.from_id)
+    userInfo = await bp.api.users.get(message.from_id)# Информация о юзере
 
-    db.edit_account_week(userInfo[0].id, 0)
+    db.edit_account_week(userInfo[0].id, 0)# Редактируем неделю, на которой юзер
 
     keyboard = (
         Keyboard()
@@ -41,9 +41,9 @@ async def keyboard_diary(message: Message):
 
 @bp.on.message(payload={'cmd': 'keyboard_diary_back'})
 async def keyboard_diary(message: Message):
-    userInfo = await bp.api.users.get(message.from_id)
+    userInfo = await bp.api.users.get(message.from_id)# Информация о юзере
 
-    db.edit_account_week(userInfo[0].id, -1)
+    db.edit_account_week(userInfo[0].id, -1)# Редактируем неделю, на которой юзер
 
     keyboard = (
         Keyboard()
@@ -71,9 +71,9 @@ async def keyboard_diary(message: Message):
 
 @bp.on.message(payload={'cmd': 'keyboard_diary_next'})
 async def keyboard_diary(message: Message):
-    userInfo = await bp.api.users.get(message.from_id)
+    userInfo = await bp.api.users.get(message.from_id)# Информация о юзере
 
-    db.edit_account_week(userInfo[0].id, 1)
+    db.edit_account_week(userInfo[0].id, 1)# Редактируем неделю, на которой юзер
 
     keyboard = (
         Keyboard()

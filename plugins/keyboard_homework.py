@@ -3,7 +3,7 @@ from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
 
 
-bp = Blueprint('keyboard_homework')
+bp = Blueprint('keyboard_homework')# Объявляем команду
 
 
 
@@ -12,9 +12,11 @@ bp = Blueprint('keyboard_homework')
 async def keyboard_schedule(message: Message):
     keyboard = (
         Keyboard()
+        #Добавить кнопку
         .add(Text('Алгебра', {"cmd": "homework"}))
         .add(Text('Инф.', {"cmd": "homework"}))
         .add(Text('Геом.', {"cmd": "homework"}))
+        #Начать с новой строки
         .row()
         .add(Text('Рус. яз.', {"cmd": "homework"}))
         .add(Text('Англ. яз.', {"cmd": "homework"}))

@@ -1,24 +1,21 @@
-from pydantic.typing import NoneType
 from vkbottle.bot import Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
-from vkbottle.tools.dev_tools.keyboard.action import Payload
 from sqlighter import SQLighter
-from ns import get_diary
-import netschoolapi
 from vkbottle import CtxStorage
 from vkbottle_types import BaseStateGroup
 from datetime import datetime
 from settings import admin_id
 
 
-bp = Blueprint('update_homework')
-bp.on.vbml_ignore_case = True
+bp = Blueprint('update_homework') # Объявляем команду
+bp.on.vbml_ignore_case = True # Игнорируем регистр
 
-db = SQLighter('database.db')
+db = SQLighter('database.db') # Подключаемся к базе данных
 
-ctx = CtxStorage()
+ctx = CtxStorage() # объявляем временное хранилище
 
+#Нужно, для запоминания где сейчас юзер
 class HomeworkData(BaseStateGroup):
     lesson = 20
     check_admin = 21
@@ -28,7 +25,7 @@ class HomeworkData(BaseStateGroup):
 
 @bp.on.message(payload={'cmd': 'keyboard_update_homework'})
 async def keyboard_update_homework(message: Message):
-    await bp.state_dispenser.set(message.peer_id, HomeworkData.lesson)
+    await bp.state_dispenser.set(message.peer_id, HomeworkData.lesson) # Говорим, что следующий шаг - выбор урока
     keyboard = (
         Keyboard()
         .add(Text('Алгебра', {"cmd": "update_homework"}))
@@ -65,33 +62,34 @@ async def keyboard_update_homework(message: Message):
 
 @bp.on.private_message(state=HomeworkData.lesson)
 async def update_homework(message: Message):
-    ctx.set('lesson', message.text)
-    await bp.state_dispenser.set(message.peer_id, HomeworkData.check_admin)
+    ctx.set('lesson', message.text)  # Загружаем во временное хранилище город
+    await bp.state_dispenser.set(message.peer_id, HomeworkData.check_admin)  # Говорим, что следующий шаг - проверка на админа
     return 'Введи дз'
 
 @bp.on.chat_message(state=HomeworkData.lesson)
 async def update_homework(message: Message):
     if 'public' in message.text:
-        ctx.set('lesson', message.text[33:]) #'[club207442693|@public207442693] Родн. лит-ра'
+        ctx.set('lesson', message.text[33:]) # Загружаем во временное хранилище урок
     else:
-        ctx.set('lesson', message.text[30:]) #'[club207442693|@botnetschool] Англ. яз.'
+        ctx.set('lesson', message.text[30:]) # Загружаем во временное хранилище урок
 
-    await bp.state_dispenser.set(message.peer_id, HomeworkData.check_admin)
+    await bp.state_dispenser.set(message.peer_id, HomeworkData.check_admin) # Говорим, что следующий шаг - проверка на админа
     return 'Введи дз'
 
 
 
 @bp.on.private_message(state=HomeworkData.check_admin)
 async def check_admin(message: Message):
-    userInfo = await bp.api.users.get(message.from_id)
-    ctx.set('homework', message.text)
-    lesson = ctx.get('lesson')
+    userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
+    ctx.set('homework', message.text)# Загружаем во временное хранилище дз
+    lesson = ctx.get('lesson') # Берем из временного хранилища урок
 
+    # Если юзер - админ:
     if str(userInfo[0].id) == str(admin_id):
-        await bp.state_dispenser.set(message.peer_id, HomeworkData.homework)
+        await bp.state_dispenser.set(message.peer_id, HomeworkData.homework) # Говорим, что следующий шаг - залив дз в дб
         return 'Ты админ?'
     else:
-        await bp.state_dispenser.set(int(admin_id), HomeworkData.homework)
+        await bp.state_dispenser.set(int(admin_id), HomeworkData.homework) # Говорим, что следующий шаг - залив дз в дб админом
         keyboard = (
         Keyboard()
         .add(Text('Одобрить', {"prvt": f"yes_update_homework_{userInfo[0].id}_{message.peer_id}"}), color=KeyboardButtonColor.POSITIVE)
@@ -101,16 +99,17 @@ async def check_admin(message: Message):
 
 @bp.on.chat_message(state=HomeworkData.check_admin)
 async def check_admin(message: Message):
-    userInfo = await bp.api.users.get(message.from_id)
-    ctx.set('homework', message.text)
-    lesson = ctx.get('lesson')
+    userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
+    ctx.set('homework', message.text) # Загружаем во временное хранилище дз
+    lesson = ctx.get('lesson') # Берем из временного хранилища урок
 
+    # Если юзер - админ:
     if str(userInfo[0].id) == str(admin_id):
-        await bp.state_dispenser.set(message.peer_id, HomeworkData.homework)
+        await bp.state_dispenser.set(message.peer_id, HomeworkData.homework) # Говорим, что следующий шаг - залив дз в дб
         return 'Ты админ?'
     else:
-        await bp.state_dispenser.delete(message.peer_id)
-        await bp.state_dispenser.set(int(admin_id), HomeworkData.homework)
+        await bp.state_dispenser.delete(message.peer_id) # Удаляем цепочку с юзером
+        await bp.state_dispenser.set(int(admin_id), HomeworkData.homework) # Говорим, что следующий шаг - залив дз в дб админом
         keyboard = (
         Keyboard()
         .add(Text('Одобрить', {"chat": f"yes_update_homework_{userInfo[0].id}_{message.peer_id}"}), color=KeyboardButtonColor.POSITIVE)
@@ -154,49 +153,51 @@ async def schedule_for_day(message: Message):
         .add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
     )
 
-    lesson = ctx.get('lesson')
-    homework = ctx.get('homework')
+    lesson = ctx.get('lesson') # Берем из временного хранилища урок
+    homework = ctx.get('homework') # Берем из временного хранилища дз
 
-    if 'no_update_homework_' in message.payload:
-        await bp.state_dispenser.delete(message.peer_id)
+    # Если в обнове дз отказали
+    if message.payload and 'no_update_homework_' in message.payload:
+        await bp.state_dispenser.delete(message.peer_id) # Удаляем цепочку
         user_id = message.payload[28:]
         user_id = int(user_id[:-2])
 
+
         await bp.api.messages.send(message=f'Администратор отказал вам в измение дз по {lesson} на:\n{homework}', user_id=user_id, keyboard=keyboard, random_id=0)
+
         await message.answer('Ты отказал человеку в изменение дз.')
         return
 
-
-
-    if message.payload and 'yes_update_homework_' in message.payload:
+    # Если админ одобрил дз:
+    elif message.payload and 'yes_update_homework_' in message.payload:
         user_id = int(message.payload[29:38]) 
         peer_id = message.payload[39:]
         peer_id = int(peer_id[:-2])
 
-        await bp.state_dispenser.delete(int(admin_id))
-        userInfo = await bp.api.users.get(user_id)
-            
+        await bp.state_dispenser.delete(int(admin_id)) # Удаляем цепочку
+        userInfo = await bp.api.users.get(user_id) # Информация о юзере
     else:
-        await bp.state_dispenser.delete(message.peer_id)
-        userInfo = await bp.api.users.get(message.from_id)
+        await bp.state_dispenser.delete(message.peer_id) # Удаляем цепочку
+        userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
     
+    # Если дз обновляют из чата
     if message.payload and 'chat' in message.payload:
         chat_id = peer_id - 2000000000
 
     try:
+        # Если дз обновляют из чата
         if message.payload and 'chat' in message.payload:
             db.edit_homework(
             db.get_chat_school(chat_id),
             db.get_chat_class(chat_id),
             lesson,
-            homework
-            )
+            homework)
 
             db.edit_upd_date(
                 db.get_chat_school(chat_id),
                 db.get_chat_class(chat_id),
                 lesson,
-                str(datetime.now())
+                str(f'{datetime.now().day}-{datetime.now().month}-{datetime.now().year} {datetime.now().hour}:{datetime.now().minute}')
             )
 
             await message.answer('Ты успешно обновил дз')
@@ -212,8 +213,7 @@ async def schedule_for_day(message: Message):
                 db.get_chat_class(chat_id),
                 lesson
             )
-
-
+        # Если обновляют не из чата
         else:
             db.edit_homework(
                 db.get_account_school(userInfo[0].id),
@@ -226,7 +226,7 @@ async def schedule_for_day(message: Message):
                 db.get_account_school(userInfo[0].id),
                 db.get_account_class(userInfo[0].id),
                 lesson,
-                str(datetime.now())
+                str(f'{datetime.now().day}-{datetime.now().month}-{datetime.now().year} {datetime.now().hour}:{datetime.now().minute}')
             )
 
             await message.answer('Ты успешно обновил дз')
@@ -250,11 +250,12 @@ async def schedule_for_day(message: Message):
         return
 
     except Exception as e:
-        await message.answer(f'Произошла ошибка\n{e} Сообщи админу')
+        await message.answer(f'Произошла ошибка\n{e} \nСообщи админу')
         if 'yes_update_homework_' in message.payload:
-           await bp.api.messages.send(message=f'Произошла ошибка\n{e} Сообщи админу', user_id=user_id, keyboard=keyboard, random_id=0)
+           await bp.api.messages.send(message=f'Произошла ошибка\n{e} \nСообщи админу', user_id=user_id, keyboard=keyboard, random_id=0)
         return
 
+    # Если одобрили запрос на обновлние дз
     if message.payload and 'yes_update_homework_' in message.payload:
         await bp.api.messages.send(message='Админ одобрил вашу заявку на обновление дз.', user_id=user_id, keyboard=keyboard, random_id=0)
         await bp.api.messages.send(message=f'Урок: {lesson} \nБыло обновлено: {upd_date} \nЗадание: {homework}', user_id=user_id, keyboard=keyboard, random_id=0)
@@ -295,22 +296,27 @@ async def schedule_for_day(message: Message):
         .add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
     )
 
-    lesson = ctx.get('lesson')
-    homework = ctx.get('homework')
+    lesson = ctx.get('lesson') # Берем из временного хранилища урок
+    homework = ctx.get('homework') # Берем из временного хранилища дз
 
-    if 'no_update_homework_' in message.payload:
-        await bp.state_dispenser.delete(message.peer_id)
+    # Если в обнове дз отказали
+    if message.payload and 'no_update_homework_' in message.payload:
+        await bp.state_dispenser.delete(message.peer_id) # Удаляем цепочку
         user_id = message.payload[28:]
         user_id = int(user_id[:-2])
 
+        #try:
         await bp.api.messages.send(message=f'Администратор отказал вам в измение дз по {lesson} на:\n{homework}', user_id=user_id, keyboard=keyboard, random_id=0)
+        #except VKAPIError[901] as e:
+        #    await message.answer("не могу отправить сообщение из-за настроек приватности")
+
         await message.answer('Ты отказал человеку в изменение дз.')
         return
 
     peer_id = message.peer_id
     chat_id = message.chat_id
 
-    await bp.state_dispenser.delete(peer_id)
+    await bp.state_dispenser.delete(peer_id) # Удаляем цепочку
 
     try:
         db.edit_homework(
@@ -324,7 +330,7 @@ async def schedule_for_day(message: Message):
             db.get_chat_school(chat_id),
             db.get_chat_class(chat_id),
             lesson,
-            str(datetime.now())
+            str(f'{datetime.now().day}-{datetime.now().month}-{datetime.now().year} {datetime.now().hour}:{datetime.now().minute}')
         )
 
         await message.answer('Ты успешно обновил дз')

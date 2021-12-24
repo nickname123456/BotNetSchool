@@ -1,10 +1,10 @@
 from netschoolapi import NetSchoolAPI
 import datetime
-import html2markdown
 import re
 
 
 
+# Вход в сго
 async def login(login, password, school, link):
     api = NetSchoolAPI(link)
     await api.login(
@@ -13,11 +13,13 @@ async def login(login, password, school, link):
         school)
 
 
+# Выход из сго
 async def logout(link):
     api = NetSchoolAPI(link)
     await api.logout()
 
 
+# Получить текущую неделю
 def get_period():
     today = datetime.date.today()
     monday = today - datetime.timedelta(days=today.weekday())
@@ -28,6 +30,7 @@ def get_period():
     return period
 
 
+# Получить следующую неделю
 def get_next_period():
     today = datetime.date.today()
     monday = today - datetime.timedelta(days=today.weekday())
@@ -41,6 +44,7 @@ def get_next_period():
     return period
 
 
+# Получить предыдущую неделю
 def get_back_period():
     today = datetime.date.today()
     monday = today - datetime.timedelta(days=today.weekday())
@@ -54,6 +58,7 @@ def get_back_period():
     return period
 
 
+# Получить дневник
 async def get_diary(login, password, period, school, link):
     api = NetSchoolAPI(link)
     await api.login(
@@ -65,6 +70,7 @@ async def get_diary(login, password, period, school, link):
     return diary
 
 
+# Получить объявления
 async def get_announcements(login, password, amount, school, link):
     api = NetSchoolAPI(link)
     await api.login(
@@ -76,7 +82,9 @@ async def get_announcements(login, password, amount, school, link):
 
     announcements = announcements[:int(amount)]
 
+    # Если есть объявления:
     if announcements:
+        # Приводим объявления в нужный вид
         announcement = ''
         result = []
         for i in announcements:
@@ -88,8 +96,7 @@ async def get_announcements(login, password, amount, school, link):
 
             result.append(announcement)
 
-
-
         return result
+    # Если нет объявлений:
     else:
         return ['❌Нет объявлений!']

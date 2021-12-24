@@ -1,15 +1,12 @@
 from ns import get_back_period, get_next_period, get_period, get_diary
 from vkbottle.bot import Message
-from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
-import netschoolapi
-from settings import admin_login, admin_password, admin_link, admin_school
 
 
 
-bp = Blueprint('diary_for_day')
-db = SQLighter('database.db')
+bp = Blueprint('diary_for_day')# Объявляем команду
+db = SQLighter('database.db')# Подключаемся к базе данных
 
 
 
@@ -42,13 +39,14 @@ db = SQLighter('database.db')
                         {'cmd': 'next_lesson_information_6'},
                         {'cmd': 'next_lesson_information_7'}])
 async def lesson_information(message: Message):
-    userInfo = await bp.api.users.get(message.from_id)
+    userInfo = await bp.api.users.get(message.from_id)# Информация о юзере
 
-    db.edit_account_lesson(userInfo[0].id, message.payload[27::29])
+    db.edit_account_lesson(userInfo[0].id, message.payload[27::29]) # Редактируем номер урока, на котором юзер
     db.commit()
 
-    day = db.get_account_day(userInfo[0].id)
+    day = db.get_account_day(userInfo[0].id) # Получаем день, на котором юзер
 
+    # Если пользователь выбрал предыдущую неделю
     if 'back_' in message.payload:
         diary = await get_diary(
             db.get_account_login(userInfo[0].id),
@@ -59,6 +57,7 @@ async def lesson_information(message: Message):
 
         lesson = diary.schedule[day].lessons[int(message.payload[32::34])]
 
+    # Если пользователь выбрал следующую неделю
     elif 'next_' in message.payload:
         diary = await get_diary(
             db.get_account_login(userInfo[0].id),
@@ -69,6 +68,7 @@ async def lesson_information(message: Message):
         
         lesson = diary.schedule[day].lessons[int(message.payload[32::34])]
 
+    # Если пользователь выбрал текущую неделю
     else:
         diary = await get_diary(
             db.get_account_login(userInfo[0].id),
@@ -93,6 +93,7 @@ async def lesson_information(message: Message):
         if i.type == 'Домашнее задание':
             homework = i.content
         else:
+            # ЕСли нет дз:
             if homework == '':
                 homework = 'не задано'
 
@@ -141,16 +142,18 @@ async def lesson_information(message: Message):
                         {'cmd': 'next_lesson_information_6'},
                         {'cmd': 'next_lesson_information_7'}])
 async def lesson_information(message: Message):
-    chat_id = message.chat_id
+    chat_id = message.chat_id # Чат айди
 
     try:
         day = db.get_chat_day(chat_id)
+    # Если чата нет в бд
     except:
         await message.answer('К этой беседе не подключен аккаунт. \nДля подключение напишите "Вход <логин> <пароль>"')
         return
 
 
     try:
+        # Если пользователь выбрал предыдущую неделю
         if 'back_' in message.payload:
             diary = await get_diary(
                 db.get_chat_login(chat_id),
@@ -161,6 +164,7 @@ async def lesson_information(message: Message):
 
             lesson = diary.schedule[day].lessons[int(message.payload[32::34])]
 
+        # Если пользователь выбрал следующую неделю
         elif 'next_' in message.payload:
             diary = await get_diary(
                 db.get_chat_login(chat_id),
@@ -171,6 +175,7 @@ async def lesson_information(message: Message):
             
             lesson = diary.schedule[day].lessons[int(message.payload[32::34])]
 
+        # Если пользователь выбрал текущую неделю
         else:
             diary = await get_diary(
                 db.get_chat_login(chat_id),
@@ -197,6 +202,7 @@ async def lesson_information(message: Message):
         #Если тип задание = дз, то записываем
         if i.type == 'Домашнее задание':
             homework = i.content
+        # ЕСли нет дз:
         else:
             if homework == '':
                 homework = 'не задано'

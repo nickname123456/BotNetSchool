@@ -3,8 +3,8 @@ from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
 
 
-bp = Blueprint('menu')
-bp.on.vbml_ignore_case = True
+bp = Blueprint('menu')# Объявляем команду
+bp.on.vbml_ignore_case = True # Игнорируем регистр
 
 
 
@@ -18,6 +18,7 @@ async def menu(message: Message):
         Keyboard()
         #Добавить кнопки
         .add(Text('Войти', {'cmd': 'login'}), color=KeyboardButtonColor.POSITIVE)
+        #Начать с новой строки
         .row()
         .add(Text('Дневник', {'cmd': 'keyboard_diary'}), color=KeyboardButtonColor.PRIMARY)
         .add(Text('Домашнее задание', {'cmd': 'keyboard_homework'}), color=KeyboardButtonColor.PRIMARY)

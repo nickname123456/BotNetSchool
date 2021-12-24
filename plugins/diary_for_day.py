@@ -6,29 +6,30 @@ from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
 from ns import get_diary
 import netschoolapi
-from settings import admin_login, admin_password, admin_link, admin_school
 
 
-bp = Blueprint('diary_for_day')
-db = SQLighter('database.db')
+bp = Blueprint('diary_for_day') # Объявляем команду
+db = SQLighter('database.db') # Подключаемся к базеданных
 
 
 @bp.on.private_message(payload=[{'cmd': 'diary_for_day'},
-                        {'cmd': 'back_diary_for_day'},
-                        {'cmd': 'next_diary_for_day'}])
+                                {'cmd': 'back_diary_for_day'},
+                                {'cmd': 'next_diary_for_day'}])
 async def diary_for_day(message: Message):
-    userInfo = await bp.api.users.get(message.from_id)
+    userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
 
     #Если дневника нет в списке
     if db.get_account_correctData(userInfo[0].id) != 1:
-        await message.answer('Ты не вошел в систему. Напиши "Вход"\n Или у тебя неверный логин/пароль')
+        await message.answer('Ты не зарегистрирован! \nНапиши "Начать"\n Или у тебя неверный логин/пароль')
         return
 
+    # Создаем клавиатуру
     keyboard = (
         Keyboard()
     )
 
 
+    # Если пользователь выбрал текущую неделю
     if message.payload == '{"cmd":"diary_for_day"}':
         try:
             diary = await get_diary(
@@ -42,12 +43,13 @@ async def diary_for_day(message: Message):
             await message.answer('Неправильный логин или пароль!')
             return
     
+    # Если пользователь выбрал предыдущую неделю
     elif message.payload == '{"cmd":"back_diary_for_day"}':
         try:
             diary = await get_diary(
                 db.get_account_login(userInfo[0].id),
                 db.get_account_password(userInfo[0].id),
-                get_back_period(),
+                get_back_period(), # Получить предыдущую неделю
                 db.get_account_school(userInfo[0].id),
                 db.get_account_link(userInfo[0].id)
             )
@@ -55,12 +57,13 @@ async def diary_for_day(message: Message):
             await message.answer('Неправильный логин или пароль!')
             return
 
+    # Если пользователь выбрал следующую неделю
     elif message.payload == '{"cmd":"next_diary_for_day"}':    
         try:
             diary = await get_diary(
                 db.get_account_login(userInfo[0].id),
                 db.get_account_password(userInfo[0].id),
-                get_next_period(),
+                get_next_period(), # Получить следующую неделю
                 db.get_account_school(userInfo[0].id),
                 db.get_account_link(userInfo[0].id)
             )
@@ -82,9 +85,8 @@ async def diary_for_day(message: Message):
 
     #Число, нужное для запоминания, какой урок будет выбран
     numberOfTimes = -1
-    #Если сообщение содержит
 
-    #ОБНОВИТЬ ТАБЛИЦУ students ЗАДАТЬ ПЕРЕМЕННОЙ day ЗНАЧЕНИЕ 0 ГДЕ айди РАВЕН айди ОТПРАВИТЕЛЯ
+    # Меняем данные о дне в бд
     db.edit_account_day(userInfo[0].id, day)
     db.commit()
 
@@ -92,26 +94,30 @@ async def diary_for_day(message: Message):
     #Добавляем кнопку с содержанием номера урока, названия урока, оценки
     for lesson in diary.schedule[day].lessons:
         for assignment in lesson.assignments:
-            if assignment.mark != None:
+            if assignment.mark != None: # Если есть оценка
                 numberOfTimes += 1
+                # Добавляем кнопку с уроком
                 keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject +
                                     ' ' + str(assignment.mark), {'cmd': f'lesson_information_{numberOfTimes}'}))
                 keyboard.row()
                 break
-            else:
-                if assignment == lesson.assignments[0] and len(lesson.assignments) > 1:
+            else: # Если нет оценки:
+                if assignment == lesson.assignments[0] and len(lesson.assignments) > 1: # Если помимо этого задания есть другое, то переходим к нему (например если задано дз, и была работа на уроке)
                     continue
+                # Добавляем кнопку с уроком
                 numberOfTimes += 1
                 keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject,
                                 {'cmd': f'lesson_information_{numberOfTimes}'}))
                 keyboard.row()
 
-        if len(lesson.assignments) == 0:
+        if len(lesson.assignments) == 0: # Если заданий вообще нет:
             numberOfTimes += 1
+            # Добавляем кнопку с уроком
             keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject,
                             {'cmd': f'lesson_information_{numberOfTimes}'}))
             keyboard.row()
 
+    # Добавляем кнопку назад
     keyboard.add(
         Text("Назад", {'cmd': 'keyboard_diary'}), color=KeyboardButtonColor.NEGATIVE)
     await message.answer('Нажми на предмет для того, чтобы увидеть информацию о нем', keyboard=keyboard)
@@ -127,16 +133,16 @@ async def diary_for_day(message: Message):
                         {'cmd': 'back_diary_for_day'},
                         {'cmd': 'next_diary_for_day'}])
 async def diary_for_day(message: Message):
-    userInfo = await bp.api.users.get(message.from_id)
     chat_id = message.chat_id
 
-
+    # Создаем клавиатуру
     keyboard = (
         Keyboard()
     )
 
 
     try:
+        # Если пользователь выбрал текущую неделю
         if message.payload == '{"cmd":"diary_for_day"}':
             period = ''
             diary = await get_diary(
@@ -146,21 +152,23 @@ async def diary_for_day(message: Message):
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id))
             
+        # Если пользователь выбрал предыдущую неделю
         elif message.payload == '{"cmd":"back_diary_for_day"}':
             period = 'back_'
             diary = await get_diary(
                 db.get_chat_login(chat_id),
                 db.get_chat_password(chat_id),
-                get_back_period(),
+                get_back_period(), # Получить предыдущую неделю
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id))
 
+        # Если пользователь выбрал следующую неделю
         elif message.payload == '{"cmd":"next_diary_for_day"}':
             period = 'next_'
             diary = await get_diary(
                 db.get_chat_login(chat_id),
                 db.get_chat_password(chat_id),
-                get_next_period(),
+                get_next_period(), # Получить следующую неделю
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id))
             
@@ -182,9 +190,8 @@ async def diary_for_day(message: Message):
 
     #Число, нужное для запоминания, какой урок будет выбран
     numberOfTimes = -1
-    #Если сообщение содержит
 
-    #ОБНОВИТЬ ТАБЛИЦУ students ЗАДАТЬ ПЕРЕМЕННОЙ day ЗНАЧЕНИЕ 0 ГДЕ айди РАВЕН айди ОТПРАВИТЕЛЯ
+    # Меняем данные о дне в бд
     db.edit_chat_day(chat_id, day)
     db.commit()
 
@@ -192,26 +199,30 @@ async def diary_for_day(message: Message):
     #Добавляем кнопку с содержанием номера урока, названия урока, оценки
     for lesson in diary.schedule[day].lessons:
         for assignment in lesson.assignments:
-            if assignment.mark != None:
+            if assignment.mark != None: # Если есть оценка
                 numberOfTimes += 1
+                # Добавляем кнопку с уроком
                 keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject +
                                     ' ' + str(assignment.mark), {'cmd': f'{period}lesson_information_{numberOfTimes}'}))
                 keyboard.row()
                 break
-            else:
+            else: # Если нет оценки:
                 if assignment == lesson.assignments[0] and len(lesson.assignments) > 1:
                     continue
+                # Добавляем кнопку с уроком
                 numberOfTimes += 1
                 keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject,
                                 {'cmd': f'{period}lesson_information_{numberOfTimes}'}))
                 keyboard.row()
 
-        if len(lesson.assignments) == 0:
+        if len(lesson.assignments) == 0: # Если заданий вообще нет:
             numberOfTimes += 1
+            # Добавляем кнопку с уроком
             keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject,
                             {'cmd': f'{period}lesson_information_{numberOfTimes}'}))
             keyboard.row()
 
+    # Добавляем кнопку назад
     keyboard.add(
         Text("Назад", {'cmd': 'keyboard_diary'}), color=KeyboardButtonColor.NEGATIVE)
     await message.answer('Нажми на предмет для того, чтобы увидеть информацию о нем', keyboard=keyboard)

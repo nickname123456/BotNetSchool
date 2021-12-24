@@ -3,7 +3,7 @@ from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
 
 
-bp = Blueprint('keyboard_schedule')
+bp = Blueprint('keyboard_schedule')# Объявляем команду
 
 
 

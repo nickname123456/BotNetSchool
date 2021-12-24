@@ -1,26 +1,23 @@
 from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
-from netschoolapi import NetSchoolAPI
-import netschoolapi
 from sqlighter import SQLighter
 import ns
 
 
-bp = Blueprint('login')
-bp.on.vbml_ignore_case = True
+bp = Blueprint('login')# Объявляем команду
+bp.on.vbml_ignore_case = True # Игнорируем регистр
 
-db = SQLighter('database.db')
+db = SQLighter('database.db')# Подключаемся к базеданных
 
 
 
 #Если написали "Вход" или нажали на соответствующую кнопку
-@bp.on.private_message(text=["Вход <userLogin> <userPassword>", "Вход"])
+@bp.on.private_message(text=["Вход <userLogin> <userPassword>", "Вход", 'Войти', 'Войти <userLogin> <userPassword>'])
 @bp.on.private_message(payload={'cmd': 'login'})
 async def login(message: Message, userLogin=None, userPassword=None):
-    #Собираем инфу о пользователе
-    userInfo = await bp.api.users.get(message.from_id)
+    userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
 
-    
+    # Если человека нет в бд
     if db.get_account_isFirstLogin(userInfo[0].id) is None:
         await message.answer("Так... Смотрю тебя теще нет в моей бд. Но ничего страшного сейчас все будет!")
         await message.answer('Напиши "Начать')
@@ -60,12 +57,12 @@ async def login(message: Message, userLogin=None, userPassword=None):
         await message.answer('Неправильный логин или пароль!')
         return
 
-    db.edit_account_correctData(userInfo[0].id, 1)
+    db.edit_account_correctData(userInfo[0].id, 1) #Подтверждаем правильность логина и пароя в бд
     db.commit()
 
     await message.answer(f'{userInfo[0].first_name}, ты успешно зашел в систему под логином: {userLogin}')
     #Выходим из СГ
-    #await ns.logout()
+    #await ns.logout(userLink)
 
     #Спустя 10 минут удаляем из памяти дневник ученика
     #await asyncio.sleep(600)
@@ -78,7 +75,7 @@ async def login(message: Message, userLogin=None, userPassword=None):
 @bp.on.chat_message(text=["Вход <userLogin> <userPassword>", "Вход"])
 @bp.on.chat_message(payload={'cmd': 'login'})
 async def login(message: Message, userLogin=None, userPassword=None):
-    chat_id = message.chat_id
+    chat_id = message.chat_id # Чат айди
 
     try:
 
@@ -94,12 +91,15 @@ async def login(message: Message, userLogin=None, userPassword=None):
         chatLogin = db.get_chat_login(chat_id)
         print(chatLogin)
 
+        #Записываем пароль из бд в переменную
         chatPassword = db.get_chat_password(chat_id)
         print(chatPassword)
 
+        #Записываем школу из бд в переменную
         chatSchool = db.get_chat_school(chat_id)
         print(chatSchool)
 
+        #Записываем ссылку из бд в переменную
         chatLink = db.get_chat_link(chat_id)
         print(chatLink)
 

@@ -3,11 +3,10 @@ from vkbottle import Keyboard, KeyboardButtonColor, Text, OpenLink
 from vkbottle.bot import Blueprint
 
 
-bp = Blueprint('not_found')
-bp.on.vbml_ignore_case = True
+bp = Blueprint('not_found') # Объявляем команду
+bp.on.vbml_ignore_case = True# Игнорируем регистр
 
 
-#Если написали "Меню" или нажали на соответствующую кнопку
 @bp.on.message(payload={'cmd': 'not_found'})
 async def not_found(message: Message):
     keyboard = (
