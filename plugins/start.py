@@ -4,7 +4,7 @@ from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
 import ns
 from vkbottle import CtxStorage
-from vkbottle_types import BaseStateGroup
+from vkbottle import BaseStateGroup
 
 
 bp = Blueprint('start') # Объявляем команду

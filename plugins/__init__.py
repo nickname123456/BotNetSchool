@@ -1,4 +1,4 @@
-from . import menu, login, keyboard_diary, diary_for_day, lesson_information, schedule_download, keyboard_schedule, schedule_for_day, announcements, start, not_found, keyboard_homework, homework, update_homework
+from . import menu, login, keyboard_diary, diary_for_day, lesson_information, schedule_download, keyboard_schedule, schedule_for_day, announcements, start, not_found, keyboard_homework, homework, update_homework, marks
 
 
 
@@ -15,4 +15,5 @@ bps = [not_found.bp,
        start.bp,
        keyboard_homework.bp,
        homework.bp,
-       update_homework.bp]
+       update_homework.bp,
+       marks.bp]

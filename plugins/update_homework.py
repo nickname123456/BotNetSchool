@@ -3,7 +3,7 @@ from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
 from vkbottle import CtxStorage
-from vkbottle_types import BaseStateGroup
+from vkbottle import BaseStateGroup
 from datetime import datetime
 from settings import admin_id
 
