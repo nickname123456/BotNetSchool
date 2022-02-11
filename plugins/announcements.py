@@ -20,59 +20,59 @@ async def announcements(message: Message, amount=3):
     userInfo = await bp.api.users.get(message.from_id) 
     user_id = userInfo[0].id
 
-    try:
-        # Логинимся в сго
-        api = NetSchoolAPI(db.get_account_link(user_id))
-        await api.login(
-            db.get_account_login(user_id),
-            db.get_account_password(user_id),
-            db.get_account_school(user_id))
-        # Копируем объявления из сго
-        announcements = await api.announcements()
+    #try:
+    # Логинимся в сго
+    api = NetSchoolAPI(db.get_account_link(user_id))
+    await api.login(
+        db.get_account_login(user_id),
+        db.get_account_password(user_id),
+        db.get_account_school(user_id))
+    # Копируем объявления из сго
+    announcements = await api.announcements()
 
-        # Берем только те объявления, которые нужны
-        announcements = announcements[:int(amount)]
+    # Берем только те объявления, которые нужны
+    announcements = announcements[:int(amount)]
 
-        # Если есть объявления:
-        if announcements:
-            # Приводим объявления в нужный вид
-            announcement = ''
-            for i in announcements:
-                announcement = f"Дата: {i.post_date.date()}\n{i.name}:\n{i.content}\n"
+    # Если есть объявления:
+    if announcements:
+        # Приводим объявления в нужный вид
+        announcement = ''
+        for i in announcements:
+            announcement = "Дата: " + i['postDate'] +"\n"+ i['name'] + ":" + i['description']
 
-                announcement = re.sub(r'\<[^>]*\>', '', announcement)
+            announcement = re.sub(r'\<[^>]*\>', '', announcement)
 
-                # Отправляем объявление
-                await message.answer(announcement)
+            # Отправляем объявление
+            await message.answer(announcement)
 
-                # Перебераем прикрепленные файлы
-                for attachment in i.attachments:
-                    # Скачиваем файл
-                    await api.download_attachment(attachment)
-                    # Путь к файлу:
-                    attachment_source = attachment.name
+            # Перебераем прикрепленные файлы
+            #for attachment in i['attachments']:
+            #    # Скачиваем файл
+            #    await api.download_attachment(attachment)
+            #    # Путь к файлу:
+            #    attachment_source = attachment.name
 
-                    # Отправляем файл
-                    attach = await DocMessagesUploader(api=message.ctx_api).upload(file_source = attachment_source,title = attachment.name ,peer_id=message.peer_id)
-                    await message.answer(attachment=attach)
+            #    # Отправляем файл
+            #    attach = await DocMessagesUploader(api=message.ctx_api).upload(file_source = attachment_source,title = attachment.name ,peer_id=message.peer_id)
+            #    await message.answer(attachment=attach)
 
-                    # Удаляем файл
-                    os.remove(attachment_source)
-
-
-                # Делаем пробел между объявлениями
-                await message.answer('&#12288;')
-
-        # Если нет объявлений:
-        else:
-            await message.answer('❌Нет объявлений!')
+            #    # Удаляем файл
+            #    os.remove(attachment_source)
 
 
-        await api.logout()
-    except: # если произошла ошибка
-        await message.answer('Ты не зарегистрирован! \nНапиши "Начать"\n Или у тебя неверный логин/пароль')
-        await api.logout()
-        return
+            # Делаем пробел между объявлениями
+            await message.answer('&#12288;')
+
+    # Если нет объявлений:
+    else:
+        await message.answer('❌Нет объявлений!')
+
+
+    await api.logout()
+    #except: # если произошла ошибка
+    #    await message.answer('Ты не зарегистрирован! \nНапиши "Начать"\n Или у тебя неверный логин/пароль')
+    #    await api.logout()
+    #    return
 
 
 
@@ -113,7 +113,7 @@ async def announcements(message: Message, amount=3):
             # Приводим объявления в нужный вид
             announcement = ''
             for i in announcements:
-                announcement = f"Дата: {i.post_date.date()}\n{i.name}:\n{i.content}\n"
+                announcement = "Дата: " + i['postDate'] +"\n"+ i['name'] + ":" + i['description']
 
                 announcement = re.sub(r'\<[^>]*\>', '', announcement)
 

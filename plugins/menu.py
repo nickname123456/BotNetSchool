@@ -22,9 +22,11 @@ async def menu(message: Message):
         .row()
         .add(Text('Дневник', {'cmd': 'keyboard_diary'}), color=KeyboardButtonColor.PRIMARY)
         .add(Text('Домашнее задание', {'cmd': 'keyboard_homework'}), color=KeyboardButtonColor.PRIMARY)
-        .row()
         .add(Text('Расписание', {'cmd': 'keyboard_schedule'}), color=KeyboardButtonColor.PRIMARY)
+        .row()
         .add(Text('Объявления', {'cmd': 'announcements'}), color=KeyboardButtonColor.PRIMARY)
+        .add(Text('Оценки', {'cmd': ' '}), color=KeyboardButtonColor.PRIMARY)
+        .add(Text('⚙', {'cmd': 'keyboard_settings'}), color=KeyboardButtonColor.PRIMARY)
     )
 
     #Ответ в чат

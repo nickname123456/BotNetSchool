@@ -1,6 +1,8 @@
 from netschoolapi import NetSchoolAPI
 import datetime
 import re
+import html2markdown
+
 
 
 
@@ -132,3 +134,57 @@ async def get_marks(login, password, school, url):
     if not result:
         result = '❌Нет оценок'
     return result
+
+
+
+async def getMarkNotify(login, password, school, url, oldmarks):
+    api = NetSchoolAPI(url)
+    await api.login(login, password, school)
+    period = await api.get_period()
+    period = period['filterSources'][2]['defaultValue'].split(' - ')
+    start = datetime.datetime.strptime(period[0], '%Y-%m-%dT%H:%M:%S.0000000')
+    end = datetime.datetime.strptime(period[1], '%Y-%m-%dT%H:%M:%S.0000000')
+    diary = await api.diary(start=start, end=end)
+    await api.logout()
+    marks = []
+    for days in diary['weekDays']:
+        for lesson in days['lessons']:
+            if 'assignments' in lesson.keys():
+                for assignment in lesson['assignments']:
+                    if 'mark' in assignment.keys() and 'mark' in assignment['mark']:
+                        if assignment['mark']['mark']:
+                            date = datetime.datetime.strptime(assignment['dueDate'], '%Y-%m-%dT%H:%M:%S')
+                            result = html2markdown.convert(f"Новая оценка по {lesson['subjectName']}: {assignment['mark']['mark']} за {assignment['assignmentName']}. Дата: {date.day}.{date.month}")
+                            clean = re.compile(r'([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
+                            result = re.sub(clean, '', result)
+                            marks.append(result)
+    difference = [item for item in marks if item not in oldmarks]
+    return marks, difference
+
+
+
+
+async def getAnnouncementsNotify(login, password, school, url, old_announcements):
+    api = NetSchoolAPI(url)
+    await api.login(login, password, school)
+    announcements = await api.announcements()
+    await api.logout()
+
+    # Если есть объявления:
+    if announcements:
+        # Приводим объявления в нужный вид
+        announcement = ''
+        needed_announcements = []
+        for i in announcements:
+            announcement = "Дата: " + i['postDate'] +"\n"+ i['name'] + ":" + i['description']
+
+            announcement = re.sub(r'\<[^>]*\>', '', announcement)
+
+            needed_announcements.append(announcement)
+
+    try:
+        difference = [item for item in needed_announcements if item not in eval(old_announcements)]
+    except TypeError:
+        difference = [item for item in needed_announcements if item not in old_announcements]
+
+    return needed_announcements, difference
