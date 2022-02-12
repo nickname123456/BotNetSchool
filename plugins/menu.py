@@ -20,13 +20,16 @@ async def menu(message: Message):
         .add(Text('Войти', {'cmd': 'login'}), color=KeyboardButtonColor.POSITIVE)
         #Начать с новой строки
         .row()
-        .add(Text('Дневник', {'cmd': 'keyboard_diary'}), color=KeyboardButtonColor.PRIMARY)
-        .add(Text('Домашнее задание', {'cmd': 'keyboard_homework'}), color=KeyboardButtonColor.PRIMARY)
-        .add(Text('Расписание', {'cmd': 'keyboard_schedule'}), color=KeyboardButtonColor.PRIMARY)
+        .add(Text('Дневник', {'cmd': 'keyboard_diary'}), color=KeyboardButtonColor.SECONDARY)
+        .add(Text('Домашнее задание', {'cmd': 'keyboard_homework'}), color=KeyboardButtonColor.SECONDARY)
         .row()
-        .add(Text('Объявления', {'cmd': 'announcements'}), color=KeyboardButtonColor.PRIMARY)
-        .add(Text('Оценки', {'cmd': ' '}), color=KeyboardButtonColor.PRIMARY)
-        .add(Text('⚙', {'cmd': 'keyboard_settings'}), color=KeyboardButtonColor.PRIMARY)
+        .add(Text('Расписание', {'cmd': 'keyboard_schedule'}), color=KeyboardButtonColor.SECONDARY)
+        .add(Text('Объявления', {'cmd': 'announcements'}), color=KeyboardButtonColor.SECONDARY)
+        .add(Text('Оценки', {'cmd': ' '}), color=KeyboardButtonColor.SECONDARY)
+        .row()
+        .add(Text('🔁', {'cmd': 'not_found'}), color=KeyboardButtonColor.SECONDARY)
+        .add(Text('Кирилл', {'cmd': 'not_found'}), color=KeyboardButtonColor.PRIMARY)
+        .add(Text('⚙', {'cmd': 'keyboard_settings'}), color=KeyboardButtonColor.SECONDARY)
     )
 
     #Ответ в чат
