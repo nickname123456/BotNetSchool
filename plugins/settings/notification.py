@@ -2,7 +2,7 @@ from vkbottle.bot import Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
-from plugins.keyboard_settings import keyboard_settings_chat, keyboard_settings_private
+from plugins.settings.keyboard_settings import keyboard_settings_chat, keyboard_settings_private
 from ns import getMarkNotify, getAnnouncementsNotify
 import asyncio
 

@@ -1,5 +1,9 @@
-from . import menu, login, keyboard_diary, diary_for_day, lesson_information, schedule_download, keyboard_schedule, schedule_for_day, announcements, start, not_found, keyboard_homework, homework, update_homework, marks, keyboard_settings, keyboard_announcements_notification, keyboard_mark_notification, notification
-
+from . import announcements, login, menu, not_found, start
+from .diary import diary_for_day, keyboard_diary, lesson_information
+from .homework import homework, keyboard_homework, update_homework
+from .marks import marks
+from .schedule import keyboard_schedule, schedule_download, schedule_for_day
+from .settings import keyboard_announcements_notification, keyboard_mark_notification, keyboard_settings, notification
 
 
 bps = [not_found.bp,

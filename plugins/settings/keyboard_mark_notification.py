@@ -1,7 +1,7 @@
 from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
-from plugins.keyboard_settings import keyboard_settings_chat, keyboard_settings_private
+from plugins.settings.keyboard_settings import keyboard_settings_chat, keyboard_settings_private
 
 
 bp = Blueprint('keyboard_mark_notification')# Объявляем команду
