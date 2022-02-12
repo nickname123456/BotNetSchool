@@ -55,7 +55,7 @@ async def lesson_information(message: Message):
             db.get_account_school(userInfo[0].id),
             db.get_account_link(userInfo[0].id))
 
-        lesson = diary.schedule[day].lessons[int(message.payload[32::34])]
+        lesson = diary['weekDays'][day]['lessons'][int(message.payload[32::34])]
 
     # Если пользователь выбрал следующую неделю
     elif 'next_' in message.payload:
@@ -66,7 +66,7 @@ async def lesson_information(message: Message):
             db.get_account_school(userInfo[0].id),
             db.get_account_link(userInfo[0].id)) 
         
-        lesson = diary.schedule[day].lessons[int(message.payload[32::34])]
+        lesson = diary['weekDays'][day]['lessons'][int(message.payload[32::34])]
 
     # Если пользователь выбрал текущую неделю
     else:
@@ -77,25 +77,26 @@ async def lesson_information(message: Message):
             db.get_account_school(userInfo[0].id),
             db.get_account_link(userInfo[0].id))
         
-        lesson = diary.schedule[day].lessons[int(message.payload[27::29])]
+        lesson = diary['weekDays'][day]['lessons'][int(message.payload[27::29])]
         
 
 
     marks = ''
     homework = ''
 
-    for i in lesson.assignments:
-        #Если оценка не равна пустоте, то записываем ее
-        if i.mark != None:
-            marks += str(i.mark) + ' '
+    if 'assignments' in lesson:
+        for i in lesson['assignments']:
+            #Если оценка не равна пустоте, то записываем ее
+            if 'mark' in i:
+                marks += str(i['mark']['mark']) + ' '
 
-        #Если тип задание = дз, то записываем
-        if i.type == 'Домашнее задание':
-            homework = i.content
-        else:
-            # ЕСли нет дз:
-            if homework == '':
-                homework = 'не задано'
+            #Если тип задание = дз, то записываем
+            if i['typeId'] == 3:
+                homework = i['assignmentName']
+            else:
+                # ЕСли нет дз:
+                if homework == '':
+                    homework = 'не задано'
 
     #print(lesson.subject)
     #print(lesson.room)
@@ -105,9 +106,9 @@ async def lesson_information(message: Message):
     #print(marks)
 
     await message.answer(f"""
-Предмет: {lesson.subject}
-Кабинет: {lesson.room}
-Время проведения урока: {lesson.start:%H.%M} - {lesson.end:%H.%M}
+Предмет: {lesson['subjectName']}
+Кабинет: {lesson['room']}
+Время проведения урока: {lesson['startTime']} - {lesson['endTime']}
 Домашние задание: {homework}
 Оценка: {marks}
     """)
@@ -162,7 +163,7 @@ async def lesson_information(message: Message):
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id))
 
-            lesson = diary.schedule[day].lessons[int(message.payload[32::34])]
+            lesson = diary['weekDays'][day]['lessons'][int(message.payload[32::34])]
 
         # Если пользователь выбрал следующую неделю
         elif 'next_' in message.payload:
@@ -173,7 +174,7 @@ async def lesson_information(message: Message):
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id))
             
-            lesson = diary.schedule[day].lessons[int(message.payload[32::34])]
+            lesson = diary['weekDays'][day]['lessons'][int(message.payload[32::34])]
 
         # Если пользователь выбрал текущую неделю
         else:
@@ -184,7 +185,7 @@ async def lesson_information(message: Message):
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id))
             
-            lesson = diary.schedule[day].lessons[int(message.payload[27::29])]
+            lesson = diary['weekDays'][day]['lessons'][int(message.payload[27::29])]
     except:
         await message.answer('К этой беседе не подключен аккаунт. \nДля подключение напишите "Вход <логин> <пароль>"')
         return
@@ -194,18 +195,19 @@ async def lesson_information(message: Message):
     marks = ''
     homework = ''
 
-    for i in lesson.assignments:
-        #Если оценка не равна пустоте, то записываем ее
-        if i.mark != None:
-            marks += str(i.mark) + ' '
+    if 'assignments' in lesson:
+        for i in lesson['assignments']:
+            #Если оценка не равна пустоте, то записываем ее
+            if 'mark' in i:
+                marks += str(i['mark']['mark']) + ' '
 
-        #Если тип задание = дз, то записываем
-        if i.type == 'Домашнее задание':
-            homework = i.content
-        # ЕСли нет дз:
-        else:
-            if homework == '':
-                homework = 'не задано'
+            #Если тип задание = дз, то записываем
+            if i['typeId'] == 3:
+                homework = i['assignmentName']
+            else:
+                # ЕСли нет дз:
+                if homework == '':
+                    homework = 'не задано'
 
     #print(lesson.subject)
     #print(lesson.room)
@@ -215,8 +217,9 @@ async def lesson_information(message: Message):
     #print(marks)
 
     await message.answer(f"""
-Предмет: {lesson.subject}
-Кабинет: {lesson.room}
-Время проведения урока: {lesson.start:%H.%M} - {lesson.end:%H.%M}
+Предмет: {lesson['subjectName']}
+Кабинет: {lesson['room']}
+Время проведения урока: {lesson['startTime']} - {lesson['endTime']}
 Домашние задание: {homework}
+Оценка: {marks}
     """)

@@ -92,28 +92,29 @@ async def diary_for_day(message: Message):
 
     
     #Добавляем кнопку с содержанием номера урока, названия урока, оценки
-    for lesson in diary.schedule[day].lessons:
-        for assignment in lesson.assignments:
-            if assignment.mark != None: # Если есть оценка
-                numberOfTimes += 1
-                # Добавляем кнопку с уроком
-                keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject +
-                                    ' ' + str(assignment.mark), {'cmd': f'lesson_information_{numberOfTimes}'}))
-                keyboard.row()
-                break
-            else: # Если нет оценки:
-                if assignment == lesson.assignments[0] and len(lesson.assignments) > 1: # Если помимо этого задания есть другое, то переходим к нему (например если задано дз, и была работа на уроке)
-                    continue
-                # Добавляем кнопку с уроком
-                numberOfTimes += 1
-                keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject,
-                                {'cmd': f'lesson_information_{numberOfTimes}'}))
-                keyboard.row()
+    for lesson in diary['weekDays'][day]['lessons']:
+        if 'assignments' in lesson:
+            for assignment in lesson['assignments']:
+                if 'mark' in assignment: # Если есть оценка
+                    numberOfTimes += 1
+                    # Добавляем кнопку с уроком
+                    keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson['subjectName'] +
+                                        ' ' + str(assignment['mark']['mark']), {'cmd': f'lesson_information_{numberOfTimes}'}))
+                    keyboard.row()
+                    break
+                else: # Если нет оценки:
+                    if assignment == lesson['assignments'][0] and len(lesson['assignments']) > 1: # Если помимо этого задания есть другое, то переходим к нему (например если задано дз, и была работа на уроке)
+                        continue
+                    # Добавляем кнопку с уроком
+                    numberOfTimes += 1
+                    keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson['subjectName'],
+                                    {'cmd': f'lesson_information_{numberOfTimes}'}))
+                    keyboard.row()
 
-        if len(lesson.assignments) == 0: # Если заданий вообще нет:
+        else: # Если заданий вообще нет:
             numberOfTimes += 1
             # Добавляем кнопку с уроком
-            keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject,
+            keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson['subjectName'],
                             {'cmd': f'lesson_information_{numberOfTimes}'}))
             keyboard.row()
 
@@ -197,29 +198,30 @@ async def diary_for_day(message: Message):
 
     
     #Добавляем кнопку с содержанием номера урока, названия урока, оценки
-    for lesson in diary.schedule[day].lessons:
-        for assignment in lesson.assignments:
-            if assignment.mark != None: # Если есть оценка
-                numberOfTimes += 1
-                # Добавляем кнопку с уроком
-                keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject +
-                                    ' ' + str(assignment.mark), {'cmd': f'{period}lesson_information_{numberOfTimes}'}))
-                keyboard.row()
-                break
-            else: # Если нет оценки:
-                if assignment == lesson.assignments[0] and len(lesson.assignments) > 1:
-                    continue
-                # Добавляем кнопку с уроком
-                numberOfTimes += 1
-                keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject,
-                                {'cmd': f'{period}lesson_information_{numberOfTimes}'}))
-                keyboard.row()
+    for lesson in diary['weekDays'][day]['lessons']:
+        if 'assignments' in lesson:
+            for assignment in lesson['assignments']:
+                if 'mark' in assignment: # Если есть оценка
+                    numberOfTimes += 1
+                    # Добавляем кнопку с уроком
+                    keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson['subjectName'] +
+                                        ' ' + str(assignment['mark']['mark']), {'cmd': f'lesson_information_{numberOfTimes}'}))
+                    keyboard.row()
+                    break
+                else: # Если нет оценки:
+                    if assignment == lesson['assignments'][0] and len(lesson['assignments']) > 1: # Если помимо этого задания есть другое, то переходим к нему (например если задано дз, и была работа на уроке)
+                        continue
+                    # Добавляем кнопку с уроком
+                    numberOfTimes += 1
+                    keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson['subjectName'],
+                                    {'cmd': f'lesson_information_{numberOfTimes}'}))
+                    keyboard.row()
 
-        if len(lesson.assignments) == 0: # Если заданий вообще нет:
+        else: # Если заданий вообще нет:
             numberOfTimes += 1
             # Добавляем кнопку с уроком
-            keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson.subject,
-                            {'cmd': f'{period}lesson_information_{numberOfTimes}'}))
+            keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson['subjectName'],
+                            {'cmd': f'lesson_information_{numberOfTimes}'}))
             keyboard.row()
 
     # Добавляем кнопку назад
