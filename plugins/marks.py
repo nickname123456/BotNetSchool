@@ -6,10 +6,40 @@ from ns import get_marks
 
 
 bp = Blueprint('marks') # Объявляем команду
+bp.on.vbml_ignore_case = True # Игнорируем регистр сообщений
+
 db = SQLighter('database.db')# Подключаемся к базеданных
 
 
-@bp.on.message(payload={'cmd': 'marks'})
-@bp.on.message(text = 'оценки')
+@bp.on.private_message(payload={'cmd': 'marks'})
+@bp.on.private_message(text = 'оценки')
 async def marks(message: Message):
-    print(await get_marks('мТаскаеваЕ1Е', '123456789', 'МАОУ "СОШ № 47 г. Челябинска"', 'https://sgo.edu-74.ru'))
+    # Информация о юзере
+    userInfo = await bp.api.users.get(message.from_id) 
+    user_id = userInfo[0].id
+
+    await message.answer(
+        await get_marks(    
+            db.get_account_login(user_id),
+            db.get_account_password(user_id),
+            db.get_account_school(user_id),
+            db.get_account_link(user_id)
+        )   
+    )
+
+
+
+@bp.on.chat_message(payload={'cmd': 'marks'})
+@bp.on.chat_message(text = 'оценки')
+async def marks(message: Message):
+    # Айди чата:
+    chat_id = message.chat_id
+
+    await message.answer(
+        await get_marks(    
+            db.get_chat_login(chat_id),
+            db.get_chat_password(chat_id),
+            db.get_chat_school(chat_id),
+            db.get_chat_link(chat_id)
+        )   
+    )
