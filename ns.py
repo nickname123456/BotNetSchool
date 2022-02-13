@@ -103,7 +103,7 @@ async def get_announcements(login, password, amount, school, link):
 
 
 
-async def get_marks(login, password, school, url):
+async def get_marks(login, password, school, url, subject = None):
     api = NetSchoolAPI(url)
     await api.login(login,password,school)
     period = await api.get_period()
@@ -122,16 +122,20 @@ async def get_marks(login, password, school, url):
                     if 'mark' in assignment.keys() and 'mark' in assignment['mark']:
                         if assignment['mark']['mark'] != None:
                             marks[lesson['subjectName']].append(assignment['mark']['mark'])
-    result = ''
-    for lesson in marks.keys():
-        if marks[lesson]:
-            marks[lesson] = [mark for mark in marks[lesson] if mark]
-            general_sum = round(sum(marks[lesson]) / len(marks[lesson]), 1)
-            marks[lesson] = ' '.join(str(e) for e in marks[lesson])
-            result += f"\n{lesson}: {marks[lesson]} | {general_sum}"
-    if not result:
-        result = '❌Нет оценок'
-    return result
+
+    if subject == None:                     
+        result = ''
+        for lesson in marks.keys():
+            if marks[lesson]:
+                marks[lesson] = [mark for mark in marks[lesson] if mark]
+                general_sum = round(sum(marks[lesson]) / len(marks[lesson]), 2)
+                marks[lesson] = ' '.join(str(e) for e in marks[lesson])
+                result += f"\n{lesson}: {marks[lesson]} | {general_sum}"
+        if not result:
+            result = '❌Нет оценок'
+        return result
+    else:
+        return marks[subject]
 
 
 
@@ -186,3 +190,42 @@ async def getAnnouncementsNotify(login, password, school, url, old_announcements
         difference = [item for item in needed_announcements if item not in old_announcements]
 
     return needed_announcements, difference
+
+
+
+
+async def correction_mark(login, password, school, url, subject, mark):
+    all_marks = await get_marks(login, password, school, url, subject)
+    average_mark = float(round(sum(all_marks) / len(all_marks), 2))
+    lower_threshold = float(mark) - 0.4
+    len_5 = 0
+    len_4 = 0
+    len_3 = 0
+
+    if mark == 5:
+        corrective_marks = [5]
+    elif mark == 4:
+        corrective_marks = [5,4]
+    elif mark == 3:
+        corrective_marks = [5,4,3]
+
+    if average_mark >= lower_threshold:
+        return 'У тебя и так норм оценка'
+    
+    for i in corrective_marks:
+        all_marks = await get_marks(login, password, school, url, subject)
+        average_mark = float(round(sum(all_marks) / len(all_marks), 2))
+        
+        while average_mark <= lower_threshold:
+            all_marks.append(i)
+            average_mark = float(round(sum(all_marks) / len(all_marks), 2))
+
+            if i == 5:
+                len_5 += 1
+            elif i == 4:
+                len_4 += 1
+            elif i == 3:
+                len_3 += 1
+    
+    return f'Для твоей цели нужны такие оценки: \n 5️⃣: {len_5} \n4️⃣: {len_4} \n 3️⃣: {len_3}'
+        

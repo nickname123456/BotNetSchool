@@ -1,7 +1,7 @@
 from . import login, menu, not_found, start
 from .diary import diary_for_day, keyboard_diary, lesson_information
 from .homework import homework, keyboard_homework, update_homework
-from .marks import marks
+from .marks import marks, correction_mark_choice_lesson, correction_mark_choice_mark, correction_mark
 from .schedule import keyboard_schedule, schedule_download, schedule_for_day
 from .settings import keyboard_announcements_notification, keyboard_mark_notification, keyboard_settings, notification
 from .announcements import announcements
@@ -25,4 +25,7 @@ bps = [not_found.bp,
        keyboard_settings.bp,
        keyboard_mark_notification.bp,
        keyboard_announcements_notification.bp,
-       notification.bp]
+       notification.bp,
+       correction_mark_choice_lesson.bp,
+       correction_mark_choice_mark.bp,
+       correction_mark.bp]
