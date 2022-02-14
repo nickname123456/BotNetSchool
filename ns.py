@@ -228,4 +228,16 @@ async def correction_mark(login, password, school, url, subject, mark):
                 len_3 += 1
     
     return f'Для твоей цели нужны такие оценки: \n 5️⃣: {len_5} \n4️⃣: {len_4} \n 3️⃣: {len_3}'
-        
+
+
+
+
+
+async def getSettings(login, password, school, url):
+	api = NetSchoolAPI(url)
+	await api.login(login, password, school)
+	settings = await api.userInfo()
+	result = '🔐Приватные данные из СГО:\n\n'
+	for key in settings.keys():
+		result += f'{key}: {settings[key]}\n'
+	return result
