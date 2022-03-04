@@ -3,6 +3,7 @@ from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
 from netschoolapi import NetSchoolAPI
 from sqlighter import SQLighter
+import logging
 
 
 bp = Blueprint('menu')# Объявляем команду
@@ -16,6 +17,7 @@ db = SQLighter('database.db')# Подключаемся к базеданных
 @bp.on.private_message(text=["Меню"])
 @bp.on.private_message(payload={'cmd': 'menu'})
 async def menu(message: Message):
+    logging.info(f'{message.peer_id}: I get menu')
     # Информация о юзере
     userInfo = await bp.api.users.get(message.from_id) 
     user_id = userInfo[0].id
@@ -51,6 +53,7 @@ async def menu(message: Message):
 
     #Ответ в чат
     await message.answer('Ты в главном меню.', keyboard=keyboard)
+    logging.info(f'{message.peer_id}: I sent menu')
 
 
 
@@ -62,6 +65,7 @@ async def menu(message: Message):
 @bp.on.chat_message(text=["Меню"])
 @bp.on.chat_message(payload={'cmd': 'menu'})
 async def menu(message: Message):
+    logging.info(f'{message.peer_id}: I get menu')
     # Айди чата:
     chat_id = message.chat_id
 
@@ -96,3 +100,4 @@ async def menu(message: Message):
 
     #Ответ в чат
     await message.answer('Ты в главном меню.', keyboard=keyboard)
+    logging.info(f'{message.peer_id}: I sent menu')

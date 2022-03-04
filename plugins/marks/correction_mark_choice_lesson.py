@@ -3,6 +3,7 @@ from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
 from vkbottle import Keyboard, KeyboardButtonColor, Text
+import logging
 
 
 bp = Blueprint('correction_mark_choice_lesson') # Объявляем команду
@@ -13,6 +14,7 @@ db = SQLighter('database.db')# Подключаемся к базеданных
 
 @bp.on.message(payload={'cmd': 'correction_mark_choice_lesson'})
 async def correction_mark_choice_lesson(message: Message):
+    logging.info(f'{message.peer_id}: I get correction_mark_choice_lesson')
     #Создаем клавиатуру
     keyboard = (
         Keyboard()
@@ -44,5 +46,6 @@ async def correction_mark_choice_lesson(message: Message):
         .row()
         .add(Text("Назад", {'cmd': 'marks'}), color=KeyboardButtonColor.NEGATIVE)
     )
-
+    
+    logging.info(f'{message.peer_id}: I sent correction_mark_choice_lesson')
     await message.answer('Какой предмет хочешь исправить?', keyboard=keyboard)

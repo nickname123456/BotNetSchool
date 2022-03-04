@@ -3,6 +3,7 @@ from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
 from vkbottle import Keyboard, KeyboardButtonColor, Text
+import logging
 
 
 bp = Blueprint('correction_mark_choice_mark') # Объявляем команду
@@ -13,6 +14,7 @@ db = SQLighter('database.db')# Подключаемся к базеданных
 
 @bp.on.private_message(payload={'cmd': 'correction_mark_choice_mark'})
 async def private_correction_mark_choice_mark(message: Message):
+    logging.info(f'{message.peer_id}: I get correction_mark_choice_mark')
     # Информация о юзере
     userInfo = await bp.api.users.get(message.from_id) 
     user_id = userInfo[0].id
@@ -66,7 +68,8 @@ async def private_correction_mark_choice_mark(message: Message):
         .row()
         .add(Text("Назад", {'cmd': 'marks'}), color=KeyboardButtonColor.NEGATIVE)
     )
-
+    
+    logging.info(f'{message.peer_id}: I sent correction_mark_choice_mark')
     await message.answer('Какую оценку хочешь?', keyboard=keyboard)
 
 
@@ -81,6 +84,7 @@ async def private_correction_mark_choice_mark(message: Message):
 
 @bp.on.chat_message(payload={'cmd': 'correction_mark_choice_mark'})
 async def chat_correction_mark_choice_mark(message: Message):
+    logging.info(f'{message.peer_id}: I get correction_mark_choice_mark')
     # Айди чата:
     chat_id = message.chat_id
     
@@ -134,4 +138,5 @@ async def chat_correction_mark_choice_mark(message: Message):
         .add(Text("Назад", {'cmd': 'correction_mark_choice_lesson'}), color=KeyboardButtonColor.NEGATIVE)
     )
 
+    logging.info(f'{message.peer_id}: I sent correction_mark_choice_mark')
     await message.answer('Какую оценку хочешь?', keyboard=keyboard)

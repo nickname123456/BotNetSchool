@@ -4,6 +4,7 @@ from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
 from ns import get_marks
 from vkbottle import Keyboard, KeyboardButtonColor, Text
+import logging
 
 
 bp = Blueprint('marks') # Объявляем команду
@@ -15,6 +16,7 @@ db = SQLighter('database.db')# Подключаемся к базеданных
 @bp.on.private_message(payload={'cmd': 'marks'})
 @bp.on.private_message(text = 'оценки')
 async def marks(message: Message):
+    logging.info(f'{message.peer_id}: I get marks')
     # Информация о юзере
     userInfo = await bp.api.users.get(message.from_id) 
     user_id = userInfo[0].id
@@ -28,6 +30,8 @@ async def marks(message: Message):
         .add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
     )
 
+    
+    logging.info(f'{message.peer_id}: I sent marks')
     await message.answer(
         await get_marks(    
             db.get_account_login(user_id),
@@ -43,6 +47,7 @@ async def marks(message: Message):
 @bp.on.chat_message(payload={'cmd': 'marks'})
 @bp.on.chat_message(text = 'оценки')
 async def marks(message: Message):
+    logging.info(f'{message.peer_id}: I get marks')
     # Айди чата:
     chat_id = message.chat_id
 
@@ -55,6 +60,8 @@ async def marks(message: Message):
         .add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
     )
 
+    
+    logging.info(f'{message.peer_id}: I sent marks')
     await message.answer(
         await get_marks(    
             db.get_chat_login(chat_id),

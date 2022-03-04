@@ -1,6 +1,7 @@
 from vkbottle.bot import Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
+import logging
 
 
 bp = Blueprint('keyboard_homework')# Объявляем команду
@@ -10,6 +11,7 @@ bp = Blueprint('keyboard_homework')# Объявляем команду
 
 @bp.on.message(payload={'cmd': 'keyboard_homework'})
 async def keyboard_schedule(message: Message):
+    logging.info(f'{message.peer_id}: I get keyboard_homework')
     keyboard = (
         Keyboard()
         #Добавить кнопку
@@ -43,3 +45,4 @@ async def keyboard_schedule(message: Message):
     )
 
     await message.answer('На какой урок хочешь узнать домашнее задание?', keyboard=keyboard)
+    logging.info(f'{message.peer_id}: I send keyboard_homework')

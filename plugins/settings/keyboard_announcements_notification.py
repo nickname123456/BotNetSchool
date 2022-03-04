@@ -1,8 +1,8 @@
 from vkbottle.bot import Message
-from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
 from plugins.settings.keyboard_settings import keyboard_settings_chat, keyboard_settings_private
+import logging
 
 
 bp = Blueprint('keyboard_announcements_notification')# Объявляем команду
@@ -12,6 +12,7 @@ db = SQLighter('database.db') # Подключаемся к базеданных
 
 @bp.on.private_message(payload={'cmd': 'keyboard_announcements_notification'})
 async def keyboard_announcements_notification(message: Message):
+    logging.info(f'{message.peer_id}: I get keyboard_announcements_notification')
     userInfo = await bp.api.users.get(message.from_id) 
     user_id = userInfo[0].id
 
@@ -33,6 +34,7 @@ async def keyboard_announcements_notification(message: Message):
 
 @bp.on.chat_message(payload={'cmd': 'keyboard_announcements_notification'})
 async def keyboard_announcements_notification(message: Message):
+    logging.info('I get keyboard_announcements_notification')
     # Айди чата:
     chat_id = message.chat_id
 

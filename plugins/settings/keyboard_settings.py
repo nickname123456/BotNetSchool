@@ -2,6 +2,7 @@ from vkbottle.bot import Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
+import logging
 
 
 
@@ -12,6 +13,7 @@ db = SQLighter('database.db') # Подключаемся к базеданных
 
 @bp.on.private_message(payload={'cmd': 'keyboard_settings'})
 async def keyboard_settings_private(message: Message):
+    logging.info(f'{message.peer_id}: I get keyboard_settings')
     userInfo = await bp.api.users.get(message.from_id) 
     user_id = userInfo[0].id
 
@@ -46,6 +48,7 @@ async def keyboard_settings_private(message: Message):
 
 @bp.on.chat_message(payload={'cmd': 'keyboard_settings'})
 async def keyboard_settings_chat(message: Message):
+    logging.info(f'{message.peer_id}: I get keyboard_settings')
     # Айди чата:
     chat_id = message.chat_id
 

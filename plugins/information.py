@@ -1,8 +1,9 @@
 from vkbottle.bot import Message
-from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
 from ns import getSettings
+import logging
+
 
 
 bp = Blueprint('information')# Объявляем команду
@@ -14,6 +15,7 @@ db = SQLighter('database.db')# Подключаемся к базеданных
 #Если написали "Меню" или нажали на соответствующую кнопку
 @bp.on.private_message(payload={'cmd': 'information'})
 async def private_information(message: Message):
+    logging.info(f'{message.peer_id}: I get information')
     # Информация о юзере
     userInfo = await bp.api.users.get(message.from_id) 
     user_id = userInfo[0].id
@@ -25,6 +27,7 @@ async def private_information(message: Message):
         db.get_account_link(user_id)
     )
     await message.answer(result)
+    logging.info(f'{message.peer_id}: I sent information')
 
 
 
@@ -33,6 +36,7 @@ async def private_information(message: Message):
 #Если написали "Меню" или нажали на соответствующую кнопку
 @bp.on.chat_message(payload={'cmd': 'information'})
 async def chat_information(message: Message):
+    logging.info(f'{message.peer_id}: I get information')
     # Айди чата:
     chat_id = message.chat_id
 
@@ -43,3 +47,4 @@ async def chat_information(message: Message):
         db.get_chat_link(chat_id)
     )
     await message.answer(result)
+    logging.info(f'{message.peer_id}: I sent information')

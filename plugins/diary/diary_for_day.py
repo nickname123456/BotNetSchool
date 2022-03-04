@@ -6,6 +6,7 @@ from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
 from ns import get_diary
 import netschoolapi
+import logging
 
 
 bp = Blueprint('diary_for_day') # Объявляем команду
@@ -17,10 +18,12 @@ db = SQLighter('database.db') # Подключаемся к базеданных
                                 {'cmd': 'next_diary_for_day'}])
 async def diary_for_day(message: Message):
     userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
+    logging.info(f'{message.peer_id}: I get diary for day')
 
     #Если дневника нет в списке
     if db.get_account_correctData(userInfo[0].id) != 1:
         await message.answer('Ты не зарегистрирован! \nНапиши "Начать"\n Или у тебя неверный логин/пароль')
+        logging.info(f'{message.peer_id}: User not found in db')
         return
 
     # Создаем клавиатуру
@@ -39,8 +42,10 @@ async def diary_for_day(message: Message):
                 db.get_account_school(userInfo[0].id),
                 db.get_account_link(userInfo[0].id)
             )
+            logging.info(f'{message.peer_id}: Get diary in NetSchool')
         except netschoolapi.errors.AuthError:
             await message.answer('Неправильный логин или пароль!')
+            logging.info(f'{message.peer_id}: Incorrect login or password!')
             return
     
     # Если пользователь выбрал предыдущую неделю
@@ -53,8 +58,10 @@ async def diary_for_day(message: Message):
                 db.get_account_school(userInfo[0].id),
                 db.get_account_link(userInfo[0].id)
             )
+            logging.info(f'{message.peer_id}: Get diary in NetSchool')
         except netschoolapi.errors.AuthError:
             await message.answer('Неправильный логин или пароль!')
+            logging.info(f'{message.peer_id}: Incorrect login or password!')
             return
 
     # Если пользователь выбрал следующую неделю
@@ -67,8 +74,10 @@ async def diary_for_day(message: Message):
                 db.get_account_school(userInfo[0].id),
                 db.get_account_link(userInfo[0].id)
             )
+            logging.info(f'{message.peer_id}: Get diary in NetSchool')
         except netschoolapi.errors.AuthError:
             await message.answer('Неправильный логин или пароль!')
+            logging.info(f'{message.peer_id}: Incorrect login or password!')
             return
     
 
@@ -122,6 +131,7 @@ async def diary_for_day(message: Message):
     keyboard.add(
         Text("Назад", {'cmd': 'keyboard_diary'}), color=KeyboardButtonColor.NEGATIVE)
     await message.answer('Нажми на предмет для того, чтобы увидеть информацию о нем', keyboard=keyboard)
+    logging.info(f'{message.peer_id}: Send keyboard for day')
 
 
 
@@ -135,6 +145,7 @@ async def diary_for_day(message: Message):
                         {'cmd': 'next_diary_for_day'}])
 async def diary_for_day(message: Message):
     chat_id = message.chat_id
+    logging.info(f'{message.peer_id}: I get diary for day')
 
     # Создаем клавиатуру
     keyboard = (
@@ -152,6 +163,7 @@ async def diary_for_day(message: Message):
                 get_period(),
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id))
+            logging.info(f'{message.peer_id}: Get diary in NetSchool')
             
         # Если пользователь выбрал предыдущую неделю
         elif message.payload == '{"cmd":"back_diary_for_day"}':
@@ -162,6 +174,7 @@ async def diary_for_day(message: Message):
                 get_back_period(), # Получить предыдущую неделю
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id))
+            logging.info(f'{message.peer_id}: Get diary in NetSchool')
 
         # Если пользователь выбрал следующую неделю
         elif message.payload == '{"cmd":"next_diary_for_day"}':
@@ -172,8 +185,10 @@ async def diary_for_day(message: Message):
                 get_next_period(), # Получить следующую неделю
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id))
+            logging.info(f'{message.peer_id}: Get diary in NetSchool')
             
     except:
+        logging.info(f'{message.peer_id}: Incorrect login or password or not linked chat!')
         await message.answer('К этой беседе не подключен аккаунт. \nДля подключение напишите "Вход <логин> <пароль>"')
         return
     
@@ -228,3 +243,4 @@ async def diary_for_day(message: Message):
     keyboard.add(
         Text("Назад", {'cmd': 'keyboard_diary'}), color=KeyboardButtonColor.NEGATIVE)
     await message.answer('Нажми на предмет для того, чтобы увидеть информацию о нем', keyboard=keyboard)
+    logging.info(f'{message.peer_id}: Send keyboard for day')

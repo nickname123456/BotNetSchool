@@ -3,6 +3,8 @@ from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
 from vkbottle import CtxStorage
 from vkbottle import BaseStateGroup
+import logging
+
 
 
 bp = Blueprint('schedule_download') # Объявляем команду
@@ -21,17 +23,20 @@ class ScheduleData(BaseStateGroup):
 
 @bp.on.private_message(lev='/Загрузить')
 async def day_schedule_download(message: Message):
+    logging.info(f'{message.peer_id}: I get /download')
     await bp.state_dispenser.set(message.peer_id, ScheduleData.DAY) # Говорим, что следующий шаг - выбор дня
     return "Введи день"
 
 @bp.on.private_message(state=ScheduleData.DAY)
 async def photo_schedule_download(message: Message):
+    logging.info(f'{message.peer_id}: I get day in schedule_download')
     ctx.set('day', message.text) # Загружаем во внутренне хранилище день недели
     await bp.state_dispenser.set(message.peer_id, ScheduleData.PHOTO) # Говорим, что следующий шаг - выбор фото
     return 'Введи фото'
 
 @bp.on.private_message(state=ScheduleData.PHOTO)
 async def finish_schedule_download(message: Message):
+    logging.info(f'{message.peer_id}: I get photo in schedule_download')
     await bp.state_dispenser.delete(message.peer_id) # Удаляем цепочку
     day = ctx.get('day') # Берем из хранилища день
     photo = message.text # Берем из хранилища фото
@@ -45,4 +50,5 @@ async def finish_schedule_download(message: Message):
         return
 
     await message.answer(f'{day} {photo}', attachment={photo})
+    logging.info(f'{message.peer_id}: I sent success')
     return 'ура победа'

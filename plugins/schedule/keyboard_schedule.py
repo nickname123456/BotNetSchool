@@ -1,6 +1,7 @@
 from vkbottle.bot import Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
+import logging
 
 
 bp = Blueprint('keyboard_schedule')# Объявляем команду
@@ -10,6 +11,7 @@ bp = Blueprint('keyboard_schedule')# Объявляем команду
 
 @bp.on.message(payload={'cmd': 'keyboard_schedule'})
 async def keyboard_schedule(message: Message):
+    logging.info(f'{message.peer_id}: I get keyboard_schedule')
     keyboard = (
         Keyboard()
         #Добавить кнопку
@@ -27,4 +29,6 @@ async def keyboard_schedule(message: Message):
         .add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
     )
 
+    
+    logging.info(f'{message.peer_id}: I sent keyboard_schedule')
     await message.answer('На какой день хочешь узнать расписание?', keyboard=keyboard)

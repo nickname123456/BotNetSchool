@@ -2,6 +2,8 @@ from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
 import ns
+import logging
+
 
 
 bp = Blueprint('login')# Объявляем команду
@@ -15,10 +17,12 @@ db = SQLighter('database.db')# Подключаемся к базеданных
 @bp.on.private_message(text=["Вход <userLogin> <userPassword>", "Вход", 'Войти', 'Войти <userLogin> <userPassword>'])
 @bp.on.private_message(payload={'cmd': 'login'})
 async def login(message: Message, userLogin=None, userPassword=None):
+    logging.info(f'{message.peer_id}: I get login')
     userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
 
     # Если человека нет в бд
     if db.get_account_isFirstLogin(userInfo[0].id) is None:
+        logging.info(f'{message.peer_id}: User not in database')
         await message.answer("Так... Смотрю тебя теще нет в моей бд. Но ничего страшного сейчас все будет!")
         await message.answer('Напиши "Начать')
         return
@@ -30,6 +34,7 @@ async def login(message: Message, userLogin=None, userPassword=None):
         db.edit_account_password(userInfo[0].id, userPassword)
         db.edit_account_correctData(userInfo[0].id, 0)
         db.commit()
+        logging.info(f'{message.peer_id}: Write new data to database')
 
     
     #Записываем логин из бд в переменную
@@ -53,14 +58,18 @@ async def login(message: Message, userLogin=None, userPassword=None):
             userSchool,
             userLink
         )
+        logging.info(f'{message.peer_id}: Login in NetSchool')
     except:
+        logging.exception(f'{message.peer_id}: Exception occurred')
         await message.answer('Неправильный логин или пароль!')
         return
 
     db.edit_account_correctData(userInfo[0].id, 1) #Подтверждаем правильность логина и пароя в бд
     db.commit()
+    logging.info(f'{message.peer_id}: Write correctData to database')
 
     await message.answer(f'{userInfo[0].first_name}, ты успешно зашел в систему под логином: {userLogin}')
+    logging.info(f'{message.peer_id}: login COMPLETED')
     #Выходим из СГ
     #await ns.logout(userLink)
 
@@ -75,6 +84,7 @@ async def login(message: Message, userLogin=None, userPassword=None):
 @bp.on.chat_message(text=["Вход <userLogin> <userPassword>", "Вход"])
 @bp.on.chat_message(payload={'cmd': 'login'})
 async def login(message: Message, userLogin=None, userPassword=None):
+    logging.info(f'{message.peer_id}: I get login')
     chat_id = message.chat_id # Чат айди
 
     try:
@@ -85,6 +95,7 @@ async def login(message: Message, userLogin=None, userPassword=None):
             db.edit_chat_login(chat_id, userLogin)
             db.edit_chat_password(chat_id, userPassword)
             db.commit()
+            logging.info(f'{message.peer_id}: Write new data to database')
 
         
         #Записываем логин из бд в переменную
@@ -108,17 +119,22 @@ async def login(message: Message, userLogin=None, userPassword=None):
             chatLogin,
             chatPassword,
             chatSchool,
-            chatLink)
+            chatLink
+        )
+        logging.info(f'{message.peer_id}: Login in NetSchool')
             
     except TypeError:
+        logging.exception(f'{message.peer_id}: Exception occurred')
         await message.answer('Нужно зарегистрировать беседу. \nНапиши "Начать"')
         return
 
     except:
+        logging.exception(f'{message.peer_id}: Exception occurred')
         await message.answer('Неправильный логин или пароль!')
         return
 
     await message.answer(f'Эта беседа успешно зашла в систему под логином: {chatLogin}')
+    logging.info(f'{message.peer_id}: login COMPLETED')
     #Выходим из СГ
     #await ns.logout()
 

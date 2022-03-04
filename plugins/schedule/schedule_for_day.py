@@ -1,6 +1,7 @@
 from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
+import logging
 
 
 bp = Blueprint('schedule_download') # Объявляем команду
@@ -10,6 +11,7 @@ db = SQLighter('database.db') # Подключаемся к базе данны�
 
 @bp.on.message(payload={'cmd': 'schedule_for_day'})
 async def schedule_for_day(message: Message):
+    logging.info(f'{message.peer_id}: I get schedule_for_day')
     
     # Если юзер выбрал понедельник, и на этот день есть расписание
     if 'Понедельник' in message.text and db.get_schedule(0) is not None:
@@ -33,3 +35,5 @@ async def schedule_for_day(message: Message):
     
     else:
         await message.answer('На этот день еще нет расписания')
+
+    logging.info(f'{message.peer_id}: I sent keyboard_schedule')

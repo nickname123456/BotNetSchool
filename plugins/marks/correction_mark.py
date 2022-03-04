@@ -2,8 +2,8 @@ from typing import Text
 from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
-from vkbottle import Keyboard, KeyboardButtonColor, Text
 import ns
+import logging
 
 
 bp = Blueprint('correction_mark') # Объявляем команду
@@ -14,6 +14,7 @@ db = SQLighter('database.db')# Подключаемся к базеданных
 
 @bp.on.private_message(payload={'cmd': 'correction_mark'})
 async def private_correction_mark(message: Message):
+    logging.info(f'{message.peer_id}: I get correction_mark')
     # Информация о юзере
     userInfo = await bp.api.users.get(message.from_id) 
     user_id = userInfo[0].id
@@ -27,6 +28,7 @@ async def private_correction_mark(message: Message):
 
     db.edit_account_correction_mark(user_id, mark)
 
+    logging.info(f'{message.peer_id}: I sent correction_mark')
     await message.answer(await ns.correction_mark(
         db.get_account_login(user_id),
         db.get_account_password(user_id),
@@ -48,6 +50,7 @@ async def private_correction_mark(message: Message):
 
 @bp.on.chat_message(payload={'cmd': 'correction_mark'})
 async def chat_correction_mark(message: Message):
+    logging.info(f'{message.peer_id}: I get correction_mark')
     # Айди чата:
     chat_id = message.chat_id
 
@@ -60,6 +63,7 @@ async def chat_correction_mark(message: Message):
 
     db.edit_chat_correction_mark(chat_id, mark)
 
+    logging.info(f'{message.peer_id}: I sent correction_mark')
     await message.answer(await ns.correction_mark(
         db.get_chat_login(chat_id),
         db.get_chat_password(chat_id),

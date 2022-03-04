@@ -3,8 +3,7 @@ from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
 from netschoolapi import NetSchoolAPI
 import re
-from vkbottle import DocMessagesUploader
-import os
+import logging
 
 
 bp = Blueprint('announcements') # Объявляем команду
@@ -19,6 +18,7 @@ async def announcements(message: Message, amount=3):
     # Информация о юзере
     userInfo = await bp.api.users.get(message.from_id) 
     user_id = userInfo[0].id
+    logging.info(f'{message.peer_id}: I get "announcements {amount}"')
 
     try:
         # Логинимся в сго
@@ -27,6 +27,7 @@ async def announcements(message: Message, amount=3):
             db.get_account_login(user_id),
             db.get_account_password(user_id),
             db.get_account_school(user_id))
+        logging.info(f'{message.peer_id}: Login in NetSchool')
         # Копируем объявления из сго
         announcements = await api.announcements()
 
@@ -44,6 +45,7 @@ async def announcements(message: Message, amount=3):
 
                 # Отправляем объявление
                 await message.answer(announcement)
+                logging.info(f'{message.peer_id}: Send announcement')
 
                 # Перебераем прикрепленные файлы
                 #for attachment in i['attachments']:
@@ -65,11 +67,14 @@ async def announcements(message: Message, amount=3):
 
         # Если нет объявлений:
         else:
+            logging.info(f'{message.peer_id}: No announcements')
             await message.answer('❌Нет объявлений!')
 
 
         await api.logout()
+        logging.info(f'{message.peer_id}: Logout from NetSchool')
     except: # если произошла ошибка
+        logging.exception(f'{message.peer_id}: Exception occurred')
         await message.answer('Ты не зарегистрирован! \nНапиши "Начать"\n Или у тебя неверный логин/пароль')
         await api.logout()
         return
@@ -94,6 +99,7 @@ async def announcements(message: Message, amount=3):
 async def announcements(message: Message, amount=3):
     # Айди чата:
     chat_id = message.chat_id
+    logging.info(f'{message.peer_id}: I get "announcements {amount}"')
 
     try:
         # Логинимся в сго
@@ -102,6 +108,7 @@ async def announcements(message: Message, amount=3):
             db.get_chat_login(chat_id),
             db.get_chat_password(chat_id),
             db.get_chat_school(chat_id))
+        logging.info(f'{message.peer_id}: Login in NetSchool')
         # Копируем объявления из сго
         announcements = await api.announcements()
 
@@ -119,6 +126,7 @@ async def announcements(message: Message, amount=3):
 
                 # Отправляем объявление
                 await message.answer(announcement)
+                logging.info(f'{message.peer_id}: Send announcement')
 
                 # Перебераем прикрепленные файлы
                 #for attachment in i['attachments']:
@@ -140,11 +148,14 @@ async def announcements(message: Message, amount=3):
 
         # Если нет объявлений:
         else:
+            logging.info(f'{message.peer_id}: No announcements')
             await message.answer('❌Нет объявлений!')
 
 
         await api.logout()
+        logging.info(f'{message.peer_id}: Logout from NetSchool')
     except: # если произошла ошибка
+        logging.exception(f'{message.peer_id}: Exception occurred')
         await message.answer('Ты не зарегистрирован! \nНапиши "Начать"\n Или у тебя неверный логин/пароль')
         #await api.logout()
         return

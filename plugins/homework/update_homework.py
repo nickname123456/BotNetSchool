@@ -6,6 +6,7 @@ from vkbottle import CtxStorage
 from vkbottle import BaseStateGroup
 from datetime import datetime
 from settings import admin_id
+import logging
 
 
 bp = Blueprint('update_homework') # Объявляем команду
@@ -25,6 +26,7 @@ class HomeworkData(BaseStateGroup):
 
 @bp.on.message(payload={'cmd': 'keyboard_update_homework'})
 async def keyboard_update_homework(message: Message):
+    logging.info(f'{message.peer_id}: I get keyboard_update_homework')
     await bp.state_dispenser.set(message.peer_id, HomeworkData.lesson) # Говорим, что следующий шаг - выбор урока
     keyboard = (
         Keyboard()
@@ -56,30 +58,37 @@ async def keyboard_update_homework(message: Message):
     )
 
     await message.answer('На какой урок хочешь изменить дз?', keyboard=keyboard)
+    
+    logging.info(f'{message.peer_id}: I send list of lessons')
 
 
 
 
 @bp.on.private_message(state=HomeworkData.lesson)
 async def update_homework(message: Message):
-    ctx.set('lesson', message.text)  # Загружаем во временное хранилище город
+    logging.info(f'{message.peer_id}: I get lesson in update_homework')
+    ctx.set('lesson', message.text)  # Загружаем во временное хранилище урок
     await bp.state_dispenser.set(message.peer_id, HomeworkData.check_admin)  # Говорим, что следующий шаг - проверка на админа
+    logging.info(f'{message.peer_id}: I sent a question about homework')
     return 'Введи дз'
 
 @bp.on.chat_message(state=HomeworkData.lesson)
 async def update_homework(message: Message):
+    logging.info(f'{message.peer_id}: I get lesson in update_homework')
     if 'public' in message.text:
         ctx.set('lesson', message.text[33:]) # Загружаем во временное хранилище урок
     else:
         ctx.set('lesson', message.text[30:]) # Загружаем во временное хранилище урок
 
     await bp.state_dispenser.set(message.peer_id, HomeworkData.check_admin) # Говорим, что следующий шаг - проверка на админа
+    logging.info(f'{message.peer_id}: I sent a question about homework')
     return 'Введи дз'
 
 
 
 @bp.on.private_message(state=HomeworkData.check_admin)
 async def check_admin(message: Message):
+    logging.info(f'{message.peer_id}: I get homework in update_homework')
     userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
     ctx.set('homework', message.text)# Загружаем во временное хранилище дз
     lesson = ctx.get('lesson') # Берем из временного хранилища урок
@@ -87,6 +96,7 @@ async def check_admin(message: Message):
     # Если юзер - админ:
     if str(userInfo[0].id) == str(admin_id):
         await bp.state_dispenser.set(message.peer_id, HomeworkData.homework) # Говорим, что следующий шаг - залив дз в дб
+        logging.info(f'{message.peer_id}: I sent a question about admin????')
         return 'Ты админ?'
     else:
         await bp.state_dispenser.set(int(admin_id), HomeworkData.homework) # Говорим, что следующий шаг - залив дз в дб админом
@@ -95,10 +105,12 @@ async def check_admin(message: Message):
         .add(Text('Одобрить', {"prvt": f"yes_update_homework_{userInfo[0].id}_{message.peer_id}"}), color=KeyboardButtonColor.POSITIVE)
         .add(Text('Отказать', {"prvt": f"no_update_homework_{userInfo[0].id}"}), color=KeyboardButtonColor.NEGATIVE)
         )
+        logging.info(f'{message.peer_id}: I sent a question about approval')
         await bp.api.messages.send(message=f'[id{userInfo[0].id}|Этот человек] хочет обновить дз по {lesson} на: \n{message.text}',user_id=admin_id, keyboard=keyboard, random_id=0)
 
 @bp.on.chat_message(state=HomeworkData.check_admin)
 async def check_admin(message: Message):
+    logging.info(f'{message.peer_id}: I get homework in update_homework')
     userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
     ctx.set('homework', message.text) # Загружаем во временное хранилище дз
     lesson = ctx.get('lesson') # Берем из временного хранилища урок
@@ -106,6 +118,7 @@ async def check_admin(message: Message):
     # Если юзер - админ:
     if str(userInfo[0].id) == str(admin_id):
         await bp.state_dispenser.set(message.peer_id, HomeworkData.homework) # Говорим, что следующий шаг - залив дз в дб
+        logging.info(f'{message.peer_id}: I sent a question about admin????')
         return 'Ты админ?'
     else:
         await bp.state_dispenser.delete(message.peer_id) # Удаляем цепочку с юзером
@@ -115,6 +128,7 @@ async def check_admin(message: Message):
         .add(Text('Одобрить', {"chat": f"yes_update_homework_{userInfo[0].id}_{message.peer_id}"}), color=KeyboardButtonColor.POSITIVE)
         .add(Text('Отказать', {"chat": f"no_update_homework_{userInfo[0].id}"}), color=KeyboardButtonColor.NEGATIVE)
         )
+        logging.info(f'{message.peer_id}: I sent a question about approval')
         await bp.api.messages.send(message=f'[id{userInfo[0].id}|Этот человек] хочет обновить дз по {lesson} на: \n{message.text}',user_id=admin_id, keyboard=keyboard, random_id=0)
 
 
@@ -123,6 +137,7 @@ async def check_admin(message: Message):
 
 @bp.on.private_message(state=HomeworkData.homework)
 async def schedule_for_day(message: Message):
+    logging.info(f'{message.peer_id}: Im at the end of update_homework')
     keyboard = (
         Keyboard()
         .add(Text('Алгебра', {"cmd": "homework"}))
@@ -164,6 +179,7 @@ async def schedule_for_day(message: Message):
 
 
         await bp.api.messages.send(message=f'Администратор отказал вам в измение дз по {lesson} на:\n{homework}', user_id=user_id, keyboard=keyboard, random_id=0)
+        logging.info(f'{message.peer_id}: I sent a refusal')
 
         await message.answer('Ты отказал человеку в изменение дз.')
         return
@@ -201,6 +217,7 @@ async def schedule_for_day(message: Message):
             )
 
             await message.answer('Ты успешно обновил дз')
+            logging.info(f'{message.peer_id}: I sent a success')
 
             homework = db.get_homework(
                 db.get_chat_school(chat_id),
@@ -230,6 +247,7 @@ async def schedule_for_day(message: Message):
             )
 
             await message.answer('Ты успешно обновил дз')
+            logging.info(f'{message.peer_id}: I sent a success')
 
             homework = db.get_homework(
                 db.get_account_school(userInfo[0].id),
@@ -250,6 +268,7 @@ async def schedule_for_day(message: Message):
         return
 
     except Exception as e:
+        logging.exception(f'{message.peer_id}: Exception occurred')
         await message.answer(f'Произошла ошибка\n{e} \nСообщи админу')
         if 'yes_update_homework_' in message.payload:
            await bp.api.messages.send(message=f'Произошла ошибка\n{e} \nСообщи админу', user_id=user_id, keyboard=keyboard, random_id=0)
@@ -260,12 +279,14 @@ async def schedule_for_day(message: Message):
         await bp.api.messages.send(message='Админ одобрил вашу заявку на обновление дз.', user_id=user_id, keyboard=keyboard, random_id=0)
         await bp.api.messages.send(message=f'Урок: {lesson} \nБыло обновлено: {upd_date} \nЗадание: {homework}', user_id=user_id, keyboard=keyboard, random_id=0)
     await message.answer(f'Урок: {lesson} \nБыло обновлено: {upd_date} \nЗадание: {homework}', keyboard=keyboard)
+    logging.info(f'{message.peer_id}: I sent a success')
 
 
 
 
 @bp.on.chat_message(state=HomeworkData.homework)
 async def schedule_for_day(message: Message):
+    logging.info(f'{message.peer_id}: Im at the end of update_homework')
     keyboard = (
         Keyboard()
         .add(Text('Алгебра', {"cmd": "homework"}))
@@ -309,7 +330,7 @@ async def schedule_for_day(message: Message):
         await bp.api.messages.send(message=f'Администратор отказал вам в измение дз по {lesson} на:\n{homework}', user_id=user_id, keyboard=keyboard, random_id=0)
         #except VKAPIError[901] as e:
         #    await message.answer("не могу отправить сообщение из-за настроек приватности")
-
+        logging.info(f'{message.peer_id}: I sent a refusal')
         await message.answer('Ты отказал человеку в изменение дз.')
         return
 
@@ -334,6 +355,7 @@ async def schedule_for_day(message: Message):
         )
 
         await message.answer('Ты успешно обновил дз')
+        logging.info(f'{message.peer_id}: I sent a success')
 
         homework = db.get_homework(
             db.get_chat_school(chat_id),
@@ -347,7 +369,9 @@ async def schedule_for_day(message: Message):
             lesson
         )
     except Exception as e:
-       await message.answer(f'Произошла ошибка\n{e} Сообщи админу')
+        logging.exception(f'{message.peer_id}: Exception occurred')
+        await message.answer(f'Произошла ошибка\n{e} Сообщи админу')
        
 
     await message.answer(f'Урок: {lesson} \nБыло обновлено: {upd_date} \nЗадание: {homework}', keyboard=keyboard)
+    logging.info(f'{message.peer_id}: I sent a success')

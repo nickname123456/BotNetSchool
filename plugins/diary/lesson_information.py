@@ -2,6 +2,7 @@ from ns import get_back_period, get_next_period, get_period, get_diary
 from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
+import logging
 
 
 
@@ -40,6 +41,7 @@ db = SQLighter('database.db')# Подключаемся к базе данных
                         {'cmd': 'next_lesson_information_7'}])
 async def lesson_information(message: Message):
     userInfo = await bp.api.users.get(message.from_id)# Информация о юзере
+    logging.info(f'{message.peer_id}: I get lesson information')
 
     db.edit_account_lesson(userInfo[0].id, message.payload[27::29]) # Редактируем номер урока, на котором юзер
     db.commit()
@@ -54,6 +56,7 @@ async def lesson_information(message: Message):
             get_back_period(),
             db.get_account_school(userInfo[0].id),
             db.get_account_link(userInfo[0].id))
+        logging.info(f'{message.peer_id}: Get back diary')
 
         lesson = diary['weekDays'][day]['lessons'][int(message.payload[32::34])]
 
@@ -65,6 +68,7 @@ async def lesson_information(message: Message):
             get_next_period(),
             db.get_account_school(userInfo[0].id),
             db.get_account_link(userInfo[0].id)) 
+        logging.info(f'{message.peer_id}: Get next diary')
         
         lesson = diary['weekDays'][day]['lessons'][int(message.payload[32::34])]
 
@@ -76,6 +80,7 @@ async def lesson_information(message: Message):
             get_period(),
             db.get_account_school(userInfo[0].id),
             db.get_account_link(userInfo[0].id))
+        logging.info(f'{message.peer_id}: Get diary')
         
         lesson = diary['weekDays'][day]['lessons'][int(message.payload[27::29])]
         
@@ -112,6 +117,7 @@ async def lesson_information(message: Message):
 Домашние задание: {homework}
 Оценка: {marks}
     """)
+    logging.info(f'{message.peer_id}: Send lesson information')
 
 
 
@@ -144,11 +150,13 @@ async def lesson_information(message: Message):
                         {'cmd': 'next_lesson_information_7'}])
 async def lesson_information(message: Message):
     chat_id = message.chat_id # Чат айди
+    logging.info(f'{message.peer_id}: I get lesson information from chat')
 
     try:
         day = db.get_chat_day(chat_id)
     # Если чата нет в бд
     except:
+        logging.info(f'{message.peer_id}: Not found chat in db')
         await message.answer('К этой беседе не подключен аккаунт. \nДля подключение напишите "Вход <логин> <пароль>"')
         return
 
@@ -162,6 +170,7 @@ async def lesson_information(message: Message):
                 get_back_period(),
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id))
+            logging.info(f'{message.peer_id}: Get back diary')
 
             lesson = diary['weekDays'][day]['lessons'][int(message.payload[32::34])]
 
@@ -173,6 +182,7 @@ async def lesson_information(message: Message):
                 get_next_period(),
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id))
+            logging.info(f'{message.peer_id}: Get next diary')
             
             lesson = diary['weekDays'][day]['lessons'][int(message.payload[32::34])]
 
@@ -184,9 +194,11 @@ async def lesson_information(message: Message):
                 get_period(),
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id))
+            logging.info(f'{message.peer_id}: Get diary')
             
             lesson = diary['weekDays'][day]['lessons'][int(message.payload[27::29])]
     except:
+        logging.exception(f'{message.peer_id}: Exception occurred')
         await message.answer('К этой беседе не подключен аккаунт. \nДля подключение напишите "Вход <логин> <пароль>"')
         return
         
@@ -223,3 +235,4 @@ async def lesson_information(message: Message):
 Домашние задание: {homework}
 Оценка: {marks}
     """)
+    logging.info(f'{message.peer_id}: Send lesson information')
