@@ -4,6 +4,8 @@ from sqlighter import SQLighter
 from netschoolapi import NetSchoolAPI
 import re
 import logging
+import os
+from vkbottle import DocMessagesUploader
 
 
 bp = Blueprint('announcements') # Объявляем команду
@@ -48,18 +50,14 @@ async def announcements(message: Message, amount=3):
                 logging.info(f'{message.peer_id}: Send announcement')
 
                 # Перебераем прикрепленные файлы
-                #for attachment in i['attachments']:
-                #    # Скачиваем файл
-                #    await api.download_attachment(attachment)
-                #    # Путь к файлу:
-                #    attachment_source = attachment.name
+                for attachment in i['attachments']:
+                    # Скачиваем файл
+                    file = await api.download_attachment_as_bytes(attachment)
 
-                #    # Отправляем файл
-                #    attach = await DocMessagesUploader(api=message.ctx_api).upload(file_source = attachment_source,title = attachment.name ,peer_id=message.peer_id)
-                #    await message.answer(attachment=attach)
-
-                #    # Удаляем файл
-                #    os.remove(attachment_source)
+                    # Отправляем файл
+                    attach = await DocMessagesUploader(api=message.ctx_api).upload(file_source = file,title = attachment['name'] ,peer_id=message.peer_id)
+                    await message.answer(attachment=attach)
+                    logging.info(f'{message.peer_id}: Send attachment')
 
 
                 # Делаем пробел между объявлениями
@@ -129,18 +127,14 @@ async def announcements(message: Message, amount=3):
                 logging.info(f'{message.peer_id}: Send announcement')
 
                 # Перебераем прикрепленные файлы
-                #for attachment in i['attachments']:
-                #    # Скачиваем файл
-                #    await api.download_attachment(attachment)
-                #    # Путь к файлу:
-                #    attachment_source = attachment.name
+                for attachment in i['attachments']:
+                    # Скачиваем файл
+                    file = await api.download_attachment_as_bytes(attachment)
 
-                #    # Отправляем файл
-                #    attach = await DocMessagesUploader(api=message.ctx_api).upload(file_source = attachment_source,title = attachment.name ,peer_id=message.peer_id)
-                #    await message.answer(attachment=attach)
-
-                #    # Удаляем файл
-                #    os.remove(attachment_source)
+                    # Отправляем файл
+                    attach = await DocMessagesUploader(api=message.ctx_api).upload(file_source = file,title = attachment['name'] ,peer_id=message.peer_id)
+                    await message.answer(attachment=attach)
+                    logging.info(f'{message.peer_id}: Send attachment')
 
 
                 # Делаем пробел между объявлениями
@@ -157,5 +151,5 @@ async def announcements(message: Message, amount=3):
     except: # если произошла ошибка
         logging.exception(f'{message.peer_id}: Exception occurred')
         await message.answer('Ты не зарегистрирован! \nНапиши "Начать"\n Или у тебя неверный логин/пароль')
-        #await api.logout()
+        await api.logout()
         return
