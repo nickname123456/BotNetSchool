@@ -75,10 +75,7 @@ async def update_homework(message: Message):
 @bp.on.chat_message(state=HomeworkData.lesson)
 async def update_homework(message: Message):
     logging.info(f'{message.peer_id}: I get lesson in update_homework')
-    if 'public' in message.text:
-        ctx.set('lesson', message.text[33:]) # Загружаем во временное хранилище урок
-    else:
-        ctx.set('lesson', message.text[30:]) # Загружаем во временное хранилище урок
+    ctx.set('lesson', message.text) # Загружаем во временное хранилище урок
 
     await bp.state_dispenser.set(message.peer_id, HomeworkData.check_admin) # Говорим, что следующий шаг - проверка на админа
     logging.info(f'{message.peer_id}: I sent a question about homework')

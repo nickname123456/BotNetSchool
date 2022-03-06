@@ -107,5 +107,5 @@ async def notification_private(message: Message):
 
 
 
-
+            logging.info(f'{message.peer_id}:I sleep for 30 minutes')
             asyncio.sleep(1800)

@@ -48,15 +48,19 @@ async def keyboard_schedule(message: Message):
         homework = db.get_homework(
             db.get_chat_school(chat_id),
             db.get_chat_class(chat_id),
-            message.text[30:]
+            message.text
         )
 
         # Получаем дату обновления дз
         upd_date = db.get_upd_date(
             db.get_chat_school(chat_id),
             db.get_chat_class(chat_id),
-            message.text[30:]
+            message.text
         )
+    except TypeError:
+        logging.exception(f'{message.peer_id}: Exception occurred')
+        await message.answer('Неправильно выбран класс!\n Настоятельно рекомендую написать "Начать", для повторной регистрации')
+
     except Exception as e:
         logging.exception(f'{message.peer_id}: Exception occurred')
         await message.answer(f'Ошибка: {e} \nСообщи админу!')

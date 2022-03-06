@@ -20,12 +20,18 @@ async def private_information(message: Message):
     userInfo = await bp.api.users.get(message.from_id) 
     user_id = userInfo[0].id
 
-    result= await getSettings(
-        db.get_account_login(user_id),
-        db.get_account_password(user_id),
-        db.get_account_school(user_id),
-        db.get_account_link(user_id)
-    )
+    try:
+        result= await getSettings(
+            db.get_account_login(user_id),
+            db.get_account_password(user_id),
+            db.get_account_school(user_id),
+            db.get_account_link(user_id)
+        )
+    except:
+        logging.exception(f'{message.peer_id}: Exception occurred')
+        await message.answer('Неправильный логин или пароль!\n Настоятельно рекомендую написать "Начать", для повторной регистрации')
+        return
+
     await message.answer(result)
     logging.info(f'{message.peer_id}: I sent information')
 
@@ -40,11 +46,17 @@ async def chat_information(message: Message):
     # Айди чата:
     chat_id = message.chat_id
 
-    result= await getSettings(
-        db.get_chat_login(chat_id),
-        db.get_chat_password(chat_id),
-        db.get_chat_school(chat_id),
-        db.get_chat_link(chat_id)
-    )
+    try:
+        result= await getSettings(
+            db.get_chat_login(chat_id),
+            db.get_chat_password(chat_id),
+            db.get_chat_school(chat_id),
+            db.get_chat_link(chat_id)
+        )
+    except:
+        logging.exception(f'{message.peer_id}: Exception occurred')
+        await message.answer('Неправильный логин или пароль!\n Настоятельно рекомендую написать "Начать", для повторной регистрации')
+        return
+
     await message.answer(result)
     logging.info(f'{message.peer_id}: I sent information')

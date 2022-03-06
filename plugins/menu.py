@@ -22,12 +22,17 @@ async def menu(message: Message):
     userInfo = await bp.api.users.get(message.from_id) 
     user_id = userInfo[0].id
 
-    api = NetSchoolAPI(db.get_account_link(user_id))
-    await api.login(
-        db.get_account_login(user_id), 
-        db.get_account_password(user_id), 
-        db.get_account_school(user_id)
-    )
+    try:
+        api = NetSchoolAPI(db.get_account_link(user_id))
+        await api.login(
+            db.get_account_login(user_id), 
+            db.get_account_password(user_id), 
+            db.get_account_school(user_id)
+        )
+    except:
+        logging.exception(f'{message.peer_id}: Exception occurred')
+        await message.answer('Неправильный логин или пароль!\n Настоятельно рекомендую написать "Начать", для повторной регистрации')
+        return
 
     settings = await api.userInfo()
     name = settings['Имя']
@@ -46,7 +51,7 @@ async def menu(message: Message):
         .add(Text('Объявления', {'cmd': 'announcements'}), color=KeyboardButtonColor.SECONDARY)
         .add(Text('Оценки', {'cmd': ' '}), color=KeyboardButtonColor.SECONDARY)
         .row()
-        .add(Text('🔁', {'cmd': 'not_found'}), color=KeyboardButtonColor.SECONDARY)
+        .add(Text('🔁', {'cmd': 'start'}), color=KeyboardButtonColor.SECONDARY)
         .add(Text(f'{name}', {'cmd': 'information'}), color=KeyboardButtonColor.PRIMARY)
         .add(Text('⚙', {'cmd': 'keyboard_settings'}), color=KeyboardButtonColor.SECONDARY)
     )
@@ -69,12 +74,17 @@ async def menu(message: Message):
     # Айди чата:
     chat_id = message.chat_id
 
-    api = NetSchoolAPI(db.get_chat_link(chat_id))
-    await api.login(
-        db.get_chat_login(chat_id), 
-        db.get_chat_password(chat_id), 
-        db.get_chat_school(chat_id)
-    )
+    try:
+        api = NetSchoolAPI(db.get_chat_link(chat_id))
+        await api.login(
+            db.get_chat_login(chat_id), 
+            db.get_chat_password(chat_id), 
+            db.get_chat_school(chat_id)
+        )
+    except:
+        logging.exception(f'{message.peer_id}: Exception occurred')
+        await message.answer('Неправильный логин или пароль!\n Настоятельно рекомендую написать "Начать", для повторной регистрации')
+        return
 
     settings = await api.userInfo()
     name = settings['Имя']

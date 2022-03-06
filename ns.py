@@ -196,7 +196,12 @@ async def getAnnouncementsNotify(login, password, school, url, old_announcements
 
 async def correction_mark(login, password, school, url, subject, mark):
     all_marks = await get_marks(login, password, school, url, subject)
-    average_mark = float(round(sum(all_marks) / len(all_marks), 2))
+
+    if len(all_marks) != 0:
+        average_mark = float(round(sum(all_marks) / len(all_marks), 2))
+    else:
+        average_mark = 0.0
+
     lower_threshold = float(mark) - 0.4
     len_5 = 0
     len_4 = 0
@@ -214,7 +219,11 @@ async def correction_mark(login, password, school, url, subject, mark):
     
     for i in corrective_marks:
         all_marks = await get_marks(login, password, school, url, subject)
-        average_mark = float(round(sum(all_marks) / len(all_marks), 2))
+
+        if len(all_marks) != 0:
+            average_mark = float(round(sum(all_marks) / len(all_marks), 2))
+        else:
+            average_mark = 0.0
         
         while average_mark <= lower_threshold:
             all_marks.append(i)
@@ -227,7 +236,7 @@ async def correction_mark(login, password, school, url, subject, mark):
             elif i == 3:
                 len_3 += 1
     
-    return f'Для твоей цели нужны такие оценки: \n 5️⃣: {len_5} \n4️⃣: {len_4} \n 3️⃣: {len_3}'
+    return f'Для твоей цели нужны такие оценки: \n 5️⃣: {len_5} \nили\n4️⃣: {len_4} \nили\n 3️⃣: {len_3}'
 
 
 

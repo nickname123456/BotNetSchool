@@ -15,6 +15,8 @@ async def keyboard_schedule(message: Message):
     keyboard = (
         Keyboard()
         #Добавить кнопку
+        .add(Text("Все дз на 1 день", {'cmd': 'keyboard_homework_for_day'}), color=KeyboardButtonColor.PRIMARY)
+        .row()
         .add(Text('Алгебра', {"cmd": "homework"}))
         .add(Text('Инф.', {"cmd": "homework"}))
         .add(Text('Геом.', {"cmd": "homework"}))

@@ -27,6 +27,7 @@ class StartData(BaseStateGroup):
 
 
 @bp.on.message(lev='Начать')
+@bp.on.message(payload={'cmd': 'start'})
 async def city_selection(message: Message):
     logging.info(f'{message.peer_id}: I get START')
     await bp.state_dispenser.set(message.peer_id, StartData.city) # Говорим, что следующий шаг - выбор города
