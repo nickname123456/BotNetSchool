@@ -78,6 +78,8 @@ async def private_homework_for_day(message: Message):
 
     for lesson in diary['weekDays'][day]['lessons']:
         lesson = lesson['subjectName']
+        if lesson == 'Проектная деятельность':
+            continue
         lesson = lessons_and_their_reduction[lesson]
         try:
             # Получаем дз
