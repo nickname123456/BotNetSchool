@@ -1,3 +1,4 @@
+from aiohttp import payload_type
 from ns import get_back_period, get_next_period
 from ns import get_period
 from vkbottle.bot import Message
@@ -42,6 +43,7 @@ async def diary_for_day(message: Message):
                 db.get_account_school(userInfo[0].id),
                 db.get_account_link(userInfo[0].id)
             )
+            period_in_payload = ''
             logging.info(f'{message.peer_id}: Get diary in NetSchool')
         except netschoolapi.errors.AuthError:
             await message.answer('Неправильный логин или пароль!')
@@ -58,6 +60,7 @@ async def diary_for_day(message: Message):
                 db.get_account_school(userInfo[0].id),
                 db.get_account_link(userInfo[0].id)
             )
+            period_in_payload = 'back_'
             logging.info(f'{message.peer_id}: Get diary in NetSchool')
         except netschoolapi.errors.AuthError:
             await message.answer('Неправильный логин или пароль!')
@@ -74,6 +77,7 @@ async def diary_for_day(message: Message):
                 db.get_account_school(userInfo[0].id),
                 db.get_account_link(userInfo[0].id)
             )
+            period_in_payload = 'next_'
             logging.info(f'{message.peer_id}: Get diary in NetSchool')
         except netschoolapi.errors.AuthError:
             await message.answer('Неправильный логин или пароль!')
@@ -108,7 +112,7 @@ async def diary_for_day(message: Message):
                     numberOfTimes += 1
                     # Добавляем кнопку с уроком
                     keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson['subjectName'] +
-                                        ' ' + str(assignment['mark']['mark']), {'cmd': f'lesson_information_{numberOfTimes}'}))
+                                        ' ' + str(assignment['mark']['mark']), {'cmd': f'{period_in_payload}lesson_information_{numberOfTimes}'}))
                     keyboard.row()
                     break
                 else: # Если нет оценки:
@@ -117,14 +121,14 @@ async def diary_for_day(message: Message):
                     # Добавляем кнопку с уроком
                     numberOfTimes += 1
                     keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson['subjectName'],
-                                    {'cmd': f'lesson_information_{numberOfTimes}'}))
+                                    {'cmd': f'{period_in_payload}lesson_information_{numberOfTimes}'}))
                     keyboard.row()
 
         else: # Если заданий вообще нет:
             numberOfTimes += 1
             # Добавляем кнопку с уроком
             keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson['subjectName'],
-                            {'cmd': f'lesson_information_{numberOfTimes}'}))
+                            {'cmd': f'{period_in_payload}lesson_information_{numberOfTimes}'}))
             keyboard.row()
 
     # Добавляем кнопку назад
@@ -163,6 +167,7 @@ async def diary_for_day(message: Message):
                 get_period(),
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id))
+            period_in_payload = ''
             logging.info(f'{message.peer_id}: Get diary in NetSchool')
             
         # Если пользователь выбрал предыдущую неделю
@@ -174,6 +179,7 @@ async def diary_for_day(message: Message):
                 get_back_period(), # Получить предыдущую неделю
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id))
+            period_in_payload = 'back_'
             logging.info(f'{message.peer_id}: Get diary in NetSchool')
 
         # Если пользователь выбрал следующую неделю
@@ -185,6 +191,7 @@ async def diary_for_day(message: Message):
                 get_next_period(), # Получить следующую неделю
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id))
+            period_in_payload = 'next_'
             logging.info(f'{message.peer_id}: Get diary in NetSchool')
             
     except:
@@ -220,7 +227,7 @@ async def diary_for_day(message: Message):
                     numberOfTimes += 1
                     # Добавляем кнопку с уроком
                     keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson['subjectName'] +
-                                        ' ' + str(assignment['mark']['mark']), {'cmd': f'lesson_information_{numberOfTimes}'}))
+                                        ' ' + str(assignment['mark']['mark']), {'cmd': f'{period_in_payload}lesson_information_{numberOfTimes}'}))
                     keyboard.row()
                     break
                 else: # Если нет оценки:
@@ -229,14 +236,14 @@ async def diary_for_day(message: Message):
                     # Добавляем кнопку с уроком
                     numberOfTimes += 1
                     keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson['subjectName'],
-                                    {'cmd': f'lesson_information_{numberOfTimes}'}))
+                                    {'cmd': f'{period_in_payload}lesson_information_{numberOfTimes}'}))
                     keyboard.row()
 
         else: # Если заданий вообще нет:
             numberOfTimes += 1
             # Добавляем кнопку с уроком
             keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson['subjectName'],
-                            {'cmd': f'lesson_information_{numberOfTimes}'}))
+                            {'cmd': f'{period_in_payload}lesson_information_{numberOfTimes}'}))
             keyboard.row()
 
     # Добавляем кнопку назад
