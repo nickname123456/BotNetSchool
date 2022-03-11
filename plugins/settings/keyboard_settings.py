@@ -26,6 +26,13 @@ async def keyboard_settings_private(message: Message):
     
     keyboard.row()
 
+    if db.get_account_schedule_notification(user_id):
+        keyboard.add(Text('Уведомления о новом расписании', {"cmd": "keyboard_schedule_notification"}), color=KeyboardButtonColor.POSITIVE)
+    else:
+        keyboard.add(Text('Уведомления о новом расписании', {"cmd": "keyboard_schedule_notification"}), color=KeyboardButtonColor.NEGATIVE)
+    
+    keyboard.row()
+
     if db.get_account_announcements_notification(user_id):
         keyboard.add(Text('Уведомления о новых объявлениях', {"cmd": "keyboard_announcements_notification"}), color=KeyboardButtonColor.POSITIVE)
     else:
@@ -58,6 +65,13 @@ async def keyboard_settings_chat(message: Message):
         keyboard.add(Text('Уведомления о новых оценках', {'cmd': 'keyboard_mark_notification'}), color=KeyboardButtonColor.POSITIVE)
     else:
         keyboard.add(Text('Уведомления о новых оценках', {'cmd': 'keyboard_mark_notification'}), color=KeyboardButtonColor.NEGATIVE)
+    
+    keyboard.row()
+
+    if db.get_chat_schedule_notification(chat_id):
+        keyboard.add(Text('Уведомления о новом расписании', {"cmd": "keyboard_schedule_notification"}), color=KeyboardButtonColor.POSITIVE)
+    else:
+        keyboard.add(Text('Уведомления о новом расписании', {"cmd": "keyboard_schedule_notification"}), color=KeyboardButtonColor.NEGATIVE)
     
     keyboard.row()
 

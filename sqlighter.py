@@ -19,6 +19,7 @@ class SQLighter:
                 class TEXT,
                 mark_notification BIT,
                 announcements_notification BIT,
+                schedule_notification BIT,
                 old_mark TEXT,
                 old_announcements TEXT,
                 correction_lesson TEXT,
@@ -26,6 +27,8 @@ class SQLighter:
                 )""")
         
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS schedule ( 
+                school TEXT,
+                class TEXT,
                 day INT,
                 photo INT
                 )""")
@@ -42,6 +45,7 @@ class SQLighter:
                 class TEXT,
                 mark_notification BIT,
                 announcements_notification BIT,
+                schedule_notification BIT,
                 old_mark TEXT,
                 old_announcements TEXT,
                 correction_lesson TEXT,
@@ -83,13 +87,19 @@ class SQLighter:
 
 
 
-    def get_schedule(self, day):
+
+    def get_schedule(self, school, clas, day):
         with self.connection:
-            return self.cursor.execute('SELECT photo FROM `schedule` WHERE `day` = ?', (day,)).fetchone()
+            return self.cursor.execute('SELECT photo FROM `schedule` WHERE `day` = ? AND `class` = ? AND `school` = ?', (day, clas, school)).fetchone()
     
-    def edit_schedule(self, day, photo):
+    def edit_schedule(self, school, clas, day, photo):
         with self.connection:
-            return self.cursor.execute("UPDATE `schedule` SET `photo` = ? WHERE `day` = ?", (photo, day))
+            return self.cursor.execute("UPDATE `schedule` SET `photo` = ? WHERE `day` = ? AND `class` = ? AND `school` = ?", (photo, day, clas, school))
+
+    def add_schedule(self, school, clas, day, photo):
+        with self.connection:
+            return self.cursor.execute('INSERT INTO EXISTS VALUES (?,?,?,?)',(school, clas, day, photo))
+
 
 
 
@@ -143,6 +153,10 @@ class SQLighter:
             with self.connection:
                 return bool(self.cursor.execute('SELECT announcements_notification FROM `students` WHERE `id` = ?', (account_id,)).fetchone()[0])
 
+    def get_account_schedule_notification(self, account_id):
+            with self.connection:
+                return bool(self.cursor.execute('SELECT schedule_notification FROM `students` WHERE `id` = ?', (account_id,)).fetchone()[0])
+
     def get_account_old_mark(self, account_id):
         with self.connection:
             return self.cursor.execute('SELECT old_mark FROM `students` WHERE `id` = ?', (account_id,)).fetchone()[0]
@@ -163,7 +177,7 @@ class SQLighter:
 
     def add_user(self, user_id, login, password, link, school, clas):
         with self.connection:
-            return self.cursor.execute('INSERT INTO students VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',(user_id, login, password, 1, 0, 0, 0, 0, link, school, clas, 0, 0, 0, 0,0,0))
+            return self.cursor.execute('INSERT INTO students VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',(user_id, login, password, 1, 0, 0, 0, 0, link, school, clas, 0, 0, 0, 0,0,0,0))
 
 
 
@@ -218,6 +232,10 @@ class SQLighter:
     def edit_account_announcements_notification(self, account_id, value):
         with self.connection:
             return self.cursor.execute("UPDATE `students` SET `announcements_notification` = ? WHERE `id` = ?", (value, account_id))
+
+    def edit_account_schedule_notification(self, account_id, value):
+        with self.connection:
+            return self.cursor.execute("UPDATE `students` SET `schedule_notification` = ? WHERE `id` = ?", (value, account_id))
 
     def edit_account_old_mark(self, account_id, value):
         with self.connection:
@@ -279,6 +297,10 @@ class SQLighter:
         with self.connection:
             return bool(self.cursor.execute('SELECT announcements_notification FROM `chats` WHERE `id` = ?', (chat_id,)).fetchone()[0])
 
+    def get_chat_schedule_notification(self, chat_id):
+        with self.connection:
+            return bool(self.cursor.execute('SELECT schedule_notification FROM `chats` WHERE `id` = ?', (chat_id,)).fetchone()[0])
+
     def get_chat_old_mark(self, chat_id):
         with self.connection:
             return self.cursor.execute('SELECT old_mark FROM `chats` WHERE `id` = ?', (chat_id,)).fetchone()[0]
@@ -299,7 +321,7 @@ class SQLighter:
 
     def add_chat(self, chat_id, login, password, link, school, clas):
         with self.connection:
-            return self.cursor.execute('INSERT INTO chats VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',(chat_id, 0, 0, 0, login, password, link, school, clas, 0, 0, 0, 0,0,0))
+            return self.cursor.execute('INSERT INTO chats VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',(chat_id, 0, 0, 0, login, password, link, school, clas, 0, 0, 0, 0,0,0,0))
 
 
 
@@ -347,6 +369,10 @@ class SQLighter:
         with self.connection:
             return self.cursor.execute("UPDATE `chats` SET `announcements_notification` = ? WHERE `id` = ?", (value, chat_id))
 
+    def edit_chat_schedule_notification(self, chat_id, value):
+        with self.connection:
+            return self.cursor.execute("UPDATE `chats` SET `schedule_notification` = ? WHERE `id` = ?", (value, chat_id))
+
     def edit_chat_old_mark(self, chat_id, value):
         with self.connection:
             return self.cursor.execute("UPDATE `chats` SET `old_mark` = ? WHERE `id` = ?", (str(value), chat_id))
@@ -381,3 +407,12 @@ class SQLighter:
     def get_chats_announcements_notification(self):
         with self.connection:
             return self.cursor.execute("SELECT * FROM `chats` WHERE `announcements_notification` = ?", (1,)).fetchall()
+
+
+    def get_accounts_schedule_notification(self):
+        with self.connection:
+            return self.cursor.execute("SELECT * FROM `students` WHERE `schedule_notification` = ?", (1,)).fetchall()
+
+    def get_chats_schedule_notification(self):
+        with self.connection:
+            return self.cursor.execute("SELECT * FROM `chats` WHERE `schedule_notification` = ?", (1,)).fetchall()

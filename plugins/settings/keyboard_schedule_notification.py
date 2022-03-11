@@ -1,0 +1,48 @@
+from vkbottle.bot import Message
+from vkbottle.bot import Blueprint
+from sqlighter import SQLighter
+from plugins.settings.keyboard_settings import keyboard_settings_chat, keyboard_settings_private
+import logging
+
+
+
+bp = Blueprint('keyboard_schedule_notification')# Объявляем команду
+db = SQLighter('database.db') # Подключаемся к базеданных
+
+
+
+@bp.on.private_message(payload={'cmd': 'keyboard_schedule_notification'})
+async def keyboard_schedule_notification(message: Message):
+    logging.info(f'{message.peer_id}: I get keyboard_schedule_notification')
+    userInfo = await bp.api.users.get(message.from_id) 
+    user_id = userInfo[0].id
+
+    if db.get_account_schedule_notification(user_id):
+        db.edit_account_schedule_notification(user_id, 0)
+        await message.answer('Теперь ты не будешь получать уведомления о новых оценках.')
+    else:
+        db.edit_account_schedule_notification(user_id, 1)
+        await message.answer('Теперь ты будешь получать уведомления о новых оценках.')
+
+    await keyboard_settings_private(message)
+
+
+
+
+
+
+
+@bp.on.chat_message(payload={'cmd': 'keyboard_schedule_notification'})
+async def keyboard_schedule_notification(message: Message):
+    logging.info(f'{message.peer_id}: I get keyboard_schedule_notification')
+    # Айди чата:
+    chat_id = message.chat_id
+
+    if db.get_chat_schedule_notification(chat_id):
+        db.edit_chat_schedule_notification(chat_id, 0)
+        await message.answer('Теперь вы не будете получать уведомления о новых оценках.')
+    else:
+        db.edit_chat_schedule_notification(chat_id, 1)
+        await message.answer('Теперь вы будете получать уведомления о новых оценках.')
+
+    await keyboard_settings_chat(message)
