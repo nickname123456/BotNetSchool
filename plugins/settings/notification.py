@@ -86,7 +86,7 @@ async def notification_private(message: Message):
             #    pass
         
         
-        chats = db.get_chats_mark_notification()
+        chats = db.get_chats_announcements_notification()
         for chat in chats:
             #try:
             chat_id = chat[0]
@@ -107,5 +107,5 @@ async def notification_private(message: Message):
 
 
 
-            logging.info(f'{message.peer_id}:I sleep for 30 minutes')
-            asyncio.sleep(1800)
+        logging.info(f'{message.peer_id}:I sleep for 30 minutes')
+        await asyncio.sleep(1800)
