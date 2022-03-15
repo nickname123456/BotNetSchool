@@ -177,7 +177,7 @@ class SQLighter:
 
     def add_user(self, user_id, login, password, link, school, clas):
         with self.connection:
-            return self.cursor.execute('INSERT INTO students VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',(user_id, login, password, 1, 0, 0, 0, 0, link, school, clas, 0, 0, 0, 0,0,0,0))
+            return self.cursor.execute('INSERT INTO students VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',(user_id, login, password, 1, 0, 0, 0, 0, link, school, clas, 0, 0, 0, '[]','[]',0,0))
 
 
 
@@ -321,7 +321,7 @@ class SQLighter:
 
     def add_chat(self, chat_id, login, password, link, school, clas):
         with self.connection:
-            return self.cursor.execute('INSERT INTO chats VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',(chat_id, 0, 0, 0, login, password, link, school, clas, 0, 0, 0, 0,0,0,0))
+            return self.cursor.execute('INSERT INTO chats VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',(chat_id, 0, 0, 0, login, password, link, school, clas, 0, 0, 0,'[]','[]',0,0))
 
 
 
