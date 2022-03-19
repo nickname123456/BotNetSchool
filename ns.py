@@ -160,7 +160,16 @@ async def getMarkNotify(login, password, school, url, oldmarks):
                             clean = re.compile(r'([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
                             result = re.sub(clean, '', result)
                             marks.append(result)
-    difference = [item for item in marks if item not in oldmarks]
+
+    difference = []
+    for item in marks:
+        try:
+            if item not in eval(oldmarks):
+                difference.append(item)
+        except TypeError:
+            if item not in oldmarks:
+                difference.append(item)
+
     return marks, difference
 
 
@@ -184,10 +193,15 @@ async def getAnnouncementsNotify(login, password, school, url, old_announcements
 
             needed_announcements.append(announcement)
 
+    difference = []
     try:
-        difference = [item for item in needed_announcements if item not in eval(old_announcements)]
+        for item in needed_announcements:
+            if item not in eval(old_announcements):
+                difference.append(item)
     except TypeError:
-        difference = [item for item in needed_announcements if item not in old_announcements]
+        for item in needed_announcements:
+            if item not in old_announcements:
+                difference.append(item)
 
     return needed_announcements, difference
 
