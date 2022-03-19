@@ -57,6 +57,7 @@ async def private_correction_mark_choice_mark(message: Message):
         lesson = 'Технология'
 
     db.edit_account_correction_lesson(user_id, lesson)
+    db.commit()
 
     #Создаем клавиатуру
     keyboard = (
@@ -126,6 +127,7 @@ async def chat_correction_mark_choice_mark(message: Message):
         lesson = 'Технология'
 
     db.edit_chat_correction_lesson(chat_id, lesson)
+    db.commit()
 
     #Создаем клавиатуру
     keyboard = (

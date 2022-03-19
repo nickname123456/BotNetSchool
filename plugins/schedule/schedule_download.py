@@ -112,6 +112,7 @@ async def finish_schedule_download(message: Message):
                 clas,
                 day,
                 photo) # Записать на этот день это фото
+            db.commit()
         else:
             await message.answer('Ошибка! Введено неправильное фото.')
             return

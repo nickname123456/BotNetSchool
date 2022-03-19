@@ -18,9 +18,11 @@ async def keyboard_announcements_notification(message: Message):
 
     if db.get_account_announcements_notification(user_id):
         db.edit_account_announcements_notification(user_id, 0)
+        db.commit()
         await message.answer('Теперь ты не будешь получать уведомления о новых объявлениях.')
     else:
         db.edit_account_announcements_notification(user_id, 1)
+        db.commit()
         await message.answer('Теперь ты будешь получать уведомления о новых объявлениях.')
 
     await keyboard_settings_private(message)
@@ -40,9 +42,11 @@ async def keyboard_announcements_notification(message: Message):
 
     if db.get_chat_announcements_notification(chat_id):
         db.edit_chat_announcements_notification(chat_id, 0)
+        db.commit()
         await message.answer('Теперь вы не будете получать уведомления о новых объявлениях.')
     else:
         db.edit_chat_announcements_notification(chat_id, 1)
+        db.commit()
         await message.answer('Теперь вы будете получать уведомления о новых объявлениях.')
 
     await keyboard_settings_chat(message)

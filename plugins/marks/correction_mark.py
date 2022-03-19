@@ -27,6 +27,7 @@ async def private_correction_mark(message: Message):
         mark = 3
 
     db.edit_account_correction_mark(user_id, mark)
+    db.commit()
 
     logging.info(f'{message.peer_id}: I sent correction_mark')
     await message.answer(await ns.correction_mark(
@@ -62,6 +63,7 @@ async def chat_correction_mark(message: Message):
         mark = 3
 
     db.edit_chat_correction_mark(chat_id, mark)
+    db.commit()
 
     logging.info(f'{message.peer_id}: I sent correction_mark')
     await message.answer(await ns.correction_mark(

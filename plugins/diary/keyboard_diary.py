@@ -16,6 +16,7 @@ async def keyboard_diary(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard diary')
 
     db.edit_account_week(userInfo[0].id, 0)# Редактируем неделю, на которой юзер
+    db.commit()
 
     keyboard = (
         Keyboard()
@@ -48,6 +49,7 @@ async def keyboard_diary(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard diary')
 
     db.edit_account_week(userInfo[0].id, -1)# Редактируем неделю, на которой юзер
+    db.commit()
 
     keyboard = (
         Keyboard()
@@ -79,6 +81,7 @@ async def keyboard_diary(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard diary')
 
     db.edit_account_week(userInfo[0].id, 1)# Редактируем неделю, на которой юзер
+    db.commit()
 
     keyboard = (
         Keyboard()

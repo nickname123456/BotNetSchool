@@ -31,7 +31,9 @@ async def login(message: Message, userLogin=None, userPassword=None):
     if userLogin != None and userPassword != None:
         #Записать их в бд
         db.edit_account_login(userInfo[0].id, userLogin)
+        db.commit()
         db.edit_account_password(userInfo[0].id, userPassword)
+        db.commit()
         db.edit_account_correctData(userInfo[0].id, 0)
         db.commit()
         logging.info(f'{message.peer_id}: Write new data to database')
@@ -93,6 +95,7 @@ async def login(message: Message, userLogin=None, userPassword=None):
         if userLogin != None and userPassword != None:
             #Записать их в бд
             db.edit_chat_login(chat_id, userLogin)
+            db.commit()
             db.edit_chat_password(chat_id, userPassword)
             db.commit()
             logging.info(f'{message.peer_id}: Write new data to database')

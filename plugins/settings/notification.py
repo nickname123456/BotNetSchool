@@ -35,6 +35,7 @@ async def notification_private(message: Message):
                 )
 
                 db.edit_account_old_mark(user_id, marks)
+                db.commit()
                 for mark in result:
                     await bp.api.messages.send(message=mark, user_id=user_id, random_id=0)
                     await asyncio.sleep(1)	
@@ -56,6 +57,7 @@ async def notification_private(message: Message):
                 )
 
                 db.edit_account_old_announcements(user_id, announcements)
+                db.commit()
                 for announcement in result:
                     await bp.api.messages.send(message=announcement, user_id=user_id, random_id=0)			
                     await asyncio.sleep(1)
@@ -79,6 +81,7 @@ async def notification_private(message: Message):
             )
 
             db.edit_chat_old_mark(chat_id, marks)
+            db.commit()
             for mark in result:
                 await bp.api.messages.send(message=mark, peer_id=2000000000+chat_id, random_id=0)
                 await asyncio.sleep(1)
@@ -99,6 +102,7 @@ async def notification_private(message: Message):
             )
 
             db.edit_chat_old_announcements(chat_id, announcements)
+            db.commit()
             for announcement in result:
                 await bp.api.messages.send(message=announcement, peer_id=2000000000+chat_id, random_id=0)			
                 await asyncio.sleep(1)

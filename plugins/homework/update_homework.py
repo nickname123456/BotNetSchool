@@ -205,6 +205,7 @@ async def schedule_for_day(message: Message):
             db.get_chat_class(chat_id),
             lesson,
             homework)
+            db.commit()
 
             db.edit_upd_date(
                 db.get_chat_school(chat_id),
@@ -212,6 +213,7 @@ async def schedule_for_day(message: Message):
                 lesson,
                 str(f'{datetime.now().day}-{datetime.now().month}-{datetime.now().year} {datetime.now().hour}:{datetime.now().minute}')
             )
+            db.commit()
 
             await message.answer('Ты успешно обновил дз')
             logging.info(f'{message.peer_id}: I sent a success')
@@ -235,6 +237,7 @@ async def schedule_for_day(message: Message):
                 lesson,
                 homework
             )
+            db.commit()
 
             db.edit_upd_date(
                 db.get_account_school(userInfo[0].id),
@@ -242,6 +245,7 @@ async def schedule_for_day(message: Message):
                 lesson,
                 str(f'{datetime.now().day}-{datetime.now().month}-{datetime.now().year} {datetime.now().hour}:{datetime.now().minute}')
             )
+            db.commit()
 
             await message.answer('Ты успешно обновил дз')
             logging.info(f'{message.peer_id}: I sent a success')
@@ -343,6 +347,7 @@ async def schedule_for_day(message: Message):
             lesson,
             homework
         )
+        db.commit()
 
         db.edit_upd_date(
             db.get_chat_school(chat_id),
@@ -350,6 +355,7 @@ async def schedule_for_day(message: Message):
             lesson,
             str(f'{datetime.now().day}-{datetime.now().month}-{datetime.now().year} {datetime.now().hour}:{datetime.now().minute}')
         )
+        db.commit()
 
         await message.answer('Ты успешно обновил дз')
         logging.info(f'{message.peer_id}: I sent a success')
