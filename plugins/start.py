@@ -1,173 +1,107 @@
-from vkbottle.bot import Message
-from vkbottle import Keyboard, KeyboardButtonColor, Text, EMPTY_KEYBOARD
-from vkbottle.bot import Blueprint
+import asyncio
+from vkbottle.bot import Message, Blueprint
 from sqlighter import SQLighter
-import ns
-from vkbottle import CtxStorage
+from ns import get_school, get_student
+import traceback
+from vkbottle import Keyboard, KeyboardButtonColor, Text, EMPTY_KEYBOARD
 from vkbottle import BaseStateGroup
 import logging
+import ns
+
+db = SQLighter('database.db')
+bp = Blueprint('registration')
 
 
-bp = Blueprint('start') # Объявляем команду
-bp.on.vbml_ignore_case = True # Игнорируем регистр
 
-db = SQLighter('database.db') # Подключаемся к базе данных
 
-ctx = CtxStorage() # объявляем временное хранилище
-
-#Нужно, для запоминания где сейчас юзер
-class StartData(BaseStateGroup):
-    city = 10
-    school = 11
-    clas = 12
-    login = 13
-    password = 14
+class NewaccountState(BaseStateGroup):
+    INLOGIN = 10
+    INSCHOOL = 11
 
 
 
 
 @bp.on.message(lev='Начать')
 @bp.on.message(payload={'cmd': 'start'})
-async def city_selection(message: Message):
-    logging.info(f'{message.peer_id}: I get START')
-    await bp.state_dispenser.set(message.peer_id, StartData.city) # Говорим, что следующий шаг - выбор города
+async def registration(message: Message):
+    await message.answer('🖊Введите адрес сетевого города, логин, пароль и класс разделенные пробелом(Пример: "https://sgo.edu-74.ru/ Кирилл~Арз qwerty123 8б").\nЕсли в логине или пароле есть пробелы, то замените их  на ~')
+    await bp.state_dispenser.set(message.peer_id, NewaccountState.INLOGIN)
 
-    keyboard = (
-        Keyboard()
-        # Добавить кнопку
-        .add(Text('Челябинск'))
-        # Новая строка
-        .row()
-        .add(Text('Волгоград'))
-        .row()
-        .add(Text('Сан Фиерро'))
-        .row()
-        .add(Text("Моего города нет в списке", {'cmd': 'not_found'}), color=KeyboardButtonColor.PRIMARY)
-    )
+
+
+@bp.on.message(state=NewaccountState.INLOGIN)
+async def registration2(message: Message):
+    logindata = message.text.split(' ')
+    if logindata:
+        try:
+            schools = await get_school(logindata[0])
+            await message.answer('📋Введи ID школы из списка ниже(ID - Школа)')
+            text = ''
+            for school in schools:
+                text += f"\n{school['id']} - {school['name']}"
+            if len(text) > 4096:
+                for x in range(0, len(text), 4096):
+                    await message.answer(text[x:x+4096])
+                    await asyncio.sleep(1,5)
+                await message.answer('✅Всё!')
+            else:
+                await message.answer(text)
+            await bp.state_dispenser.set(message.peer_id, NewaccountState.INSCHOOL, logindata=logindata)
+        except Exception as e:
+            print(traceback.print_exc())
+            await message.answer(f'❌Ошибка: {e}\nПопробуйте еще раз или обратитесь к [id350673924|разработчику]')
+    else:
+        await message.answer('❌Не нашел в твоем сообщении данные, введи еще раз')
+
+
+
+@bp.on.private_message(state=NewaccountState.INSCHOOL)
+async def registration3(message: Message):
+    userInfo = await bp.api.users.get(message.from_id) # Информация о юзерен
+
+    logindata = message.state_peer.payload["logindata"]
+
+    for i in await get_school(logindata[0]):
+        if i['id'] == int(message.text):
+            school = i['name']
     
-    await message.answer('Выбери свой город из списка ниже', keyboard=keyboard)
-    logging.info(f'{message.peer_id}: asked a question about the city')
-
-
-
-@bp.on.message(state=StartData.city)
-async def school_selection(message: Message):
-    logging.info(f'{message.peer_id}: I get CITY')
-    ctx.set('city', message.text) # Загружаем во временное хранилище город
-    await bp.state_dispenser.set(message.peer_id, StartData.clas) # Говорим, что следующий шаг - выбор класса
-
-    keyboard = (
-        Keyboard()
-        # Добавить кнопку
-        .add(Text('МАОУ "СОШ № 47 г. Челябинска"'))
-        # Новая строка
-        .row()
-        .add(Text('ФГКОУ «Волгоградский кадетский корпус...'))
-        .row()
-        .add(Text('Автошкола SF'))
-        .row()
-        .add(Text("Моей школы нет в списке", {'cmd': 'not_found'}), color=KeyboardButtonColor.PRIMARY)
-    )
-
-    await message.answer('Выбери свою школу', keyboard=keyboard)
-    logging.info(f'{message.peer_id}: Asked a question about the school')
-
-
-@bp.on.message(state=StartData.clas)
-async def class_selection(message: Message):
-    logging.info(f'{message.peer_id}: I get SCHOOL')
-    ctx.set('school', message.text) # Загружаем во внутренне хранилище школу
-    await bp.state_dispenser.set(message.peer_id, StartData.school) # Говорим, что следующий шаг - выбор школы
-
-    await message.answer('Окей, теперь напиши в каком ты классе (буква обязательно в нижнем регистре!). \nНапример: 8б.', keyboard=EMPTY_KEYBOARD)
-    logging.info(f'{message.peer_id}: Asked a question about the class')
-
-@bp.on.message(state=StartData.school)
-async def login_selection(message: Message):
-    logging.info(f'{message.peer_id}: I get CLASS')
-    ctx.set('class', message.text) # Загружаем во внутренне хранилище класс
-    await bp.state_dispenser.set(message.peer_id, StartData.login)  # Говорим, что следующий шаг - выбор логина
-
-    await message.answer('Спасибо.\nТеперь введи свой логин', keyboard=EMPTY_KEYBOARD)
-    logging.info(f'{message.peer_id}: Asked a question about the login')
-
-
-@bp.on.message(state=StartData.login)
-async def password_selection(message: Message):
-    logging.info(f'{message.peer_id}: I get LOGIN')
-    ctx.set('login', message.text) # Загружаем во внутренне хранилище логин
-    await bp.state_dispenser.set(message.peer_id, StartData.password)  # Говорим, что следующий шаг - выбор пароля
-
-    await message.answer('Окей, теперь пароль', keyboard=EMPTY_KEYBOARD)
-    logging.info(f'{message.peer_id}: Asked a question about the password')
-    
-
-@bp.on.private_message(state=StartData.password)
-async def end_of_start(message: Message):
-    logging.info(f'{message.peer_id}: I get PASSWORD')
-    await bp.state_dispenser.delete(message.peer_id) # Удаляем цепочку
-    userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
-    city = ctx.get('city') # Берем из временного хранилища город
-    school = ctx.get('school') # Берем из временного хранилища школу
-    login = ctx.get('login') # Берем из временного хранилища логин
-    clas = ctx.get('class') # Берем из временного хранилища класс
-    password = message.text 
-    logging.info(f'{message.peer_id}: I got the rest of the variables')
-
-    # Если город - Челябинск
-    if 'Челябинск' in city:
-        link = 'https://sgo.edu-74.ru'
-    # Если город - Волгоград
-    elif 'Волгоград' in city:
-        link = 'https://sgo.volganet.ru'
-    logging.info(f'{message.peer_id}: Turned the city into link')
-
-    # Если школа - ...
-    if 'ФГКОУ «Волгоградский кадетский корпус...' in school:
-        school = 'ФГКОУ «Волгоградский кадетский корпус Следственного комитета Российской Федерации имени Ф.Ф. Слипченко»'
-    # Если школа - ...
-    elif 'МАОУ "СОШ № 47 г. Челябинска"' in school:
-        school = 'МАОУ "СОШ № 47 г. Челябинска"'
-    logging.info(f'{message.peer_id}: Turned the school into full name of school')
-
-    # Если юзер решил шуткануть)
-    if 'Сан Фиерро' in city or 'Автошкола SF' in school:
-        logging.info(f'{message.peer_id}: User joked)))000))0')
-        return 'Давай теперь без рофлов.\nНапиши "Начать"'
+    login = ''
+    for i in str(logindata[1]):
+        if i == '~':
+            login+=' '
+        else:
+            login+=i
 
     try:
         # Если юзера нет в бд:
         if db.get_account_isFirstLogin(userInfo[0].id) is None:
-            db.add_user(userInfo[0].id, login, password, link, school, clas)
+            db.add_user(userInfo[0].id, login, logindata[2], logindata[0], school, logindata[3])
             db.commit()
         logging.info(f'{message.peer_id}: User in database')
     except TypeError:
         logging.exception(f'{message.peer_id}: User not in database')
-        db.add_user(userInfo[0].id, login, password, link, school, clas)
+        db.add_user(userInfo[0].id, login, logindata[2], logindata[0], school, logindata[3])
         db.commit()
 
     else:
-        db.edit_account_link(userInfo[0].id, link) # Редактируем бд под новые данные
+        db.edit_account_link(userInfo[0].id, logindata[0]) # Редактируем бд под новые данные
         logging.info(f'{message.peer_id}: Changed database: link')
         db.edit_account_school(userInfo[0].id, school) # Редактируем бд под новые данные
         logging.info(f'{message.peer_id}: Changed database: school')
         db.edit_account_login(userInfo[0].id, login) # Редактируем бд под новые данные
         logging.info(f'{message.peer_id}: Changed database: login')
-        db.edit_account_password(userInfo[0].id, password) # Редактируем бд под новые данные
+        db.edit_account_password(userInfo[0].id, logindata[2]) # Редактируем бд под новые данные
         logging.info(f'{message.peer_id}: Changed database: password')
-        db.edit_account_class(userInfo[0].id, clas) # Редактируем бд под новые данные
+        db.edit_account_class(userInfo[0].id, logindata[3]) # Редактируем бд под новые данные
         logging.info(f'{message.peer_id}: Changed database: clas')
         db.commit()
 
-    login = db.get_account_login(userInfo[0].id)
-    print(login)
 
-    password = db.get_account_password(userInfo[0].id)
-    print(password)
     
+    login = db.get_account_login(userInfo[0].id)
+    password = db.get_account_password(userInfo[0].id)
     school = db.get_account_school(userInfo[0].id)
-    print(school)
-
+    link = db.get_account_link(userInfo[0].id)
     try:
         #Авторезируемся в Сетевом Городе
         await ns.login(
@@ -191,82 +125,64 @@ async def end_of_start(message: Message):
         .add(Text('Назад', {'cmd': 'menu'}))
     )
 
+    
+    await bp.state_dispenser.delete(message.from_id)
     await message.answer(f'{userInfo[0].first_name}, ты успешно зашел в систему под логином: {login}', keyboard=keyboard)
     logging.info(f'{message.peer_id}: Start COMPLETED')
 
 
 
 
-@bp.on.chat_message(state=StartData.password)
-async def end_of_start(message: Message):
-    logging.info(f'{message.peer_id}: I get PASSWORD')
-    await bp.state_dispenser.delete(message.peer_id) # Удаляем цепочку
+
+
+
+@bp.on.chat_message(state=NewaccountState.INSCHOOL)
+async def registration3(message: Message):
     chat_id = message.chat_id
-    city = ctx.get('city') # Берем из временного хранилища город
-    school = ctx.get('school') # Берем из временного хранилища школу
-    login = ctx.get('login') # Берем из временного хранилища логин
-    clas = ctx.get('class') # Берем из временного хранилища класс
-    password = message.text
-    logging.info(f'{message.peer_id}: I got the rest of the variables')
 
-    # Если город - Челябинск
-    if 'Челябинск' in city:
-        link = 'https://sgo.edu-74.ru'
-    # Если город - Волгоград
-    elif 'Волгоград' in city:
-        link = 'https://sgo.volganet.ru'
-    logging.info(f'{message.peer_id}: Turned the city into link')
+    logindata = message.state_peer.payload["logindata"]
 
-    # Если школа - ...
-    if 'ФГКОУ «Волгоградский кадетский корпус...' in school:
-        school = 'ФГКОУ «Волгоградский кадетский корпус Следственного комитета Российской Федерации имени Ф.Ф. Слипченко»'
-    # Если школа - ...
-    elif 'МАОУ "СОШ № 47 г. Челябинска"' in school:
-        school = 'МАОУ "СОШ № 47 г. Челябинска"'
-    logging.info(f'{message.peer_id}: Turned the school into full name of school')
+    for i in await get_school(logindata[0]):
+        if i['id'] == int(message.text):
+            school = i['name']
 
-    # Если юзер решил шуткануть)
-    if 'Сан Фиерро' in city or 'Автошкола SF' in school:
-        logging.info(f'{message.peer_id}: User joked)))000))0')
-        return 'Давай теперь без рофлов.\nНапиши "Начать"'
+    login = ''
+    for i in str(logindata[1]):
+        if i == '~':
+            login+=' '
+        else:
+            login+=i
 
     try:
-        # Если чата нет в бд:
-        if db.get_chat_login(chat_id) is None:
-            db.add_chat(chat_id, login, password, link, school, clas)
+        # Если юзера нет в бд:
+        if db.get_chat_id(chat_id) is None:
+            db.add_chat(chat_id, login, logindata[2], logindata[0], school, logindata[3])
             db.commit()
         logging.info(f'{message.peer_id}: User in database')
     except TypeError:
         logging.exception(f'{message.peer_id}: User not in database')
-        db.add_chat(chat_id, login, password, link, school, clas)
+        db.add_chat(chat_id, login, logindata[2], logindata[0], school, logindata[3])
         db.commit()
 
     else:
-        # Редактируем бд под новые данные
-        db.edit_chat_link(chat_id, link)
+        db.edit_chat_link(chat_id, logindata[0]) # Редактируем бд под новые данные
         logging.info(f'{message.peer_id}: Changed database: link')
-        db.edit_chat_school(chat_id, school)
+        db.edit_chat_school(chat_id, school) # Редактируем бд под новые данные
         logging.info(f'{message.peer_id}: Changed database: school')
-        db.edit_chat_login(chat_id, login)
+        db.edit_chat_login(chat_id, login) # Редактируем бд под новые данные
         logging.info(f'{message.peer_id}: Changed database: login')
-        db.edit_chat_password(chat_id, password)
+        db.edit_chat_password(chat_id, logindata[2]) # Редактируем бд под новые данные
         logging.info(f'{message.peer_id}: Changed database: password')
-        db.edit_chat_class(chat_id, clas)
+        db.edit_chat_class(chat_id, logindata[3]) # Редактируем бд под новые данные
         logging.info(f'{message.peer_id}: Changed database: clas')
         db.commit()
 
+
+    
     login = db.get_chat_login(chat_id)
-    print(login)
-
     password = db.get_chat_password(chat_id)
-    print(password)
-
     school = db.get_chat_school(chat_id)
-    print(school)
-
     link = db.get_chat_link(chat_id)
-    print(link)
-
     try:
         #Авторезируемся в Сетевом Городе
         await ns.login(
@@ -281,10 +197,14 @@ async def end_of_start(message: Message):
         await message.answer('Неправильный логин или пароль!')
         return
 
+    logging.info(f'{message.peer_id}: We make a note in the database that the user login and password are correct')
+
     keyboard = (
         Keyboard()
         .add(Text('Назад', {'cmd': 'menu'}))
     )
 
-    await message.answer(f'Эта беседа успешно зашла в систему под логином: {login}', keyboard=keyboard)
+    await bp.state_dispenser.delete(message.peer_id)
+    await message.answer(f'Ты успешно зашел в систему под логином: {login}', keyboard=keyboard)
     logging.info(f'{message.peer_id}: Start COMPLETED')
+

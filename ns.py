@@ -5,6 +5,20 @@ import html2markdown
 
 
 
+async def get_student(url, login, password, school):
+	api = NetSchoolAPI(url)
+	student = await api.login(login,password,school)
+	await api.logout()
+	return student
+
+    
+async def get_school(url):
+	api = NetSchoolAPI(url)
+	result = await api.schools()
+	await api.close()
+	return result
+
+
 
 # Вход в сго
 async def login(login, password, school, link):
