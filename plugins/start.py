@@ -49,7 +49,7 @@ async def registration2(message: Message):
             await bp.state_dispenser.set(message.peer_id, NewaccountState.INSCHOOL, logindata=logindata)
         except Exception as e:
             print(traceback.print_exc())
-            await message.answer(f'❌Ошибка: {e}\nПопробуйте еще раз или обратитесь к [id350673924|разработчику]')
+            await message.answer(f'❌Ошибка: {e}\nПопробуйте еще раз или обратитесь к [kirillarz|разработчику]')
     else:
         await message.answer('❌Не нашел в твоем сообщении данные, введи еще раз')
 
