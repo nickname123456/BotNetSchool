@@ -5,6 +5,7 @@ from .marks import marks, correction_mark_choice_lesson, correction_mark_choice_
 from .schedule import keyboard_schedule, schedule_download, schedule_for_day
 from .settings import keyboard_announcements_notification, keyboard_mark_notification, keyboard_settings, notification, keyboard_schedule_notification
 from .announcements import announcements
+from admin import admin_panel
 
 
 bps = [not_found.bp,
@@ -31,4 +32,6 @@ bps = [not_found.bp,
        correction_mark.bp,
        information.bp,
        homework_for_day.bp,
-       keyboard_schedule_notification.bp]
+       keyboard_schedule_notification.bp,
+       admin_panel.bp
+       ]
