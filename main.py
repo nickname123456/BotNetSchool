@@ -33,6 +33,6 @@ for bp in bps:
 logging.info('Bot started.')
 
 scheduler.start()
-scheduler.add_job(notification, "interval", minutes=1, args=(bot,))
+scheduler.add_job(notification, "interval", minutes=10, args=(bot,))
 
 bot.run_forever()
