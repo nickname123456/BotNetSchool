@@ -2,6 +2,10 @@ from vkbottle import Bot
 from plugins import bps
 from settings import token
 import logging
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from plugins.settings.notification import notification
+
+scheduler = AsyncIOScheduler()
 
 # Подключаем бота к нашему токену
 bot = Bot(token=token)
@@ -27,4 +31,8 @@ for bp in bps:
 
 # Запускаем бота
 logging.info('Bot started.')
+
+scheduler.start()
+scheduler.add_job(notification, "interval", minutes=1, args=(bot,))
+
 bot.run_forever()

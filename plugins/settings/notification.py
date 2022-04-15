@@ -1,5 +1,3 @@
-from vkbottle.bot import Message
-from vkbottle.bot import Blueprint
 from sqlighter import SQLighter
 from ns import getMarkNotify, getAnnouncementsNotify
 import asyncio
@@ -7,23 +5,18 @@ import logging
 from settings import admin_id
 
 
-bp = Blueprint('notification')# Объявляем команду
+
 db = SQLighter('database.db') # Подключаемся к базеданных
-bp.on.vbml_ignore_case = True # Игнорируем регистр
 
 
-@bp.on.message(text=["Уведы", "Уведомления"])
-@bp.on.message(payload={'cmd': 'notification'})
-async def notification_private(message: Message):
-    logging.info(f'{message.peer_id}: I get notification')
-    users = db.get_accounts_mark_notification()
+
+
+async def notification(bot):
+    logging.info(f'Started mailing')
 
     while True:
-
-        logging.info(f'{message.peer_id}: Started mailing')
-
         try:
-
+            users = db.get_accounts_mark_notification()
             for user in users:
                 #try:
                 if user[7]:
@@ -39,7 +32,7 @@ async def notification_private(message: Message):
                     db.edit_account_old_mark(user_id, marks)
                     db.commit()
                     for mark in result:
-                        await bp.api.messages.send(message=mark, user_id=user_id, random_id=0)
+                        await bot.api.messages.send(message=mark, user_id=user_id, random_id=0)
                         await asyncio.sleep(1)	
                 #except Exception as e:
                 #    pass
@@ -61,7 +54,7 @@ async def notification_private(message: Message):
                     db.edit_account_old_announcements(user_id, announcements)
                     db.commit()
                     for announcement in result:
-                        await bp.api.messages.send(message=announcement, user_id=user_id, random_id=0)			
+                        await bot.api.messages.send(message=announcement, user_id=user_id, random_id=0)			
                         await asyncio.sleep(1)
                 #except Exception as e:
                 #    pass
@@ -85,7 +78,7 @@ async def notification_private(message: Message):
                 db.edit_chat_old_mark(chat_id, marks)
                 db.commit()
                 for mark in result:
-                    await bp.api.messages.send(message=mark, peer_id=2000000000+chat_id, random_id=0)
+                    await bot.api.messages.send(message=mark, peer_id=2000000000+chat_id, random_id=0)
                     await asyncio.sleep(1)
                 #except Exception as e:
                 #    pass
@@ -106,15 +99,15 @@ async def notification_private(message: Message):
                 db.edit_chat_old_announcements(chat_id, announcements)
                 db.commit()
                 for announcement in result:
-                    await bp.api.messages.send(message=announcement, peer_id=2000000000+chat_id, random_id=0)			
+                    await bot.api.messages.send(message=announcement, peer_id=2000000000+chat_id, random_id=0)			
                     await asyncio.sleep(1)
                 #except Exception as e:
                 #    pass
 
 
 
-            logging.info(f'{message.peer_id}:I sleep for 10 minutes')
-            await asyncio.sleep(600)
+            logging.info(f'I sleep for 10 minutes')
+            #await asyncio.sleep(600)
 
         except:
-            await bp.api.messages.send(message='У нас тут это... Ошибка в РАССЫЛКЕ!!! \nЧЕКАЙ ХЕРОКУ ЛОГИ', user_id=admin_id, random_id=0)
+            await bot.api.messages.send(message='У нас тут это... Ошибка в РАССЫЛКЕ!!! \nЧЕКАЙ ХЕРОКУ ЛОГИ', user_id=admin_id, random_id=0)
