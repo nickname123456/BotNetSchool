@@ -1,7 +1,7 @@
 from typing import Text
 from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
-from PostgreSQLighter import SQLighter
+from PostgreSQLighter import db
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 import logging
 
@@ -9,7 +9,6 @@ import logging
 bp = Blueprint('correction_mark_choice_lesson') # Объявляем команду
 bp.on.vbml_ignore_case = True # Игнорируем регистр сообщений
 
-db = SQLighter('database.db')# Подключаемся к базеданных
 
 
 @bp.on.message(payload={'cmd': 'correction_mark_choice_lesson'})

@@ -1,4 +1,4 @@
-from PostgreSQLighter import SQLighter
+from PostgreSQLighter import db
 from ns import getMarkNotify, getAnnouncementsNotify
 import asyncio
 import logging
@@ -6,7 +6,6 @@ from settings import admin_id
 
 
 
-db = SQLighter('database.db') # Подключаемся к базеданных
 
 
 

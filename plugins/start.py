@@ -1,6 +1,6 @@
 import asyncio
 from vkbottle.bot import Message, Blueprint
-from PostgreSQLighter import SQLighter
+from PostgreSQLighter import db
 from ns import get_school
 import traceback
 from vkbottle import Keyboard,  Text
@@ -9,7 +9,6 @@ import logging
 import ns
 from vkbottle import CtxStorage
 
-db = SQLighter('database.db')
 bp = Blueprint('registration')
 
 

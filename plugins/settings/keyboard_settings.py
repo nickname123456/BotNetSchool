@@ -1,13 +1,12 @@
 from vkbottle.bot import Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
-from PostgreSQLighter import SQLighter
+from PostgreSQLighter import db
 import logging
 
 
 
 bp = Blueprint('keyboard_settings')# Объявляем команду
-db = SQLighter('database.db') # Подключаемся к базеданных
 
 
 

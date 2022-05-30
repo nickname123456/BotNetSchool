@@ -1,13 +1,12 @@
 from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
-from PostgreSQLighter import SQLighter
+from PostgreSQLighter import db
 from plugins.settings.keyboard_settings import keyboard_settings_chat, keyboard_settings_private
 import logging
 
 
 
 bp = Blueprint('keyboard_mark_notification')# Объявляем команду
-db = SQLighter('database.db') # Подключаемся к базеданных
 
 
 

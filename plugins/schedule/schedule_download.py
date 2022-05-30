@@ -1,6 +1,6 @@
 from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
-from PostgreSQLighter import SQLighter
+from PostgreSQLighter import db
 from vkbottle import CtxStorage
 from vkbottle import BaseStateGroup
 import logging
@@ -12,7 +12,6 @@ from vkbottle import Keyboard, KeyboardButtonColor, Text, EMPTY_KEYBOARD
 bp = Blueprint('schedule_download') # Объявляем команду
 bp.on.vbml_ignore_case = True# Игнорируем регистр
 
-db = SQLighter('database.db')# Подключаемся к базе данных
 
 ctx = CtxStorage() # объявляем временное хранилище
 
