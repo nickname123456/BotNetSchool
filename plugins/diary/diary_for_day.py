@@ -4,14 +4,13 @@ from ns import get_period
 from vkbottle.bot import Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
-from sqlighter import SQLighter
+from PostgreSQLighter import db
 from ns import get_diary
 import netschoolapi
 import logging
 
 
 bp = Blueprint('diary_for_day') # Объявляем команду
-db = SQLighter('database.db') # Подключаемся к базеданных
 
 
 @bp.on.private_message(payload=[{'cmd': 'diary_for_day'},

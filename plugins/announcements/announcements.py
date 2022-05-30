@@ -1,6 +1,6 @@
 from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
-from sqlighter import SQLighter
+from PostgreSQLighter import db
 from netschoolapi import NetSchoolAPI
 import re
 import logging
@@ -11,7 +11,6 @@ from vkbottle import DocMessagesUploader
 bp = Blueprint('announcements') # Объявляем команду
 bp.on.vbml_ignore_case = True # Игнорируем регистр сообщений
 
-db = SQLighter('database.db') # Подключаемся к базеданных
 
 
 @bp.on.private_message(text=["Объявления <amount>", "Объявления"])

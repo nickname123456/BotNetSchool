@@ -1,11 +1,10 @@
 from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
-from sqlighter import SQLighter
+from PostgreSQLighter import db
 import logging
 
 
 bp = Blueprint('homework') # Объявляем команду
-db = SQLighter('database.db')# Подключаемся к базеданных
 
 
 

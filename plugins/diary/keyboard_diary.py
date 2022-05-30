@@ -1,13 +1,12 @@
 from vkbottle.bot import Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
-from sqlighter import SQLighter
+from PostgreSQLighter import db
 from ns import get_next_period, get_back_period, get_period
 import logging
 
 
 bp = Blueprint('keyboard_diary')# Объявляем команду
-db = SQLighter('database.db') # Подключаемся к базе данных
 
 
 @bp.on.message(payload={'cmd': 'keyboard_diary'})

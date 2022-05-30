@@ -1,6 +1,6 @@
 from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
-from sqlighter import SQLighter
+from PostgreSQLighter import SQLighter
 from vkbottle import CtxStorage
 from vkbottle import BaseStateGroup
 import logging

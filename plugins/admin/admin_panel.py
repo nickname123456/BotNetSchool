@@ -1,6 +1,6 @@
 from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
-from sqlighter import SQLighter
+from PostgreSQLighter import db
 import logging
 
 
@@ -8,7 +8,6 @@ import logging
 bp = Blueprint('admin_panel')# Объявляем команду
 bp.on.vbml_ignore_case = True # Игнорируем регистр
 
-db = SQLighter('database.db')# Подключаемся к базеданных
 
 
 

@@ -1,7 +1,7 @@
 from vkbottle.bot import Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
-from sqlighter import SQLighter
+from PostgreSQLighter import db
 from vkbottle import CtxStorage
 from vkbottle import BaseStateGroup
 from datetime import datetime
@@ -12,7 +12,6 @@ import logging
 bp = Blueprint('update_homework') # Объявляем команду
 bp.on.vbml_ignore_case = True # Игнорируем регистр
 
-db = SQLighter('database.db') # Подключаемся к базе данных
 
 ctx = CtxStorage() # объявляем временное хранилище
 

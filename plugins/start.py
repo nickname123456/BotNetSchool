@@ -1,6 +1,6 @@
 import asyncio
 from vkbottle.bot import Message, Blueprint
-from sqlighter import SQLighter
+from PostgreSQLighter import SQLighter
 from ns import get_school
 import traceback
 from vkbottle import Keyboard,  Text

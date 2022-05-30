@@ -1,4 +1,4 @@
-from sqlighter import SQLighter
+from PostgreSQLighter import SQLighter
 from ns import getMarkNotify, getAnnouncementsNotify
 import asyncio
 import logging

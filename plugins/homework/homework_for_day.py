@@ -3,14 +3,13 @@ from vkbottle.bot import Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
 import logging
-from sqlighter import SQLighter
+from PostgreSQLighter import db
 from ns import get_diary, get_period
 import netschoolapi
 from settings import lessons_and_their_reduction
 
 
 bp = Blueprint('homework_for_day')# Объявляем команду
-db = SQLighter('database.db') # Подключаемся к базеданных
 
 
 

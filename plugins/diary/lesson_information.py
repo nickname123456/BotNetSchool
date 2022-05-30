@@ -1,13 +1,12 @@
 from ns import get_back_period, get_next_period, get_period, get_diary
 from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
-from sqlighter import SQLighter
+from PostgreSQLighter import db
 import logging
 
 
 
 bp = Blueprint('diary_for_day')# Объявляем команду
-db = SQLighter('database.db')# Подключаемся к базе данных
 
 
 

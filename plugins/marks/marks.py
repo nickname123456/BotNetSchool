@@ -1,7 +1,7 @@
 from typing import Text
 from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
-from sqlighter import SQLighter
+from PostgreSQLighter import SQLighter
 from ns import get_marks
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 import logging

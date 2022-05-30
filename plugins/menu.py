@@ -2,7 +2,7 @@ from vkbottle.bot import Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
 from netschoolapi import NetSchoolAPI
-from sqlighter import SQLighter
+from PostgreSQLighter import SQLighter
 import logging
 
 
