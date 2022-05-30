@@ -1,3 +1,5 @@
 settings.py
 database.db
 log.log
+../__pycache__/
+__pycache__/
