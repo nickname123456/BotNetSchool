@@ -49,7 +49,7 @@ async def registration2(message: Message):
 
             schools = await get_school(link)
             await message.answer('📋Введи ID школы из списка ниже(ID - Школа)')
-            await asyncio.sleep(3)
+            await asyncio.sleep(2)
             text = ''
             for school in schools:
                 text += f"\n{school['id']} - {school['name']}"
