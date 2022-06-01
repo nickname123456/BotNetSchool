@@ -74,3 +74,26 @@ def parseReportTotal(html_page: str) -> Dict:
 		report_dict['4'][marks[1].text] = marks[5].text
 		report_dict['year'][marks[1].text] = marks[6].text
 	return report_dict
+
+def parseAverageMark(html_page: str) -> Dict:
+	report_dict = {'average': {}, 'AverageInClass': {}}
+	html = bs4(html_page, 'lxml')
+	table = html.find_all('table', 'table-print chart-table chart-bars')[0]
+	subjects = table.find_all('tr', 'chart-labels-row')[0].find_all('th')
+	for subject in subjects[1:]:
+		report_dict['average'][subject.text] = None
+		report_dict['AverageInClass'][subject.text] = None
+	
+	marks = table.find_all('tr', 'text-nowrap chart-data-row')[0].find_all('td')
+	counter = 0
+	for mark in marks[1:]:
+		report_dict['average'][list(report_dict['average'].keys())[counter]] = mark.text
+		counter += 1
+
+	marks = table.find_all('tr', 'text-nowrap chart-data-row')[1].find_all('td')
+	counter = 0
+	for mark in marks[1:]:
+		report_dict['AverageInClass'][list(report_dict['AverageInClass'].keys())[counter]] = mark.text
+		counter += 1
+	
+	return report_dict
