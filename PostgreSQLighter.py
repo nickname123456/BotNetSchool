@@ -429,29 +429,35 @@ class SQLighter:
 
     def get_accounts_mark_notification(self):
         with self.connection:
-            return self.cursor.execute("SELECT * FROM students WHERE mark_notification = %s", (1,)).fetchall()
+            self.cursor.execute("SELECT * FROM students WHERE mark_notification = %s", (1,))
+            return self.cursor.fetchall()
 
     def get_chats_mark_notification(self):
         with self.connection:
-            return self.cursor.execute("SELECT * FROM chats WHERE mark_notification = %s", (1,)).fetchall()
+            self.cursor.execute("SELECT * FROM chats WHERE mark_notification = %s", (1,))
+            return self.cursor.fetchall()
 
 
     def get_accounts_announcements_notification(self):
         with self.connection:
-            return self.cursor.execute("SELECT * FROM students WHERE announcements_notification = %s", (1,)).fetchall()
+            self.cursor.execute("SELECT * FROM students WHERE announcements_notification = %s", (1,))
+            return self.cursor.fetchall()
 
     def get_chats_announcements_notification(self):
         with self.connection:
-            return self.cursor.execute("SELECT * FROM chats WHERE announcements_notification = %s", (1,)).fetchall()
+            self.cursor.execute("SELECT * FROM chats WHERE announcements_notification = %s", (1,))
+            return self.cursor.fetchall()
 
 
     def get_accounts_schedule_notification(self):
         with self.connection:
-            return self.cursor.execute("SELECT * FROM students WHERE schedule_notification = %s", (1,)).fetchall()
+            self.cursor.execute("SELECT * FROM students WHERE schedule_notification = %s", (1,))
+            return self.cursor.fetchall()
 
     def get_chats_schedule_notification(self):
         with self.connection:
-            return self.cursor.execute("SELECT * FROM chats WHERE schedule_notification = %s", (1,)).fetchall()
+            self.cursor.execute("SELECT * FROM chats WHERE schedule_notification = %s", (1,))
+            return self.cursor.fetchall()
 
 
 db = SQLighter('')
