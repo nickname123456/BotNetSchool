@@ -268,6 +268,18 @@ async def correction_mark(login, password, school, url, subject, mark):
 
 
 
+async def getReportTotal(login, password, school, url):
+    api = NetSchoolAPI(url)
+    await api.login(login, password, school)
+    reportTotal = await api.reportTotal()
+    result = {}
+    for period in reportTotal.keys():
+        result[period] = f'Оценки за {period} триместр/четверть:'
+        for i in reportTotal[period].keys():
+            result[period] += f'\n{i}: {reportTotal[period][i]}'
+
+    return result
+
 
 
 async def getSettings(login, password, school, url):

@@ -6,6 +6,7 @@ from .schedule import keyboard_schedule, schedule_download, schedule_for_day
 from .settings import keyboard_announcements_notification, keyboard_mark_notification, keyboard_settings, keyboard_schedule_notification
 from .announcements import announcements
 from .admin import admin_panel
+from .reports import reports, reportTotal
 
 
 bps = [not_found.bp,
@@ -32,5 +33,7 @@ bps = [not_found.bp,
        information.bp,
        homework_for_day.bp,
        keyboard_schedule_notification.bp,
-       admin_panel.bp
+       admin_panel.bp,
+       reports.bp,
+       reportTotal.bp
        ]
