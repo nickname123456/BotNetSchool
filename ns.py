@@ -2,7 +2,7 @@ from netschoolapi import NetSchoolAPI
 import datetime
 import re
 import html2markdown
-
+from settings import lessons_and_their_smiles
 
 
 async def get_student(url, login, password, school):
@@ -274,11 +274,14 @@ async def getReportTotal(login, password, school, url):
     reportTotal = await api.reportTotal()
     result = {}
     for period in reportTotal.keys():
-        if period == 'year': result[period] = f'🔢Оценки за год:'
-        else: result[period] = f'🔢Оценки за {period} триместр/четверть:'
+        if period == 'year': result[period] = f'Оценки за год:'
+        else: result[period] = f'Оценки за {period} триместр/четверть:'
 
         for i in reportTotal[period].keys():
-            result[period] += f'\n📖{i}: {reportTotal[period][i]}'
+            if i in lessons_and_their_smiles:
+                result[period] += f'\n{lessons_and_their_smiles[i]}{i}: {reportTotal[period][i]}'
+            else:
+                result[period] += f'\n📖{i}: {reportTotal[period][i]}'
 
     result['Warning'] = '⚠️Внимание⚠️ \nЕсли у вас триместры, то оценки за год стоят под названием "Оценки за 4 триместр/четверть"'
     return result
@@ -288,13 +291,19 @@ async def getReportAverageMark(login, password, school, url):
     await api.login(login, password, school)
     reportAverageMark = await api.reportAverageMark()
     
-    result = ['📈Вот твой средний балл на текущий триместр/четверть:', '📉Вот средний балл твоего класса на текущий триместр/четверть:']
+    result = ['Вот твой средний балл на текущий триместр/четверть:', 'Вот средний балл твоего класса на текущий триместр/четверть:']
 
     for i in reportAverageMark['average'].keys():
-        result[0] += f"\n📖{i}: {reportAverageMark['average'][i]}"
+        if i in lessons_and_their_smiles:
+            result[0] += f"\n{lessons_and_their_smiles[i]}{i}: {reportAverageMark['average'][i]}"
+        else:
+            result[0] += f"\n📖{i}: {reportAverageMark['average'][i]}"
     
     for i in reportAverageMark['AverageInClass'].keys():
-        result[1] += f"\n📖{i}: {reportAverageMark['AverageInClass'][i]}"
+        if i in lessons_and_their_smiles:
+            result[1] += f"\n{lessons_and_their_smiles[i]}{i}: {reportAverageMark['AverageInClass'][i]}"
+        else:
+            result[1] += f"\n📖{i}: {reportAverageMark['AverageInClass'][i]}"
 
     return result
 
@@ -306,7 +315,10 @@ async def getParentReport(login, password, school, url):
     result = []
 
     for subject in parentReport['subjects'].keys():
-        result.append(f"👨‍🎓{subject}:")
+        if subject in lessons_and_their_smiles:
+            result.append(f"{lessons_and_their_smiles[subject]}{subject}:")
+        else:
+            result.append(f"👨‍🎓{subject}:")
         for mark in parentReport['subjects'][subject].keys():
             if mark != 'average' and mark != 'term':
                 result[-1] += f"\nОценок '{mark}': {parentReport['subjects'][subject][mark]}"
