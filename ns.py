@@ -324,11 +324,13 @@ async def getParentReport(login, password, school, url):
 
 
 
-async def getSettings(login, password, school, url):
-	api = NetSchoolAPI(url)
-	await api.login(login, password, school)
-	settings = await api.userInfo()
-	result = '🔐Приватные данные из СГО:\n\n'
-	for key in settings.keys():
-		result += f'{key}: {settings[key]}\n'
-	return result
+async def getSettings(login, password, school, url, clas):
+    api = NetSchoolAPI(url)
+    await api.login(login, password, school)
+    settings = await api.userInfo()
+    result = '🔐Твои личные данные из СГО:\n\n'
+    result +=  f'Школа: {school}\n'
+    result +=  f'Класс: {clas}\n'
+    for key in settings.keys():
+        result += f'{key}: {settings[key]}\n'
+    return result
