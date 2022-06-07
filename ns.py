@@ -295,6 +295,30 @@ async def getReportAverageMark(login, password, school, url):
 
     return result
 
+async def getParentReport(login, password, school, url):
+    api = NetSchoolAPI(url)
+    await api.login(login, password, school)
+    parentReport = await api.parentReport()
+    
+    result = []
+
+    for subject in parentReport['subjects'].keys():
+        result.append(f"{subject}:")
+        for mark in parentReport['subjects'][subject].keys():
+            if mark != 'average' and mark != 'term':
+                result[-1] += f"\nОценок '{mark}': {parentReport['subjects'][subject][mark]}"
+        result[-1] += f"\nСредний балл: {parentReport['subjects'][subject]['average']}"
+        result[-1] += f"\nИтог: {parentReport['subjects'][subject]['term']}"
+
+    result.append('Итого по всем предметам:')
+    for mark in parentReport['total'].keys():
+        if mark != 'average' and mark != 'average_term':
+            result[-1] += f"\nОценок '{mark}': {parentReport['total'][mark]}"
+    result[-1] += f"\nСредний балл: {parentReport['total']['average']}"
+    result[-1] += f"\nИтог: {parentReport['total']['average_term']}"
+
+    return result
+
 
 
 async def getSettings(login, password, school, url):
