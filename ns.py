@@ -280,6 +280,21 @@ async def getReportTotal(login, password, school, url):
 
     return result
 
+async def getReportAverageMark(login, password, school, url):
+    api = NetSchoolAPI(url)
+    await api.login(login, password, school)
+    reportAverageMark = await api.reportAverageMark()
+    
+    result = ['🔢Вот твой средний балл:', '🔢Вот средний балл твоего класса:']
+
+    for i in reportAverageMark['average'].keys():
+        result[0] += f"\n{i}: {reportAverageMark['average'][i]}"
+    
+    for i in reportAverageMark['AverageInClass'].keys():
+        result[1] += f"\n{i}: {reportAverageMark['AverageInClass'][i]}"
+
+    return result
+
 
 
 async def getSettings(login, password, school, url):
