@@ -274,10 +274,13 @@ async def getReportTotal(login, password, school, url):
     reportTotal = await api.reportTotal()
     result = {}
     for period in reportTotal.keys():
-        result[period] = f'Оценки за {period} триместр/четверть:'
-        for i in reportTotal[period].keys():
-            result[period] += f'\n{i}: {reportTotal[period][i]}'
+        if period == 'year': result[period] = f'🔢Оценки за год:'
+        else: result[period] = f'🔢Оценки за {period} триместр/четверть:'
 
+        for i in reportTotal[period].keys():
+            result[period] += f'\n📖{i}: {reportTotal[period][i]}'
+
+    result['Warning'] = '⚠️Внимание⚠️ \nЕсли у вас триместры, то оценки за год стоят под названием "Оценки за 4 триместр/четверть"'
     return result
 
 async def getReportAverageMark(login, password, school, url):
@@ -285,13 +288,13 @@ async def getReportAverageMark(login, password, school, url):
     await api.login(login, password, school)
     reportAverageMark = await api.reportAverageMark()
     
-    result = ['🔢Вот твой средний балл:', '🔢Вот средний балл твоего класса:']
+    result = ['📈Вот твой средний балл на текущий триместр/четверть:', '📉Вот средний балл твоего класса на текущий триместр/четверть:']
 
     for i in reportAverageMark['average'].keys():
-        result[0] += f"\n{i}: {reportAverageMark['average'][i]}"
+        result[0] += f"\n📖{i}: {reportAverageMark['average'][i]}"
     
     for i in reportAverageMark['AverageInClass'].keys():
-        result[1] += f"\n{i}: {reportAverageMark['AverageInClass'][i]}"
+        result[1] += f"\n📖{i}: {reportAverageMark['AverageInClass'][i]}"
 
     return result
 
@@ -303,14 +306,14 @@ async def getParentReport(login, password, school, url):
     result = []
 
     for subject in parentReport['subjects'].keys():
-        result.append(f"{subject}:")
+        result.append(f"👨‍🎓{subject}:")
         for mark in parentReport['subjects'][subject].keys():
             if mark != 'average' and mark != 'term':
                 result[-1] += f"\nОценок '{mark}': {parentReport['subjects'][subject][mark]}"
         result[-1] += f"\nСредний балл: {parentReport['subjects'][subject]['average']}"
         result[-1] += f"\nИтог: {parentReport['subjects'][subject]['term']}"
 
-    result.append('Итого по всем предметам:')
+    result.append('📊Итого по всем предметам:')
     for mark in parentReport['total'].keys():
         if mark != 'average' and mark != 'average_term':
             result[-1] += f"\nОценок '{mark}': {parentReport['total'][mark]}"
