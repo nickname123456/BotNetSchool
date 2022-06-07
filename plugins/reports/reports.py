@@ -49,7 +49,7 @@ async def marks(message: Message):
         .add(Text('Итоговые отметки', {'cmd': 'reportTotal'}), color=KeyboardButtonColor.SECONDARY)
         .add(Text('Средний балл', {'cmd': 'reportAverageMark'}), color=KeyboardButtonColor.SECONDARY)
         .row()
-        .add(Text('Информационное письмо для родителей', {'cmd': 'reportTotal'}), color=KeyboardButtonColor.SECONDARY)
+        .add(Text('Информационное письмо для родителей', {'cmd': 'parentReport'}), color=KeyboardButtonColor.SECONDARY)
         .row()
         .add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
     )
