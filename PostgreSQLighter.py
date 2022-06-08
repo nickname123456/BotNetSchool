@@ -75,6 +75,11 @@ class SQLighter:
             self.cursor.execute('SELECT homework FROM homeworks WHERE school = %s AND class = %s AND lesson = %s', (school, clas, lesson))
             return self.cursor.fetchone()[0]
     
+    def get_lessons_with_homework(self, school, clas):
+        with self.connection:
+            self.cursor.execute('SELECT lesson FROM homeworks WHERE school = %s AND class = %s', (school, clas))
+            return self.cursor.fetchall()
+    
     def get_upd_date(self, school, clas, lesson):
         with self.connection:
             self.cursor.execute('SELECT upd_date FROM homeworks WHERE school = %s AND class = %s AND lesson = %s', (school, clas, lesson))

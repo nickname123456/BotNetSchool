@@ -2,6 +2,7 @@ from vkbottle.bot import Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
 import logging
+from PostgreSQLighter import db
 
 
 bp = Blueprint('keyboard_homework')# Объявляем команду
@@ -9,42 +10,60 @@ bp = Blueprint('keyboard_homework')# Объявляем команду
 
 
 
-@bp.on.message(payload={'cmd': 'keyboard_homework'})
+@bp.on.private_message(payload={'cmd': 'keyboard_homework'})
 async def keyboard_schedule(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_homework')
-    keyboard = (
-        Keyboard()
-        #Добавить кнопку
-        .add(Text("Все дз на 1 день", {'cmd': 'keyboard_homework_for_day'}), color=KeyboardButtonColor.PRIMARY)
-        .row()
-        .add(Text('Алгебра', {"cmd": "homework"}))
-        .add(Text('Инф.', {"cmd": "homework"}))
-        .add(Text('Геом.', {"cmd": "homework"}))
-        #Начать с новой строки
-        .row()
-        .add(Text('Рус. яз.', {"cmd": "homework"}))
-        .add(Text('Англ. яз.', {"cmd": "homework"}))
-        .add(Text('Литература', {"cmd": "homework"}))
-        .row()
-        .add(Text('Родн.Рус. яз.', {"cmd": "homework"}))
-        .add(Text('Родн. лит-ра', {"cmd": "homework"}))
-        .add(Text('ОБЖ', {"cmd": "homework"}))
-        .row()
-        .add(Text('Общество.', {"cmd": "homework"}))
-        .add(Text('История', {"cmd": "homework"}))
-        .add(Text('Геогр.', {"cmd": "homework"}))
-        .row()
-        .add(Text('Биол.', {"cmd": "homework"}))
-        .add(Text('Физика', {"cmd": "homework"}))
-        .add(Text('Химия', {"cmd": "homework"}))
-        .row()
-        .add(Text('Музыка', {"cmd": "homework"}))
-        .add(Text('Физ-ра', {"cmd": "homework"}))
-        .add(Text('Техн.', {"cmd": "homework"}))
-        .row()
-        .add(Text('Обновить', {"cmd": "keyboard_update_homework"}), color=KeyboardButtonColor.POSITIVE)
-        .add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
+    userInfo = await bp.api.users.get(message.from_id)
+    userId = userInfo[0].id
+    
+    keyboard = Keyboard()
+    keyboard.add(Text("Все дз на 1 день", {'cmd': 'keyboard_homework_for_day'}), color=KeyboardButtonColor.PRIMARY)
+    keyboard.row()
+
+    lessons = db.get_lessons_with_homework(
+        db.get_account_school(userId),
+        db.get_account_class(userId)
     )
+    counter = 1
+    for i in lessons:
+        if counter == 4: 
+            keyboard.row()
+            counter = 1
+        keyboard.add(Text(i[0], {"cmd": "homework"}))
+        counter += 1
+
+    keyboard.row()
+    keyboard.add(Text('Обновить', {"cmd": "keyboard_update_homework"}), color=KeyboardButtonColor.POSITIVE)
+    keyboard.add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
+
+    await message.answer('На какой урок хочешь узнать домашнее задание?', keyboard=keyboard)
+    logging.info(f'{message.peer_id}: I send keyboard_homework')
+
+
+@bp.on.chat_message(payload={'cmd': 'keyboard_homework'})
+async def keyboard_schedule(message: Message):
+    logging.info(f'{message.peer_id}: I get keyboard_homework')
+    chat_id = message.chat_id
+    
+    keyboard = Keyboard()
+    keyboard.add(Text("Все дз на 1 день", {'cmd': 'keyboard_homework_for_day'}), color=KeyboardButtonColor.PRIMARY)
+    keyboard.row()
+
+    lessons = db.get_lessons_with_homework(
+        db.get_chat_school(chat_id),
+        db.get_chat_class(chat_id)
+    )
+    counter = 1
+    for i in lessons:
+        if counter == 4: 
+            keyboard.row()
+            counter = 1
+        keyboard.add(Text(i[0], {"cmd": "homework"}))
+        counter += 1
+
+    keyboard.row()
+    keyboard.add(Text('Обновить', {"cmd": "keyboard_update_homework"}), color=KeyboardButtonColor.POSITIVE)
+    keyboard.add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
 
     await message.answer('На какой урок хочешь узнать домашнее задание?', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I send keyboard_homework')
