@@ -272,6 +272,7 @@ async def getReportTotal(login, password, school, url):
     api = NetSchoolAPI(url)
     await api.login(login, password, school)
     reportTotal = await api.reportTotal()
+    await api.logout()
     result = {}
     for period in reportTotal.keys():
         if period == 'year': result[period] = f'Оценки за год:'
@@ -290,6 +291,7 @@ async def getReportAverageMark(login, password, school, url):
     api = NetSchoolAPI(url)
     await api.login(login, password, school)
     reportAverageMark = await api.reportAverageMark()
+    await api.logout()
     
     result = ['Вот твой средний балл на текущий триместр/четверть:', 'Вот средний балл твоего класса на текущий триместр/четверть:']
 
@@ -346,6 +348,7 @@ async def getSettings(login, password, school, url, clas):
     api = NetSchoolAPI(url)
     await api.login(login, password, school)
     settings = await api.userInfo()
+    await api.logout()
     result = '🔐Твои личные данные из СГО:\n\n'
     result +=  f'Школа: {school}\n'
     result +=  f'Класс: {clas}\n'
