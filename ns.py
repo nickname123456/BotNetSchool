@@ -307,10 +307,11 @@ async def getReportAverageMark(login, password, school, url):
 
     return result
 
-async def getParentReport(login, password, school, url):
+async def getParentReport(login, password, school, url, termId):
     api = NetSchoolAPI(url)
     await api.login(login, password, school)
-    parentReport = await api.parentReport()
+    parentReport = await api.parentReport(termId)
+    await api.logout()
     
     result = []
 
@@ -334,7 +335,12 @@ async def getParentReport(login, password, school, url):
 
     return result
 
-
+async def getTerms(login, password, school, url):
+    api = NetSchoolAPI(url)
+    await api.login(login, password, school)
+    terms = await api.getTerms()
+    await api.logout()
+    return terms
 
 async def getSettings(login, password, school, url, clas):
     api = NetSchoolAPI(url)

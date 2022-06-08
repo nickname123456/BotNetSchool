@@ -331,7 +331,7 @@ class NetSchoolAPI:
         )
         return response.text
 
-    async def parentReport(self, term: Optional[int] = 1):
+    async def parentReport(self, termId):
         response_with_cookies = await self._client.post(
             'asp/Reports/ReportParentInfoLetter.asp',
             data = {
@@ -352,7 +352,7 @@ class NetSchoolAPI:
                 'SID': self._student_id,
                 'ReportType': 2,
                 'PCLID': self._class_id,
-                'TERMID': ((await self.getTermId())[term - 1]),
+                'TERMID': termId,
             })
         return parser.parseReportParent(response.text)
 
@@ -366,6 +366,17 @@ class NetSchoolAPI:
                 'RPTID': 'ParentInfoLetter',
             })
         return parser.parseTermId(response.text)
+
+    async def getTerms(self):
+        response = await self._client.post(
+            'asp/Reports/ReportParentInfoLetter.asp',
+            data = {
+                'AT': self._at,
+                'VER': self._ver,
+                'RPNAME': 'Информационное письмо для родителей',
+                'RPTID': 'ParentInfoLetter',
+            })
+        return parser.parseTerms(response.text)
 
     async def reportTotal(self):
         response_with_cookies = await self._client.post(
