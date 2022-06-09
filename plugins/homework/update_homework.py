@@ -24,7 +24,7 @@ class HomeworkData(BaseStateGroup):
 
 
 @bp.on.private_message(payload={'cmd': 'keyboard_update_homework'})
-async def keyboard_update_homework(message: Message):
+async def private_keyboard_update_homework(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_update_homework')
     userInfo = await bp.api.users.get(message.from_id)
     userId = userInfo[0].id
@@ -53,7 +53,7 @@ async def keyboard_update_homework(message: Message):
 
 
 @bp.on.chat_message(payload={'cmd': 'keyboard_update_homework'})
-async def keyboard_update_homework(message: Message):
+async def chat_keyboard_update_homework(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_update_homework')
     chat_id = message.chat_id
 
@@ -83,7 +83,7 @@ async def keyboard_update_homework(message: Message):
 
 
 @bp.on.message(state=HomeworkData.lesson)
-async def update_homework(message: Message):
+async def get_new_homework(message: Message):
     logging.info(f'{message.peer_id}: I get lesson in update_homework')
     userInfo = await bp.api.users.get(message.from_id)
     ctx.set('lesson', message.text) # Загружаем во временное хранилище урок
@@ -97,7 +97,7 @@ async def update_homework(message: Message):
 
 
 @bp.on.private_message(state=HomeworkData.check_admin)
-async def check_admin(message: Message):
+async def private_check_admin(message: Message):
     logging.info(f'{message.peer_id}: I get homework in update_homework')
     userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
     ctx.set('homework', message.text)# Загружаем во временное хранилище дз
@@ -114,7 +114,7 @@ async def check_admin(message: Message):
     await message.answer('Я отправил это домашнее задание администратору. Я сообщу, если он его одобрит.')
 
 @bp.on.chat_message(state=HomeworkData.check_admin)
-async def check_admin(message: Message):
+async def chat_check_admin(message: Message):
     logging.info(f'{message.peer_id}: I get homework in update_homework')
     userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
     ctx.set('homework', message.text) # Загружаем во временное хранилище дз
@@ -135,7 +135,7 @@ async def check_admin(message: Message):
 
 
 @bp.on.private_message(state=HomeworkData.homework)
-async def schedule_for_day(message: Message):
+async def private_edit_hamework(message: Message):
     logging.info(f'{message.peer_id}: Im at the end of update_homework')
     userInfo = await bp.api.users.get(message.from_id)
     userId = userInfo[0].id
@@ -282,7 +282,7 @@ async def schedule_for_day(message: Message):
 
 
 @bp.on.chat_message(state=HomeworkData.homework)
-async def schedule_for_day(message: Message):
+async def chat_edit_hamework(message: Message):
     logging.info(f'{message.peer_id}: Im at the end of update_homework')
     chat_id = message.chat_id
     
