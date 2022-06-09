@@ -1,5 +1,5 @@
 from vkbottle.bot import Message
-from vkbottle import Keyboard, KeyboardButtonColor, Text
+from vkbottle import Keyboard, KeyboardButtonColor, Text, EMPTY_KEYBOARD 
 from vkbottle.bot import Blueprint
 from PostgreSQLighter import db
 from vkbottle import CtxStorage
@@ -23,60 +23,74 @@ class HomeworkData(BaseStateGroup):
     homework = 23
 
 
-@bp.on.message(payload={'cmd': 'keyboard_update_homework'})
+@bp.on.private_message(payload={'cmd': 'keyboard_update_homework'})
 async def keyboard_update_homework(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_update_homework')
+    userInfo = await bp.api.users.get(message.from_id)
+    userId = userInfo[0].id
+
     await bp.state_dispenser.set(message.peer_id, HomeworkData.lesson) # Говорим, что следующий шаг - выбор урока
-    keyboard = (
-        Keyboard()
-        .add(Text('Алгебра', {"cmd": "update_homework"}))
-        .add(Text('Инф.', {"cmd": "update_homework"}))
-        .add(Text('Геом.', {"cmd": "update_homework"}))
-        .row()
-        .add(Text('Рус. яз.', {"cmd": "update_homework"}))
-        .add(Text('Англ. яз.', {"cmd": "update_homework"}))
-        .add(Text('Литература', {"cmd": "update_homework"}))
-        .row()
-        .add(Text('Родн.Рус. яз.', {"cmd": "update_homework"}))
-        .add(Text('Родн. лит-ра', {"cmd": "update_homework"}))
-        .add(Text('ОБЖ', {"cmd": "update_homework"}))
-        .row()
-        .add(Text('Общество.', {"cmd": "update_homework"}))
-        .add(Text('История', {"cmd": "update_homework"}))
-        .add(Text('Геогр.', {"cmd": "update_homework"}))
-        .row()
-        .add(Text('Биол.', {"cmd": "update_homework"}))
-        .add(Text('Физика', {"cmd": "update_homework"}))
-        .add(Text('Химия', {"cmd": "update_homework"}))
-        .row()
-        .add(Text('Музыка', {"cmd": "update_homework"}))
-        .add(Text('Физ-ра', {"cmd": "update_homework"}))
-        .add(Text('Техн.', {"cmd": "update_homework"}))
-        .row()
-        .add(Text("Назад", {'cmd': 'keyboard_homework'}), color=KeyboardButtonColor.NEGATIVE)
+
+    keyboard = Keyboard()
+
+    lessons = db.get_lessons_with_homework(
+        db.get_account_school(userId),
+        db.get_account_class(userId)
     )
+    counter = 1
+    for i in lessons:
+        if counter == 4: 
+            keyboard.row()
+            counter = 1
+        keyboard.add(Text(i[0], {"cmd": "update_homework"}))
+        counter += 1
+    
+    keyboard.row()
+    keyboard.add(Text("Назад", {'cmd': 'keyboard_homework'}), color=KeyboardButtonColor.NEGATIVE)
 
     await message.answer('На какой урок хочешь изменить дз?', keyboard=keyboard)
+    logging.info(f'{message.peer_id}: I send list of lessons')
+
+
+@bp.on.chat_message(payload={'cmd': 'keyboard_update_homework'})
+async def keyboard_update_homework(message: Message):
+    logging.info(f'{message.peer_id}: I get keyboard_update_homework')
+    chat_id = message.chat_id
+
+    await bp.state_dispenser.set(message.peer_id, HomeworkData.lesson) # Говорим, что следующий шаг - выбор урока
+
+    keyboard = Keyboard()
+
+    lessons = db.get_lessons_with_homework(
+        db.get_chat_school(chat_id),
+        db.get_chat_class(chat_id)
+    )
+    counter = 1
+    for i in lessons:
+        if counter == 4: 
+            keyboard.row()
+            counter = 1
+        keyboard.add(Text(i[0], {"cmd": "update_homework"}))
+        counter += 1
     
+    keyboard.row()
+    keyboard.add(Text("Назад", {'cmd': 'keyboard_homework'}), color=KeyboardButtonColor.NEGATIVE)
+
+    await message.answer('На какой урок хочешь изменить дз?', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I send list of lessons')
 
 
 
 
-@bp.on.private_message(state=HomeworkData.lesson)
+@bp.on.message(state=HomeworkData.lesson)
 async def update_homework(message: Message):
     logging.info(f'{message.peer_id}: I get lesson in update_homework')
-    ctx.set('lesson', message.text)  # Загружаем во временное хранилище урок
-    await bp.state_dispenser.set(message.peer_id, HomeworkData.check_admin)  # Говорим, что следующий шаг - проверка на админа
-    logging.info(f'{message.peer_id}: I sent a question about homework')
-    return 'Введи дз'
-
-@bp.on.chat_message(state=HomeworkData.lesson)
-async def update_homework(message: Message):
-    logging.info(f'{message.peer_id}: I get lesson in update_homework')
+    userInfo = await bp.api.users.get(message.from_id)
     ctx.set('lesson', message.text) # Загружаем во временное хранилище урок
 
-    await bp.state_dispenser.set(message.peer_id, HomeworkData.check_admin) # Говорим, что следующий шаг - проверка на админа
+    if str(userInfo[0].id) == str(admin_id): await bp.state_dispenser.set(message.peer_id, HomeworkData.homework)
+    else: await bp.state_dispenser.set(message.peer_id, HomeworkData.check_admin) # Говорим, что следующий шаг - проверка на админа
+    
     logging.info(f'{message.peer_id}: I sent a question about homework')
     return 'Введи дз'
 
@@ -89,20 +103,15 @@ async def check_admin(message: Message):
     ctx.set('homework', message.text)# Загружаем во временное хранилище дз
     lesson = ctx.get('lesson') # Берем из временного хранилища урок
 
-    # Если юзер - админ:
-    if str(userInfo[0].id) == str(admin_id):
-        await bp.state_dispenser.set(message.peer_id, HomeworkData.homework) # Говорим, что следующий шаг - залив дз в дб
-        logging.info(f'{message.peer_id}: I sent a question about admin????')
-        return 'Ты админ?'
-    else:
-        await bp.state_dispenser.set(int(admin_id), HomeworkData.homework) # Говорим, что следующий шаг - залив дз в дб админом
-        keyboard = (
-        Keyboard()
-        .add(Text('Одобрить', {"prvt": f"yes_update_homework_{userInfo[0].id}_{message.peer_id}"}), color=KeyboardButtonColor.POSITIVE)
-        .add(Text('Отказать', {"prvt": f"no_update_homework_{userInfo[0].id}"}), color=KeyboardButtonColor.NEGATIVE)
-        )
-        logging.info(f'{message.peer_id}: I sent a question about approval')
-        await bp.api.messages.send(message=f'[id{userInfo[0].id}|Этот человек] хочет обновить дз по {lesson} на: \n{message.text}',user_id=admin_id, keyboard=keyboard, random_id=0)
+    await bp.state_dispenser.set(int(admin_id), HomeworkData.homework) # Говорим, что следующий шаг - залив дз в дб админом
+    keyboard = (
+    Keyboard()
+    .add(Text('Одобрить', {"prvt": f"yes_update_homework_{userInfo[0].id}_{message.peer_id}"}), color=KeyboardButtonColor.POSITIVE)
+    .add(Text('Отказать', {"prvt": f"no_update_homework_{userInfo[0].id}"}), color=KeyboardButtonColor.NEGATIVE)
+    )
+    logging.info(f'{message.peer_id}: I sent a question about approval')
+    await bp.api.messages.send(message=f'[id{userInfo[0].id}|Этот человек] хочет обновить дз по {lesson} на: \n{message.text}',user_id=admin_id, keyboard=keyboard, random_id=0)
+    await message.answer('Я отправил это домашнее задание администратору. Я сообщу, если он его одобрит.')
 
 @bp.on.chat_message(state=HomeworkData.check_admin)
 async def check_admin(message: Message):
@@ -111,22 +120,16 @@ async def check_admin(message: Message):
     ctx.set('homework', message.text) # Загружаем во временное хранилище дз
     lesson = ctx.get('lesson') # Берем из временного хранилища урок
 
-    # Если юзер - админ:
-    if str(userInfo[0].id) == str(admin_id):
-        await bp.state_dispenser.set(message.peer_id, HomeworkData.homework) # Говорим, что следующий шаг - залив дз в дб
-        logging.info(f'{message.peer_id}: I sent a question about admin????')
-        return 'Ты админ?'
-    else:
-        await bp.state_dispenser.delete(message.peer_id) # Удаляем цепочку с юзером
-        await bp.state_dispenser.set(int(admin_id), HomeworkData.homework) # Говорим, что следующий шаг - залив дз в дб админом
-        keyboard = (
-        Keyboard()
-        .add(Text('Одобрить', {"chat": f"yes_update_homework_{userInfo[0].id}_{message.peer_id}"}), color=KeyboardButtonColor.POSITIVE)
-        .add(Text('Отказать', {"chat": f"no_update_homework_{userInfo[0].id}"}), color=KeyboardButtonColor.NEGATIVE)
-        )
-        logging.info(f'{message.peer_id}: I sent a question about approval')
-        await bp.api.messages.send(message=f'[id{userInfo[0].id}|Этот человек] хочет обновить дз по {lesson} на: \n{message.text}',user_id=admin_id, keyboard=keyboard, random_id=0)
-
+    await bp.state_dispenser.delete(message.peer_id) # Удаляем цепочку с юзером
+    await bp.state_dispenser.set(int(admin_id), HomeworkData.homework) # Говорим, что следующий шаг - залив дз в дб админом
+    keyboard = (
+    Keyboard()
+    .add(Text('Одобрить', {"chat": f"yes_update_homework_{userInfo[0].id}_{message.peer_id}"}), color=KeyboardButtonColor.POSITIVE)
+    .add(Text('Отказать', {"chat": f"no_update_homework_{userInfo[0].id}"}), color=KeyboardButtonColor.NEGATIVE)
+    )
+    logging.info(f'{message.peer_id}: I sent a question about approval')
+    await bp.api.messages.send(message=f'[id{userInfo[0].id}|Этот человек] хочет обновить дз по {lesson} на: \n{message.text}',user_id=admin_id, keyboard=keyboard, random_id=0)
+    return 'Я отправил это домашнее задание администратору. Я сообщу, если он его одобрит.'
 
 
 
@@ -134,35 +137,31 @@ async def check_admin(message: Message):
 @bp.on.private_message(state=HomeworkData.homework)
 async def schedule_for_day(message: Message):
     logging.info(f'{message.peer_id}: Im at the end of update_homework')
-    keyboard = (
-        Keyboard()
-        .add(Text('Алгебра', {"cmd": "homework"}))
-        .add(Text('Инф.', {"cmd": "homework"}))
-        .add(Text('Геом.', {"cmd": "homework"}))
-        .row()
-        .add(Text('Рус. яз.', {"cmd": "homework"}))
-        .add(Text('Англ. яз.', {"cmd": "homework"}))
-        .add(Text('Литература', {"cmd": "homework"}))
-        .row()
-        .add(Text('Родн.Рус. яз.', {"cmd": "homework"}))
-        .add(Text('Родн. лит-ра', {"cmd": "homework"}))
-        .add(Text('ОБЖ', {"cmd": "homework"}))
-        .row()
-        .add(Text('Общество.', {"cmd": "homework"}))
-        .add(Text('История', {"cmd": "homework"}))
-        .add(Text('Геогр.', {"cmd": "homework"}))
-        .row()
-        .add(Text('Биол.', {"cmd": "homework"}))
-        .add(Text('Физика', {"cmd": "homework"}))
-        .add(Text('Химия', {"cmd": "homework"}))
-        .row()
-        .add(Text('Музыка', {"cmd": "homework"}))
-        .add(Text('Физ-ра', {"cmd": "homework"}))
-        .add(Text('Техн.', {"cmd": "homework"}))
-        .row()
-        .add(Text('Обновить', {"cmd": "keyboard_update_homework"}), color=KeyboardButtonColor.POSITIVE)
-        .add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
+    userInfo = await bp.api.users.get(message.from_id)
+    userId = userInfo[0].id
+
+    if message.payload is None: # если человек попал в этот стейт прямиком из указания дз (у админа не спрашивалось разрешение)
+        ctx.set('homework', message.text)# Загружаем во временное хранилище дз
+    
+    keyboard = Keyboard()
+    keyboard.add(Text("Все дз на 1 день", {'cmd': 'keyboard_homework_for_day'}), color=KeyboardButtonColor.PRIMARY)
+    keyboard.row()
+
+    lessons = db.get_lessons_with_homework(
+        db.get_account_school(userId),
+        db.get_account_class(userId)
     )
+    counter = 1
+    for i in lessons:
+        if counter == 4: 
+            keyboard.row()
+            counter = 1
+        keyboard.add(Text(i[0], {"cmd": "homework"}))
+        counter += 1
+
+    keyboard.row()
+    keyboard.add(Text('Обновить', {"cmd": "keyboard_update_homework"}), color=KeyboardButtonColor.POSITIVE)
+    keyboard.add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
 
     lesson = ctx.get('lesson') # Берем из временного хранилища урок
     homework = ctx.get('homework') # Берем из временного хранилища дз
@@ -170,21 +169,19 @@ async def schedule_for_day(message: Message):
     # Если в обнове дз отказали
     if message.payload and 'no_update_homework_' in message.payload:
         await bp.state_dispenser.delete(message.peer_id) # Удаляем цепочку
-        user_id = message.payload[28:]
-        user_id = int(user_id[:-2])
+        user_id = int(message.payload[28:-2])
 
 
         await bp.api.messages.send(message=f'Администратор отказал вам в измение дз по {lesson} на:\n{homework}', user_id=user_id, keyboard=keyboard, random_id=0)
         logging.info(f'{message.peer_id}: I sent a refusal')
 
-        await message.answer('Ты отказал человеку в изменение дз.')
+        await message.answer('Ты отказал человеку в изменение дз.', keyboard=EMPTY_KEYBOARD)
         return
 
     # Если админ одобрил дз:
     elif message.payload and 'yes_update_homework_' in message.payload:
         user_id = int(message.payload[29:38]) 
-        peer_id = message.payload[39:]
-        peer_id = int(peer_id[:-2])
+        peer_id = int(message.payload[39:-2])
 
         await bp.state_dispenser.delete(int(admin_id)) # Удаляем цепочку
         userInfo = await bp.api.users.get(user_id) # Информация о юзере
@@ -214,7 +211,7 @@ async def schedule_for_day(message: Message):
             )
             db.commit()
 
-            await message.answer('Ты успешно обновил дз')
+            await message.answer('Ты успешно обновил дз', keyboard=keyboard)
             logging.info(f'{message.peer_id}: I sent a success')
 
             homework = db.get_homework(
@@ -287,35 +284,31 @@ async def schedule_for_day(message: Message):
 @bp.on.chat_message(state=HomeworkData.homework)
 async def schedule_for_day(message: Message):
     logging.info(f'{message.peer_id}: Im at the end of update_homework')
-    keyboard = (
-        Keyboard()
-        .add(Text('Алгебра', {"cmd": "homework"}))
-        .add(Text('Инф.', {"cmd": "homework"}))
-        .add(Text('Геом.', {"cmd": "homework"}))
-        .row()
-        .add(Text('Рус. яз.', {"cmd": "homework"}))
-        .add(Text('Англ. яз.', {"cmd": "homework"}))
-        .add(Text('Литература', {"cmd": "homework"}))
-        .row()
-        .add(Text('Родн.Рус. яз.', {"cmd": "homework"}))
-        .add(Text('Родн. лит-ра', {"cmd": "homework"}))
-        .add(Text('ОБЖ', {"cmd": "homework"}))
-        .row()
-        .add(Text('Общество.', {"cmd": "homework"}))
-        .add(Text('История', {"cmd": "homework"}))
-        .add(Text('Геогр.', {"cmd": "homework"}))
-        .row()
-        .add(Text('Биол.', {"cmd": "homework"}))
-        .add(Text('Физика', {"cmd": "homework"}))
-        .add(Text('Химия', {"cmd": "homework"}))
-        .row()
-        .add(Text('Музыка', {"cmd": "homework"}))
-        .add(Text('Физ-ра', {"cmd": "homework"}))
-        .add(Text('Техн.', {"cmd": "homework"}))
-        .row()
-        .add(Text('Обновить', {"cmd": "keyboard_update_homework"}), color=KeyboardButtonColor.POSITIVE)
-        .add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
+    chat_id = message.chat_id
+    
+    if message.payload is None: # если человек попал в этот стейт прямиком из указания дз (у админа не спрашивалось разрешение)
+        ctx.set('homework', message.text)# Загружаем во временное хранилище дз
+
+    keyboard = Keyboard()
+    keyboard.add(Text("Все дз на 1 день", {'cmd': 'keyboard_homework_for_day'}), color=KeyboardButtonColor.PRIMARY)
+    keyboard.row()
+
+    lessons = db.get_lessons_with_homework(
+        db.get_chat_school(chat_id),
+        db.get_chat_class(chat_id)
     )
+    counter = 1
+    for i in lessons:
+        if counter == 4: 
+            keyboard.row()
+            counter = 1
+        keyboard.add(Text(i[0], {"cmd": "homework"}))
+        counter += 1
+
+    keyboard.row()
+    keyboard.add(Text('Обновить', {"cmd": "keyboard_update_homework"}), color=KeyboardButtonColor.POSITIVE)
+    keyboard.add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
+
 
     lesson = ctx.get('lesson') # Берем из временного хранилища урок
     homework = ctx.get('homework') # Берем из временного хранилища дз
@@ -323,8 +316,7 @@ async def schedule_for_day(message: Message):
     # Если в обнове дз отказали
     if message.payload and 'no_update_homework_' in message.payload:
         await bp.state_dispenser.delete(message.peer_id) # Удаляем цепочку
-        user_id = message.payload[28:]
-        user_id = int(user_id[:-2])
+        user_id = int(message.payload[28:-2])
 
         #try:
         await bp.api.messages.send(message=f'Администратор отказал вам в измение дз по {lesson} на:\n{homework}', user_id=user_id, keyboard=keyboard, random_id=0)
