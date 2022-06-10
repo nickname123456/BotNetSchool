@@ -2,7 +2,7 @@ from typing import Union
 from vkbottle.bot import Message
 from vkbottle.dispatch.rules import ABCRule
 
-# Новый вид правила
+# На что начинается колбэк
 class PayloadStarts(ABCRule[Message]):
     def __init__(self, text):
         self.text = text
