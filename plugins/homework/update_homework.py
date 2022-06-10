@@ -19,8 +19,7 @@ ctx = CtxStorage() # объявляем временное хранилище
 class HomeworkData(BaseStateGroup):
     lesson = 20
     check_admin = 21
-    check_admin2 = 22
-    homework = 23
+    homework = 22
 
 
 @bp.on.private_message(payload={'cmd': 'keyboard_update_homework'})
