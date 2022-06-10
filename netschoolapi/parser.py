@@ -33,8 +33,8 @@ def parseHolidayMonth(html_page: str) -> List:
 def parseTerms(html_page: str) -> Dict:
 	term_dict = {}
 	html = bs4(html_page, 'lxml')
-	terms = html.find_all('select', 'form-control')
-	terms = terms[1].find_all('option')
+	terms = html.find_all(name = 'select', attrs={'name': 'TERMID'})
+	terms = terms[0].find_all('option')
 	for term in terms:
 		term_dict[term.text] = term.attrs['value']
 	return term_dict
@@ -42,8 +42,8 @@ def parseTerms(html_page: str) -> Dict:
 def parseTermId(html_page: str) -> List:
 	term_list = []
 	html = bs4(html_page, 'lxml')
-	terms = html.find_all('select', 'form-control')
-	terms = terms[1].find_all('option')
+	terms = html.find_all(name = 'select',attrs={'name': 'TERMID'})
+	terms = terms[0].find_all('option')
 	for term in terms:
 		term_list.append(term.attrs['value'])
 	return term_list
