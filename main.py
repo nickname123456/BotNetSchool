@@ -1,9 +1,9 @@
 from vkbottle import Bot
-from plugins import bps
+from commands import bps
 from settings import token
 import logging
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from plugins.settings.notification import notification
+from commands.settings.notification import notification
 
 scheduler = AsyncIOScheduler()
 

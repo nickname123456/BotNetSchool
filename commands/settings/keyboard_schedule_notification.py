@@ -1,7 +1,7 @@
 from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
 from PostgreSQLighter import db
-from plugins.settings.keyboard_settings import keyboard_settings_chat, keyboard_settings_private
+from commands.settings.keyboard_settings import keyboard_settings_chat, keyboard_settings_private
 import logging
 
 
