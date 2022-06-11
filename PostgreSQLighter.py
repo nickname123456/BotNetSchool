@@ -11,6 +11,7 @@ class SQLighter:
                 id INT,
                 login TEXT,
                 password TEXT,
+                studentId INT,
                 isFirstLogin INT,
                 week INT,
                 day INT,
@@ -42,6 +43,7 @@ class SQLighter:
                 lesson INT,
                 login TEXT,
                 password TEXT,
+                studentId INT,
                 link TEXT,
                 school TEXT,
                 class TEXT,
@@ -129,6 +131,11 @@ class SQLighter:
             self.cursor.execute('SELECT password FROM students WHERE id = %s', (account_id,))
             return self.cursor.fetchone()[0]
 
+    def get_account_studentId(self, account_id):
+        with self.connection:
+            self.cursor.execute('SELECT studentId FROM students WHERE id = %s', (account_id,))
+            return self.cursor.fetchone()[0]
+
     def get_account_isFirstLogin(self, account_id):
         with self.connection:
             self.cursor.execute('SELECT isFirstLogin FROM students WHERE id = %s', (account_id,))
@@ -201,9 +208,9 @@ class SQLighter:
 
 
 
-    def add_user(self, user_id, login, password, link, school, clas):
+    def add_user(self, user_id, login, password, link, school, clas, studentId):
         with self.connection:
-            return self.cursor.execute('INSERT INTO students VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',(user_id, login, password, 1, 0, 0, 0, 0, link, school, clas, 0, 0, 0, '[]','[]',0,0))
+            return self.cursor.execute('INSERT INTO students VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',(user_id, login, password, studentId, 1, 0, 0, 0, 0, link, school, clas, 0, 0, 0, '[]','[]',0,0))
 
 
 
@@ -217,7 +224,11 @@ class SQLighter:
 
     def edit_account_password(self, account_id, password):
         with self.connection:
-            return self.cursor.execute("UPDATE students SET password = %s WHERE id = %s", ( password, account_id))
+            return self.cursor.execute("UPDATE students SET password = %s WHERE id = %s", (password, account_id))
+
+    def edit_account_studentId(self, account_id, studentId):
+        with self.connection:
+            return self.cursor.execute("UPDATE students SET studentId = %s WHERE id = %s", (studentId, account_id))
 
     def edit_account_isFirstLogin(self, account_id, isFirstLogin):
         with self.connection:
@@ -298,6 +309,11 @@ class SQLighter:
             self.cursor.execute('SELECT password FROM chats WHERE id = %s', (chat_id,))
             return self.cursor.fetchone()[0]
 
+    def get_chat_studentId(self, chat_id):
+        with self.connection:
+            self.cursor.execute('SELECT studentId FROM chats WHERE id = %s', (chat_id,))
+            return self.cursor.fetchone()[0]
+
     def get_chat_day(self, chat_id):
         with self.connection:
             self.cursor.execute('SELECT day FROM chats WHERE id = %s', (chat_id,))
@@ -360,9 +376,9 @@ class SQLighter:
 
 
 
-    def add_chat(self, chat_id, login, password, link, school, clas):
+    def add_chat(self, chat_id, login, password, link, school, clas, studentId):
         with self.connection:
-            return self.cursor.execute('INSERT INTO chats VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',(chat_id, 0, 0, 0, login, password, link, school, clas, 0, 0, 0,'[]','[]',0,0))
+            return self.cursor.execute('INSERT INTO chats VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',(chat_id, 0, 0, 0, login, password,studentId, link, school, clas, 0, 0, 0,'[]','[]',0,0))
 
 
 
@@ -376,7 +392,11 @@ class SQLighter:
 
     def edit_chat_password(self, chat_id, password):
         with self.connection:
-            return self.cursor.execute("UPDATE chats SET password = %s WHERE id = %s", ( password, chat_id))
+            return self.cursor.execute("UPDATE chats SET password = %s WHERE id = %s", (password, chat_id))
+
+    def edit_chat_studentId(self, chat_id, studentId):
+        with self.connection:
+            return self.cursor.execute("UPDATE chats SET studentId = %s WHERE id = %s", (studentId, chat_id))
 
     def edit_chat_day(self, chat_id, day):
         with self.connection:

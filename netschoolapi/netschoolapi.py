@@ -442,6 +442,19 @@ class NetSchoolAPI:
                 'DDT': f"{end.day}.{end.month}.{end.year}",
             })
         return parser.parseAverageMark(response.text)
+    
+    async def getStudents(self):
+        response = await self._client.get('webapi/student/diary/init')
+        diary_info = response.json()
+        students = diary_info['students']
+        return students
+
+    async def getCurrentStudentId(self):
+        response = await self._client.get('webapi/student/diary/init')
+        diary_info = response.json()
+        student = diary_info['students'][diary_info['currentStudentId']]
+        studentId = student['studentId']
+        return studentId
 
     async def yearView(self):
         response = await self._client.post(

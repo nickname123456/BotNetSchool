@@ -125,15 +125,16 @@ async def private_registration6(message: Message):
         else:
             login+=i
 
+    studentId = await ns.getCurrentStudentId(login, password, school, link)
     try:
         # Если юзера нет в бд:
         if db.get_account_isFirstLogin(userInfo[0].id) is None:
-            db.add_user(userInfo[0].id, login, password, link, school, clas)
+            db.add_user(userInfo[0].id, login, password, link, school, clas, studentId)
             db.commit()
         logging.info(f'{message.peer_id}: User in database')
     except TypeError:
         logging.exception(f'{message.peer_id}: User not in database')
-        db.add_user(userInfo[0].id, login, password, link, school, clas)
+        db.add_user(userInfo[0].id, login, password, link, school, clas, studentId)
         db.commit()
 
     else:
@@ -147,6 +148,8 @@ async def private_registration6(message: Message):
         logging.info(f'{message.peer_id}: Changed database: password')
         db.edit_account_class(userInfo[0].id, clas) # Редактируем бд под новые данные
         logging.info(f'{message.peer_id}: Changed database: clas')
+        db.edit_account_studentId(userInfo[0].id, studentId) # Редактируем бд под новые данные
+        logging.info(f'{message.peer_id}: Changed database: studentId')
         db.commit()
 
 
@@ -210,16 +213,17 @@ async def chat_registration6(message: Message):
             login+=' '
         else:
             login+=i
-
+            
+    studentId = await ns.getCurrentStudentId(login, password, school, link)
     try:
         # Если юзера нет в бд:
         if db.get_chat_id(chat_id) is None:
-            db.add_chat(chat_id, login, password, link, school, clas)
+            db.add_chat(chat_id, login, password, link, school, clas, studentId)
             db.commit()
         logging.info(f'{message.peer_id}: User in database')
     except TypeError:
         logging.exception(f'{message.peer_id}: User not in database')
-        db.add_chat(chat_id, login, password, link, school, clas)
+        db.add_chat(chat_id, login, password, link, school, clas, studentId)
         db.commit()
 
     else:
@@ -233,6 +237,8 @@ async def chat_registration6(message: Message):
         logging.info(f'{message.peer_id}: Changed database: password')
         db.edit_chat_class(chat_id, clas) # Редактируем бд под новые данные
         logging.info(f'{message.peer_id}: Changed database: clas')
+        db.edit_chat_studentId(chat_id, studentId) # Редактируем бд под новые данные
+        logging.info(f'{message.peer_id}: Changed database: studentId')
         db.commit()
 
 

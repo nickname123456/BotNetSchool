@@ -344,6 +344,20 @@ async def getTerms(login, password, school, url):
     await api.logout()
     return terms
 
+async def getStudents(login, password, school, url):
+    api = NetSchoolAPI(url)
+    await api.login(login, password, school)
+    students = await api.getStudents()
+    await api.logout()
+    return students
+
+async def getCurrentStudentId(login, password, school, url):
+    api = NetSchoolAPI(url)
+    await api.login(login, password, school)
+    studentId = await api.getCurrentStudentId()
+    await api.logout()
+    return studentId
+
 async def getSettings(login, password, school, url, clas):
     api = NetSchoolAPI(url)
     await api.login(login, password, school)

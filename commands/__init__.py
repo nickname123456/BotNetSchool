@@ -7,6 +7,7 @@ from .settings import keyboard_announcements_notification, keyboard_mark_notific
 from .announcements import announcements
 from .admin import admin_panel
 from .reports import reports, reportTotal, reportAverageMark, parentReport
+from .change_anything import change_anything_kb, change_student
 
 
 bps = [not_found.bp,
@@ -37,5 +38,7 @@ bps = [not_found.bp,
        reports.bp,
        reportTotal.bp,
        reportAverageMark.bp,
-       parentReport.bp
+       parentReport.bp,
+       change_anything_kb.bp,
+       change_student.bp
        ]

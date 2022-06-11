@@ -33,6 +33,12 @@ async def login(message: Message, userLogin=None, userPassword=None):
         db.commit()
         db.edit_account_password(userInfo[0].id, userPassword)
         db.commit()
+        db.edit_account_studentId(userInfo[0].id, 
+            await ns.getCurrentStudentId(
+                userLogin,userPassword, 
+                db.get_account_school(userInfo[0].id),
+                db.get_account_link(userInfo[0].id)))
+        db.commit()
         db.edit_account_correctData(userInfo[0].id, 0)
         db.commit()
         logging.info(f'{message.peer_id}: Write new data to database')
@@ -40,16 +46,9 @@ async def login(message: Message, userLogin=None, userPassword=None):
     
     #Записываем логин из бд в переменную
     userLogin = db.get_account_login(userInfo[0].id)
-    print(userLogin)
-
     userPassword = db.get_account_password(userInfo[0].id)
-    print(userPassword)
-
     userSchool = db.get_account_school(userInfo[0].id)
-    print(userSchool)
-
     userLink = db.get_account_link(userInfo[0].id)
-    print(userLink)
 
     try:
         #Авторезируемся в Сетевом Городе
@@ -97,6 +96,11 @@ async def login(message: Message, userLogin=None, userPassword=None):
             db.commit()
             db.edit_chat_password(chat_id, userPassword)
             db.commit()
+            db.edit_account_studentId(chat_id, 
+            await ns.getCurrentStudentId(
+                userLogin,userPassword, 
+                db.get_account_school(chat_id),
+                db.get_account_link(chat_id)))
             logging.info(f'{message.peer_id}: Write new data to database')
 
         
