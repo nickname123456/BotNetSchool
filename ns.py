@@ -354,7 +354,7 @@ async def getStudents(login, password, school, url, studentId):
     await api.logout()
     return students
 
-async def getCurrentStudentId(login, password, school, url, studentId):
+async def getCurrentStudentId(login, password, school, url, studentId=None):
     api = NetSchoolAPI(url)
     await api.login(login, password, school, studentId)
     studentId = await api.getCurrentStudentId()
