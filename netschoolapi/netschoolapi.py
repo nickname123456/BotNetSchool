@@ -89,7 +89,8 @@ class NetSchoolAPI:
                     student = i
                     break
         else:
-            student = diary_info['students'][diary_info['currentStudentId']]['studentId']
+            studentId = diary_info['students'][diary_info['currentStudentId']]['studentId']
+            student = diary_info['students'][diary_info['currentStudentId']]
 
         self._student_id = studentId
         response = await self._client.get('webapi/years/current')
@@ -346,6 +347,11 @@ class NetSchoolAPI:
                 'VER': self._ver,
                 'RPNAME': 'Информационное письмо для родителей',
                 'RPTID': 'ParentInfoLetter',
+                'LoginType': '0',
+                'SID': self._student_id,
+                'ReportType': 2,
+                'PCLID': self._class_id,
+                'TERMID': termId,
             })
         self._client.cookies.extract_cookies(response_with_cookies)
 
@@ -393,6 +399,9 @@ class NetSchoolAPI:
                 'VER': self._ver,
                 'RPNAME': 'Итоговые отметки',
                 'RPTID': 'StudentTotalMarks',
+                'LoginType': '0',
+                'SID': self._student_id,
+                'RPTID' :'StudentTotalMarks',
             })
         self._client.cookies.extract_cookies(response_with_cookies)
 
@@ -423,6 +432,11 @@ class NetSchoolAPI:
         return year_reference['id']
 
     async def reportAverageMark(self):
+        period = await self.get_period()
+        period = period['filterSources'][2]['defaultValue'].split(' - ')
+        start = datetime.strptime(period[0], '%Y-%m-%dT%H:%M:%S.0000000')
+        end = datetime.strptime(period[1], '%Y-%m-%dT%H:%M:%S.0000000')
+        
         response_with_cookies = await self._client.post(
             'asp/Reports/ReportStudentAverageMark.asp',
             data = {
@@ -430,13 +444,13 @@ class NetSchoolAPI:
                 'VER': self._ver,
                 'RPNAME': 'Cредний балл',
                 'RPTID': 'StudentAverageMark',
+                'LoginType': '0',
+                'SID': self._student_id,
+                'ADT': f"{start.day}.{start.month}.{start.year}",
+                'DDT': f"{end.day}.{end.month}.{end.year}",
             })
         self._client.cookies.extract_cookies(response_with_cookies)
 
-        period = await self.get_period()
-        period = period['filterSources'][2]['defaultValue'].split(' - ')
-        start = datetime.strptime(period[0], '%Y-%m-%dT%H:%M:%S.0000000')
-        end = datetime.strptime(period[1], '%Y-%m-%dT%H:%M:%S.0000000')
         response = await self._client.post(
             'asp/Reports/StudentAverageMark.asp',
             data = {
