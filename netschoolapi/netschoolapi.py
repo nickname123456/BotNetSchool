@@ -41,7 +41,7 @@ class NetSchoolAPI:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.logout()
 
-    async def login(self, user_name: str, password: str, school: Union[str, int]):
+    async def login(self, user_name: str, password: str, school: Union[str, int], studentId = None):
         response_with_cookies = await self._client.get('webapi/logindata')
         self._client.cookies.extract_cookies(response_with_cookies)
 
@@ -83,8 +83,15 @@ class NetSchoolAPI:
         
         response = await self._client.get('webapi/student/diary/init')
         diary_info = response.json()
-        student = diary_info['students'][diary_info['currentStudentId']]
-        self._student_id = student['studentId']
+        if studentId is not None:
+            for i in diary_info['students']:
+                if i['studentId'] == studentId:
+                    student = i
+                    break
+        else:
+            student = diary_info['students'][diary_info['currentStudentId']]['studentId']
+
+        self._student_id = studentId
         response = await self._client.get('webapi/years/current')
         year_reference = response.json()
         self._year_id = year_reference['id']
@@ -97,7 +104,7 @@ class NetSchoolAPI:
             assignment['id']: assignment['name']
             for assignment in assignment_reference
         }
-        self._login_data = (user_name, password, school)
+        self._login_data = (user_name, password, school, studentId)
         self._class_id = (await self.get_period())['filterSources'][1]['defaultValue']
         return student
 

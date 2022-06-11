@@ -25,7 +25,8 @@ async def private_information(message: Message):
             db.get_account_password(user_id),
             db.get_account_school(user_id),
             db.get_account_link(user_id),
-            db.get_account_class(user_id)
+            db.get_account_class(user_id),
+            db.get_account_studentId(user_id)
         )
     except:
         logging.exception(f'{message.peer_id}: Exception occurred')
@@ -52,7 +53,8 @@ async def chat_information(message: Message):
             db.get_chat_password(chat_id),
             db.get_chat_school(chat_id),
             db.get_chat_link(chat_id),
-            db.get_chat_class(chat_id)
+            db.get_chat_class(chat_id),
+            db.get_chat_studentId(chat_id)
         )
     except:
         logging.exception(f'{message.peer_id}: Exception occurred')

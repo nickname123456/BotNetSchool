@@ -5,9 +5,9 @@ import html2markdown
 from settings import lessons_and_their_smiles
 
 
-async def get_student(url, login, password, school):
+async def get_student(url, login, password, school, studentId):
 	api = NetSchoolAPI(url)
-	student = await api.login(login,password,school)
+	student = await api.login(login,password,school, studentId)
 	await api.logout()
 	return student
 
@@ -21,12 +21,13 @@ async def get_school(url):
 
 
 # Вход в сго
-async def login(login, password, school, link):
+async def login(login, password, school, link, studentId = None):
     api = NetSchoolAPI(link)
     await api.login(
         login,
         password,
-        school)
+        school,
+        studentId)
 
 
 # Выход из сго
@@ -75,24 +76,26 @@ def get_back_period():
 
 
 # Получить дневник
-async def get_diary(login, password, period, school, link):
+async def get_diary(login, password, period, school, link, studentId):
     api = NetSchoolAPI(link)
     await api.login(
         login,
         password,
-        school)
+        school,
+        studentId)
     diary = await api.diary(period[0], period[1])
     await api.logout()
     return diary
 
 
 # Получить объявления
-async def get_announcements(login, password, amount, school, link):
+async def get_announcements(login, password, amount, school, link, studentId):
     api = NetSchoolAPI(link)
     await api.login(
         login,
         password,
-        school)
+        school,
+        studentId)
     announcements = await api.announcements()
     await api.logout()
 
@@ -117,9 +120,9 @@ async def get_announcements(login, password, amount, school, link):
 
 
 
-async def get_marks(login, password, school, url, subject = None):
+async def get_marks(login, password, school, url, studentId, subject = None):
     api = NetSchoolAPI(url)
-    await api.login(login,password,school)
+    await api.login(login,password,school,studentId)
     period = await api.get_period()
     period = period['filterSources'][2]['defaultValue'].split(' - ')
     start = datetime.datetime.strptime(period[0], '%Y-%m-%dT%H:%M:%S.0000000')
@@ -153,9 +156,9 @@ async def get_marks(login, password, school, url, subject = None):
 
 
 
-async def getMarkNotify(login, password, school, url, oldmarks):
+async def getMarkNotify(login, password, school, url, studentId, oldmarks):
     api = NetSchoolAPI(url)
-    await api.login(login, password, school)
+    await api.login(login, password, school, studentId)
     period = await api.get_period()
     period = period['filterSources'][2]['defaultValue'].split(' - ')
     start = datetime.datetime.strptime(period[0], '%Y-%m-%dT%H:%M:%S.0000000')
@@ -189,9 +192,9 @@ async def getMarkNotify(login, password, school, url, oldmarks):
 
 
 
-async def getAnnouncementsNotify(login, password, school, url, old_announcements):
+async def getAnnouncementsNotify(login, password, school, url, studentId, old_announcements):
     api = NetSchoolAPI(url)
-    await api.login(login, password, school)
+    await api.login(login, password, school, studentId)
     announcements = await api.announcements()
     await api.logout()
 
@@ -222,8 +225,8 @@ async def getAnnouncementsNotify(login, password, school, url, old_announcements
 
 
 
-async def correction_mark(login, password, school, url, subject, mark):
-    all_marks = await get_marks(login, password, school, url, subject)
+async def correction_mark(login, password, school, url, studentId, subject, mark):
+    all_marks = await get_marks(login, password, school, url, studentId, subject)
 
     if len(all_marks) != 0:
         average_mark = float(round(sum(all_marks) / len(all_marks), 2))
@@ -268,9 +271,9 @@ async def correction_mark(login, password, school, url, subject, mark):
 
 
 
-async def getReportTotal(login, password, school, url):
+async def getReportTotal(login, password, school, url, studentId):
     api = NetSchoolAPI(url)
-    await api.login(login, password, school)
+    await api.login(login, password, school, studentId)
     reportTotal = await api.reportTotal()
     await api.logout()
     result = {}
@@ -287,9 +290,9 @@ async def getReportTotal(login, password, school, url):
     result['Warning'] = '⚠️Внимание⚠️ \nЕсли у вас триместры, то оценки за год стоят под названием "Оценки за 4 триместр/четверть"'
     return result
 
-async def getReportAverageMark(login, password, school, url):
+async def getReportAverageMark(login, password, school, url, studentId):
     api = NetSchoolAPI(url)
-    await api.login(login, password, school)
+    await api.login(login, password, school, studentId)
     reportAverageMark = await api.reportAverageMark()
     await api.logout()
     
@@ -309,9 +312,9 @@ async def getReportAverageMark(login, password, school, url):
 
     return result
 
-async def getParentReport(login, password, school, url, termId):
+async def getParentReport(login, password, school, url, studentId, termId):
     api = NetSchoolAPI(url)
-    await api.login(login, password, school)
+    await api.login(login, password, school, studentId)
     parentReport = await api.parentReport(termId)
     await api.logout()
     
@@ -337,30 +340,30 @@ async def getParentReport(login, password, school, url, termId):
 
     return result
 
-async def getTerms(login, password, school, url):
+async def getTerms(login, password, school, url, studentId):
     api = NetSchoolAPI(url)
-    await api.login(login, password, school)
+    await api.login(login, password, school, studentId)
     terms = await api.getTerms()
     await api.logout()
     return terms
 
-async def getStudents(login, password, school, url):
+async def getStudents(login, password, school, url, studentId):
     api = NetSchoolAPI(url)
-    await api.login(login, password, school)
+    await api.login(login, password, school, studentId)
     students = await api.getStudents()
     await api.logout()
     return students
 
-async def getCurrentStudentId(login, password, school, url):
+async def getCurrentStudentId(login, password, school, url, studentId):
     api = NetSchoolAPI(url)
-    await api.login(login, password, school)
+    await api.login(login, password, school, studentId)
     studentId = await api.getCurrentStudentId()
     await api.logout()
     return studentId
 
-async def getSettings(login, password, school, url, clas):
+async def getSettings(login, password, school, url, studentId, clas):
     api = NetSchoolAPI(url)
-    await api.login(login, password, school)
+    await api.login(login, password, school, studentId)
     settings = await api.userInfo()
     await api.logout()
     result = '🔐Твои личные данные из СГО:\n\n'

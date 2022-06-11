@@ -54,7 +54,8 @@ async def lesson_information(message: Message):
             db.get_account_password(userInfo[0].id),
             get_back_period(),
             db.get_account_school(userInfo[0].id),
-            db.get_account_link(userInfo[0].id))
+            db.get_account_link(userInfo[0].id),
+            db.get_account_studentId(userInfo[0].id))
         logging.info(f'{message.peer_id}: Get back diary')
 
         lesson = diary['weekDays'][day]['lessons'][int(message.payload[32::34])]
@@ -66,7 +67,8 @@ async def lesson_information(message: Message):
             db.get_account_password(userInfo[0].id),
             get_next_period(),
             db.get_account_school(userInfo[0].id),
-            db.get_account_link(userInfo[0].id)) 
+            db.get_account_link(userInfo[0].id),
+            db.get_account_studentId(userInfo[0].id)) 
         logging.info(f'{message.peer_id}: Get next diary')
         
         lesson = diary['weekDays'][day]['lessons'][int(message.payload[32::34])]
@@ -78,7 +80,8 @@ async def lesson_information(message: Message):
             db.get_account_password(userInfo[0].id),
             get_period(),
             db.get_account_school(userInfo[0].id),
-            db.get_account_link(userInfo[0].id))
+            db.get_account_link(userInfo[0].id),
+            db.get_account_studentId(userInfo[0].id))
         logging.info(f'{message.peer_id}: Get diary')
         
         lesson = diary['weekDays'][day]['lessons'][int(message.payload[27::29])]
@@ -168,7 +171,8 @@ async def lesson_information(message: Message):
                 db.get_chat_password(chat_id),
                 get_back_period(),
                 db.get_chat_school(chat_id),
-                db.get_chat_link(chat_id))
+                db.get_chat_link(chat_id),
+                db.get_chat_studentId(chat_id))
             logging.info(f'{message.peer_id}: Get back diary')
 
             lesson = diary['weekDays'][day]['lessons'][int(message.payload[32::34])]
@@ -180,7 +184,8 @@ async def lesson_information(message: Message):
                 db.get_chat_password(chat_id),
                 get_next_period(),
                 db.get_chat_school(chat_id),
-                db.get_chat_link(chat_id))
+                db.get_chat_link(chat_id),
+                db.get_chat_studentId(chat_id))
             logging.info(f'{message.peer_id}: Get next diary')
             
             lesson = diary['weekDays'][day]['lessons'][int(message.payload[32::34])]
@@ -192,7 +197,8 @@ async def lesson_information(message: Message):
                 db.get_chat_password(chat_id),
                 get_period(),
                 db.get_chat_school(chat_id),
-                db.get_chat_link(chat_id))
+                db.get_chat_link(chat_id),
+                db.get_chat_studentId(chat_id))
             logging.info(f'{message.peer_id}: Get diary')
             
             lesson = diary['weekDays'][day]['lessons'][int(message.payload[27::29])]

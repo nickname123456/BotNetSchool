@@ -40,7 +40,8 @@ async def diary_for_day(message: Message):
                 db.get_account_password(userInfo[0].id),
                 get_period(),
                 db.get_account_school(userInfo[0].id),
-                db.get_account_link(userInfo[0].id)
+                db.get_account_link(userInfo[0].id),
+                db.get_account_studentId(userInfo[0].id)
             )
             period_in_payload = ''
             logging.info(f'{message.peer_id}: Get diary in NetSchool')
@@ -57,7 +58,8 @@ async def diary_for_day(message: Message):
                 db.get_account_password(userInfo[0].id),
                 get_back_period(), # Получить предыдущую неделю
                 db.get_account_school(userInfo[0].id),
-                db.get_account_link(userInfo[0].id)
+                db.get_account_link(userInfo[0].id),
+                db.get_account_studentId(userInfo[0].id)
             )
             period_in_payload = 'back_'
             logging.info(f'{message.peer_id}: Get diary in NetSchool')
@@ -74,7 +76,8 @@ async def diary_for_day(message: Message):
                 db.get_account_password(userInfo[0].id),
                 get_next_period(), # Получить следующую неделю
                 db.get_account_school(userInfo[0].id),
-                db.get_account_link(userInfo[0].id)
+                db.get_account_link(userInfo[0].id),
+                db.get_account_studentId(userInfo[0].id)
             )
             period_in_payload = 'next_'
             logging.info(f'{message.peer_id}: Get diary in NetSchool')
@@ -165,7 +168,8 @@ async def diary_for_day(message: Message):
                 db.get_chat_password(chat_id),
                 get_period(),
                 db.get_chat_school(chat_id),
-                db.get_chat_link(chat_id))
+                db.get_chat_link(chat_id),
+                db.get_chat_studentId(chat_id))
             period_in_payload = ''
             logging.info(f'{message.peer_id}: Get diary in NetSchool')
             
@@ -177,7 +181,8 @@ async def diary_for_day(message: Message):
                 db.get_chat_password(chat_id),
                 get_back_period(), # Получить предыдущую неделю
                 db.get_chat_school(chat_id),
-                db.get_chat_link(chat_id))
+                db.get_chat_link(chat_id),
+                db.get_chat_studentId(chat_id))
             period_in_payload = 'back_'
             logging.info(f'{message.peer_id}: Get diary in NetSchool')
 
@@ -189,7 +194,8 @@ async def diary_for_day(message: Message):
                 db.get_chat_password(chat_id),
                 get_next_period(), # Получить следующую неделю
                 db.get_chat_school(chat_id),
-                db.get_chat_link(chat_id))
+                db.get_chat_link(chat_id),
+                db.get_chat_studentId(chat_id))
             period_in_payload = 'next_'
             logging.info(f'{message.peer_id}: Get diary in NetSchool')
             

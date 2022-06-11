@@ -16,18 +16,20 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр сообще
 @bp.on.private_message(text=["Объявления <amount>", "Объявления"])
 @bp.on.private_message(payload={'cmd': 'announcements'})
 async def announcements(message: Message, amount=3):
+    logging.info(f'{message.peer_id}: I get "announcements {amount}"')
     # Информация о юзере
     userInfo = await bp.api.users.get(message.from_id) 
     user_id = userInfo[0].id
-    logging.info(f'{message.peer_id}: I get "announcements {amount}"')
 
+    studentId = db.get_account_studentId(user_id)
     try:
         # Логинимся в сго
         api = NetSchoolAPI(db.get_account_link(user_id))
         await api.login(
             db.get_account_login(user_id),
             db.get_account_password(user_id),
-            db.get_account_school(user_id))
+            db.get_account_school(user_id),
+            studentId)
         logging.info(f'{message.peer_id}: Login in NetSchool')
         # Копируем объявления из сго
         announcements = await api.announcements()
@@ -94,17 +96,19 @@ async def announcements(message: Message, amount=3):
 @bp.on.chat_message(text=["Объявления <amount>", "Объявления"])
 @bp.on.chat_message(payload={'cmd': 'announcements'})
 async def announcements(message: Message, amount=3):
+    logging.info(f'{message.peer_id}: I get "announcements {amount}"')
     # Айди чата:
     chat_id = message.chat_id
-    logging.info(f'{message.peer_id}: I get "announcements {amount}"')
 
+    studentId = db.get_chat_studentId(chat_id)
     try:
         # Логинимся в сго
         api = NetSchoolAPI(db.get_chat_link(chat_id))
         await api.login(
             db.get_chat_login(chat_id),
             db.get_chat_password(chat_id),
-            db.get_chat_school(chat_id))
+            db.get_chat_school(chat_id),
+            studentId)
         logging.info(f'{message.peer_id}: Login in NetSchool')
         # Копируем объявления из сго
         announcements = await api.announcements()

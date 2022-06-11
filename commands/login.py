@@ -35,9 +35,11 @@ async def login(message: Message, userLogin=None, userPassword=None):
         db.commit()
         db.edit_account_studentId(userInfo[0].id, 
             await ns.getCurrentStudentId(
-                userLogin,userPassword, 
+                userLogin,
+                userPassword, 
                 db.get_account_school(userInfo[0].id),
-                db.get_account_link(userInfo[0].id)))
+                db.get_account_link(userInfo[0].id),
+                db.get_account_studentId(userInfo[0].id)))
         db.commit()
         db.edit_account_correctData(userInfo[0].id, 0)
         db.commit()
@@ -49,6 +51,7 @@ async def login(message: Message, userLogin=None, userPassword=None):
     userPassword = db.get_account_password(userInfo[0].id)
     userSchool = db.get_account_school(userInfo[0].id)
     userLink = db.get_account_link(userInfo[0].id)
+    studentId = db.get_account_studentId(userInfo[0].id)
 
     try:
         #Авторезируемся в Сетевом Городе
@@ -56,7 +59,8 @@ async def login(message: Message, userLogin=None, userPassword=None):
             userLogin,
             userPassword,
             userSchool,
-            userLink
+            userLink,
+            studentId
         )
         logging.info(f'{message.peer_id}: Login in NetSchool')
     except:
@@ -96,36 +100,33 @@ async def login(message: Message, userLogin=None, userPassword=None):
             db.commit()
             db.edit_chat_password(chat_id, userPassword)
             db.commit()
-            db.edit_account_studentId(chat_id, 
+            db.edit_chat_studentId(chat_id, 
             await ns.getCurrentStudentId(
                 userLogin,userPassword, 
-                db.get_account_school(chat_id),
-                db.get_account_link(chat_id)))
+                db.get_chat_school(chat_id),
+                db.get_chat_link(chat_id),
+                db.get_chat_studentId(chat_id)))
             logging.info(f'{message.peer_id}: Write new data to database')
 
         
         #Записываем логин из бд в переменную
         chatLogin = db.get_chat_login(chat_id)
-        print(chatLogin)
-
         #Записываем пароль из бд в переменную
         chatPassword = db.get_chat_password(chat_id)
-        print(chatPassword)
-
         #Записываем школу из бд в переменную
         chatSchool = db.get_chat_school(chat_id)
-        print(chatSchool)
-
         #Записываем ссылку из бд в переменную
         chatLink = db.get_chat_link(chat_id)
-        print(chatLink)
+        #Записываем id ученика из бд в переменную
+        studentId = db.get_chat_studentId(chat_id)
 
         #Авторезируемся в Сетевом Городе
         await ns.login(
             chatLogin,
             chatPassword,
             chatSchool,
-            chatLink
+            chatLink,
+            studentId
         )
         logging.info(f'{message.peer_id}: Login in NetSchool')
             

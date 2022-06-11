@@ -21,12 +21,14 @@ async def menu(message: Message):
     userInfo = await bp.api.users.get(message.from_id) 
     user_id = userInfo[0].id
 
+    studentId = db.get_account_studentId(user_id)
     try:
         api = NetSchoolAPI(db.get_account_link(user_id))
         await api.login(
             db.get_account_login(user_id), 
             db.get_account_password(user_id), 
-            db.get_account_school(user_id)
+            db.get_account_school(user_id),
+            studentId
         )
     except:
         logging.exception(f'{message.peer_id}: Exception occurred')
@@ -73,12 +75,14 @@ async def menu(message: Message):
     # Айди чата:
     chat_id = message.chat_id
 
+    studentId = db.get_chat_studentId(chat_id)
     try:
         api = NetSchoolAPI(db.get_chat_link(chat_id))
         await api.login(
             db.get_chat_login(chat_id), 
             db.get_chat_password(chat_id), 
-            db.get_chat_school(chat_id)
+            db.get_chat_school(chat_id),
+            studentId
         )
     except:
         logging.exception(f'{message.peer_id}: Exception occurred')

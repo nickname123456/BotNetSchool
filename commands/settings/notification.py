@@ -24,7 +24,8 @@ async def notification(bot):
                     db.get_account_password(user_id),
                     db.get_account_school(user_id),
                     db.get_account_link(user_id),
-                    db.get_account_old_mark(user_id)
+                    db.get_account_old_mark(user_id),
+                    db.get_account_studentId(user_id)
                 )
 
                 db.edit_account_old_mark(user_id, marks)
@@ -46,7 +47,8 @@ async def notification(bot):
                     db.get_account_password(user_id),
                     db.get_account_school(user_id),
                     db.get_account_link(user_id),
-                    db.get_account_old_announcements(user_id)
+                    db.get_account_old_announcements(user_id),
+                    db.get_account_studentId(user_id)
                 )
 
                 db.edit_account_old_announcements(user_id, announcements)
@@ -70,7 +72,8 @@ async def notification(bot):
                 db.get_chat_password(chat_id),
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id),
-                db.get_chat_old_mark(chat_id)
+                db.get_chat_old_mark(chat_id),
+                db.get_chat_studentId(chat_id)
             )
 
             db.edit_chat_old_mark(chat_id, marks)
@@ -91,7 +94,8 @@ async def notification(bot):
                 db.get_chat_password(chat_id),
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id),
-                db.get_chat_old_announcements(chat_id)
+                db.get_chat_old_announcements(chat_id),
+                db.get_chat_studentId(chat_id)
             )
 
             db.edit_chat_old_announcements(chat_id, announcements)

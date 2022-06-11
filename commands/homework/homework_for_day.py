@@ -56,7 +56,8 @@ async def private_homework_for_day(message: Message):
             db.get_account_password(userInfo[0].id),
             get_period(),
             db.get_account_school(userInfo[0].id),
-            db.get_account_link(userInfo[0].id)
+            db.get_account_link(userInfo[0].id),
+            db.get_account_studentId(userInfo[0].id)
         )
         logging.info(f'{message.peer_id}: Get diary in NetSchool')
     except netschoolapi.errors.AuthError:
@@ -119,7 +120,8 @@ async def chat_homework_for_day(message: Message):
             db.get_chat_password(chat_id),
             get_period(),
             db.get_chat_school(chat_id),
-            db.get_chat_link(chat_id)
+            db.get_chat_link(chat_id),
+            db.get_chat_studentId(chat_id)
         )
         logging.info(f'{message.peer_id}: Get diary in NetSchool')
     except netschoolapi.errors.AuthError:

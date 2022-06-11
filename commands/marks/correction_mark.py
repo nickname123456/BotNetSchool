@@ -36,6 +36,7 @@ async def private_correction_mark(message: Message):
         db.get_account_link(user_id),
         db.get_account_correction_lesson(user_id),
         db.get_account_correction_mark(user_id),
+        db.get_account_studentId(user_id)
     ))
 
 
@@ -72,4 +73,5 @@ async def chat_correction_mark(message: Message):
         db.get_chat_link(chat_id),
         db.get_chat_correction_lesson(chat_id),
         db.get_chat_correction_mark(chat_id),
+        db.get_chat_studentId(chat_id)
     ))
