@@ -17,7 +17,7 @@ bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 
 
 @bp.on.private_message(payload={'cmd': 'change_student'})
-async def menu(message: Message):
+async def private_change_student(message: Message):
     logging.info(f'{message.peer_id}: I get change_student')
     # Информация о юзере
     userInfo = await bp.api.users.get(message.from_id) 
@@ -30,17 +30,22 @@ async def menu(message: Message):
         db.get_account_link(user_id),
         db.get_account_studentId(user_id)
     )
+    currentStudentId = db.get_account_studentId(user_id)
     
     keyboard = Keyboard()
     for i in students:
-        keyboard.add(Text(i['nickName'], {'cmd': f'change_student_{i["studentId"]}'}), color=KeyboardButtonColor.SECONDARY)
-        keyboard.row()
+        if i['studentId'] == currentStudentId:
+            keyboard.add(Text(i['nickName'], {'cmd': f'change_student_{i["studentId"]}'}), color=KeyboardButtonColor.POSITIVE)
+            keyboard.row()
+        else:
+            keyboard.add(Text(i['nickName'], {'cmd': f'change_student_{i["studentId"]}'}), color=KeyboardButtonColor.SECONDARY)
+            keyboard.row()
     keyboard.add(Text("Назад", {'cmd': 'change_anything_kb'}), color=KeyboardButtonColor.NEGATIVE)
 
     await message.answer('Выбери ребенка', keyboard=keyboard)
 
 @bp.on.chat_message(payload={'cmd': 'change_student'})
-async def menu(message: Message):
+async def chat_change_student(message: Message):
     logging.info(f'{message.peer_id}: I get change_student')
     # Айди чата:
     chat_id = message.chat_id
@@ -52,11 +57,16 @@ async def menu(message: Message):
         db.get_chat_link(chat_id),
         db.get_chat_studentId(chat_id)
     )
+    currentStudentId = db.get_chat_studentId(chat_id)
     
     keyboard = Keyboard()
     for i in students:
-        keyboard.add(Text(i['nickName'], {'cmd': f'change_student_{i["studentId"]}'}), color=KeyboardButtonColor.SECONDARY)
-        keyboard.row()
+        if i['studentId'] == currentStudentId:
+            keyboard.add(Text(i['nickName'], {'cmd': f'change_student_{i["studentId"]}'}), color=KeyboardButtonColor.POSITIVE)
+            keyboard.row()
+        else:
+            keyboard.add(Text(i['nickName'], {'cmd': f'change_student_{i["studentId"]}'}), color=KeyboardButtonColor.SECONDARY)
+            keyboard.row()
     keyboard.add(Text("Назад", {'cmd': 'change_anything_kb'}), color=KeyboardButtonColor.NEGATIVE)
 
     await message.answer('Выбери ребенка', keyboard=keyboard)
@@ -73,8 +83,8 @@ async def marks(message: Message):
 
     db.edit_account_studentId(user_id, studentId)
 
-    await message.answer('Я успешно сменил выбрнного ребенка')
-    await change_anything_kb(message)
+    await message.answer('Я успешно сменил выбранного ребенка')
+    await private_change_student(message)
 
 @bp.on.chat_message(PayloadStarts='{"cmd":"change_student_')
 async def marks(message: Message):
@@ -86,5 +96,5 @@ async def marks(message: Message):
 
     db.edit_chat_studentId(chat_id, studentId)
 
-    await message.answer('Я успешно сменил выбрнного ребенка')
-    await change_anything_kb(message)
+    await message.answer('Я успешно сменил выбранного ребенка')
+    await chat_change_student(message)
