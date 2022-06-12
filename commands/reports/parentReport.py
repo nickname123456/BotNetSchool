@@ -15,7 +15,7 @@ bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 
 
 @bp.on.private_message(payload={'cmd': 'parentReport'})
-async def parentReport(message: Message):
+async def private_parentReport(message: Message):
     logging.info(f'{message.peer_id}: I get parentReport')
     # Информация о юзере
     userInfo = await bp.api.users.get(message.from_id) 
@@ -38,7 +38,7 @@ async def parentReport(message: Message):
     await message.answer('Выбери триместр/четверть', keyboard=keyboard)
 
 @bp.on.chat_message(payload={'cmd': 'parentReport'})
-async def parentReport(message: Message):
+async def chat_parentReport(message: Message):
     logging.info(f'{message.peer_id}: I get parentReport')
     # Айди чата:
     chat_id = message.chat_id
@@ -64,7 +64,7 @@ async def parentReport(message: Message):
 
 
 @bp.on.private_message(PayloadStarts='{"cmd":"parentReport_')
-async def marks(message: Message):
+async def private_parentReport_with_term(message: Message):
     logging.info(f'{message.peer_id}: I get parentReport')
     # Информация о юзере
     userInfo = await bp.api.users.get(message.from_id) 
@@ -86,7 +86,7 @@ async def marks(message: Message):
 
 
 @bp.on.chat_message(PayloadStarts='{"cmd":"parentReport_')
-async def marks(message: Message):
+async def chat_parentReport_with_term(message: Message):
     logging.info(f'{message.peer_id}: I get parentReport')
     # Айди чата:
     chat_id = message.chat_id

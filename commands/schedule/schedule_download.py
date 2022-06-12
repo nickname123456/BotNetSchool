@@ -5,7 +5,7 @@ from vkbottle import CtxStorage
 from vkbottle import BaseStateGroup
 import logging
 import asyncio
-from vkbottle import Keyboard, KeyboardButtonColor, Text, EMPTY_KEYBOARD
+from vkbottle import Keyboard, Text, EMPTY_KEYBOARD
 
 
 
@@ -56,7 +56,7 @@ async def photo_schedule_download(message: Message):
 
 
 @bp.on.private_message(state=ScheduleData.PHOTO)
-async def photo_schedule_download(message: Message):
+async def school_schedule_download(message: Message):
     logging.info(f'{message.peer_id}: I get photo in schedule_download')
     ctx.set('photo', message.text) # Загружаем во внутренне хранилище фото
     await bp.state_dispenser.set(message.peer_id, ScheduleData.SCHOOL) # Говорим, что следующий шаг - выбор школы
@@ -75,7 +75,7 @@ async def photo_schedule_download(message: Message):
 
 
 @bp.on.private_message(state=ScheduleData.SCHOOL)
-async def photo_schedule_download(message: Message):
+async def class_schedule_download(message: Message):
     logging.info(f'{message.peer_id}: I get school in schedule_download')
     ctx.set('school', message.text) # Загружаем во внутреннее хранилище школу
     await bp.state_dispenser.set(message.peer_id, ScheduleData.CLAS) # Говорим, что следующий шаг - выбор класса

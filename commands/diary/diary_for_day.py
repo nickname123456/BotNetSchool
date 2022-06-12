@@ -1,4 +1,3 @@
-from aiohttp import payload_type
 from ns import get_back_period, get_next_period
 from ns import get_period
 from vkbottle.bot import Message
@@ -16,7 +15,7 @@ bp = Blueprint('diary_for_day') # Объявляем команду
 @bp.on.private_message(payload=[{'cmd': 'diary_for_day'},
                                 {'cmd': 'back_diary_for_day'},
                                 {'cmd': 'next_diary_for_day'}])
-async def diary_for_day(message: Message):
+async def private_diary_for_day(message: Message):
     userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
     logging.info(f'{message.peer_id}: I get diary for day')
 
@@ -149,7 +148,7 @@ async def diary_for_day(message: Message):
 @bp.on.chat_message(payload=[{'cmd': 'diary_for_day'},
                         {'cmd': 'back_diary_for_day'},
                         {'cmd': 'next_diary_for_day'}])
-async def diary_for_day(message: Message):
+async def chat_diary_for_day(message: Message):
     chat_id = message.chat_id
     logging.info(f'{message.peer_id}: I get diary for day')
 

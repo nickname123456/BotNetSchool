@@ -1,7 +1,5 @@
-from typing import Text
 from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
-from vkbottle import Keyboard, KeyboardButtonColor, Text
 import logging
 import ns
 from PostgreSQLighter import db
@@ -13,7 +11,7 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр сообще
 
 
 @bp.on.private_message(payload={'cmd': 'reportTotal'})
-async def marks(message: Message):
+async def private_reportTotal(message: Message):
     logging.info(f'{message.peer_id}: I get reportTotal')
     # Информация о юзере
     userInfo = await bp.api.users.get(message.from_id) 
@@ -34,7 +32,7 @@ async def marks(message: Message):
 
 
 @bp.on.chat_message(payload={'cmd': 'reportTotal'})
-async def marks(message: Message):
+async def chat_reportTotal(message: Message):
     logging.info(f'{message.peer_id}: I get reportTotal')
     # Айди чата:
     chat_id = message.chat_id

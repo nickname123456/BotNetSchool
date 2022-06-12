@@ -4,12 +4,12 @@ from PostgreSQLighter import db
 import logging
 
 
-bp = Blueprint('schedule_download') # Объявляем команду
+bp = Blueprint('schedule_for_day') # Объявляем команду
 
 
 
 @bp.on.private_message(payload={'cmd': 'schedule_for_day'})
-async def schedule_for_day(message: Message):
+async def private_schedule_for_day(message: Message):
     logging.info(f'{message.peer_id}: I get schedule_for_day')
     userInfo = await bp.api.users.get(message.from_id)
     user_id = userInfo[0].id
@@ -25,7 +25,7 @@ async def schedule_for_day(message: Message):
 
 
 @bp.on.chat_message(payload={'cmd': 'schedule_for_day'})
-async def schedule_for_day(message: Message):
+async def chat_schedule_for_day(message: Message):
     logging.info(f'{message.peer_id}: I get schedule_for_day')
     chat_id = message.chat_id
 

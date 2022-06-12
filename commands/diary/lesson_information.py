@@ -38,7 +38,7 @@ bp = Blueprint('diary_for_day')# Объявляем команду
                         {'cmd': 'next_lesson_information_5'},
                         {'cmd': 'next_lesson_information_6'},
                         {'cmd': 'next_lesson_information_7'}])
-async def lesson_information(message: Message):
+async def private_lesson_information(message: Message):
     userInfo = await bp.api.users.get(message.from_id)# Информация о юзере
     logging.info(f'{message.peer_id}: I get lesson information')
 
@@ -150,7 +150,7 @@ async def lesson_information(message: Message):
                         {'cmd': 'next_lesson_information_5'},
                         {'cmd': 'next_lesson_information_6'},
                         {'cmd': 'next_lesson_information_7'}])
-async def lesson_information(message: Message):
+async def chat_lesson_information(message: Message):
     chat_id = message.chat_id # Чат айди
     logging.info(f'{message.peer_id}: I get lesson information from chat')
 

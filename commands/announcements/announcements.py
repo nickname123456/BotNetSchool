@@ -4,7 +4,6 @@ from PostgreSQLighter import db
 from netschoolapi import NetSchoolAPI
 import re
 import logging
-import os
 from vkbottle import DocMessagesUploader
 
 
@@ -15,7 +14,7 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр сообще
 
 @bp.on.private_message(text=["Объявления <amount>", "Объявления"])
 @bp.on.private_message(payload={'cmd': 'announcements'})
-async def announcements(message: Message, amount=3):
+async def private_announcements(message: Message, amount=3):
     logging.info(f'{message.peer_id}: I get "announcements {amount}"')
     # Информация о юзере
     userInfo = await bp.api.users.get(message.from_id) 
@@ -95,7 +94,7 @@ async def announcements(message: Message, amount=3):
 
 @bp.on.chat_message(text=["Объявления <amount>", "Объявления"])
 @bp.on.chat_message(payload={'cmd': 'announcements'})
-async def announcements(message: Message, amount=3):
+async def chat_announcements(message: Message, amount=3):
     logging.info(f'{message.peer_id}: I get "announcements {amount}"')
     # Айди чата:
     chat_id = message.chat_id

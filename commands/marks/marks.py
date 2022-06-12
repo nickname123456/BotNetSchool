@@ -14,7 +14,7 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр сообще
 
 @bp.on.private_message(payload={'cmd': 'marks'})
 @bp.on.private_message(text = 'оценки')
-async def marks(message: Message):
+async def private_marks(message: Message):
     logging.info(f'{message.peer_id}: I get marks')
     # Информация о юзере
     userInfo = await bp.api.users.get(message.from_id) 
@@ -46,7 +46,7 @@ async def marks(message: Message):
 
 @bp.on.chat_message(payload={'cmd': 'marks'})
 @bp.on.chat_message(text = 'оценки')
-async def marks(message: Message):
+async def chat_marks(message: Message):
     logging.info(f'{message.peer_id}: I get marks')
     # Айди чата:
     chat_id = message.chat_id

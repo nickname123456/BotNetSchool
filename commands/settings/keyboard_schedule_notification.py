@@ -11,7 +11,7 @@ bp = Blueprint('keyboard_schedule_notification')# Объявляем коман�
 
 
 @bp.on.private_message(payload={'cmd': 'keyboard_schedule_notification'})
-async def keyboard_schedule_notification(message: Message):
+async def private_keyboard_schedule_notification(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_schedule_notification')
     userInfo = await bp.api.users.get(message.from_id) 
     user_id = userInfo[0].id
@@ -34,7 +34,7 @@ async def keyboard_schedule_notification(message: Message):
 
 
 @bp.on.chat_message(payload={'cmd': 'keyboard_schedule_notification'})
-async def keyboard_schedule_notification(message: Message):
+async def chat_keyboard_schedule_notification(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_schedule_notification')
     # Айди чата:
     chat_id = message.chat_id

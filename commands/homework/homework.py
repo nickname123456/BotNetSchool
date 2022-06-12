@@ -10,7 +10,7 @@ bp = Blueprint('homework') # Объявляем команду
 
 
 @bp.on.private_message(payload={'cmd': 'homework'})
-async def keyboard_schedule(message: Message):
+async def private_homework(message: Message):
     userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
     logging.info(f'{message.peer_id}: I get homework')
     try:
@@ -38,7 +38,7 @@ async def keyboard_schedule(message: Message):
 
 
 @bp.on.chat_message(payload={'cmd': 'homework'})
-async def keyboard_schedule(message: Message):
+async def chat_homework(message: Message):
     chat_id = message.chat_id
     logging.info(f'{message.peer_id}: I get homework')
 

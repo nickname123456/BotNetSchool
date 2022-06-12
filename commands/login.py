@@ -15,7 +15,7 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр
 #Если написали "Вход" или нажали на соответствующую кнопку
 @bp.on.private_message(text=["Вход <userLogin> <userPassword>", "Вход", 'Войти', 'Войти <userLogin> <userPassword>'])
 @bp.on.private_message(payload={'cmd': 'login'})
-async def login(message: Message, userLogin=None, userPassword=None):
+async def private_login(message: Message, userLogin=None, userPassword=None):
     logging.info(f'{message.peer_id}: I get login')
     userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
 
@@ -87,7 +87,7 @@ async def login(message: Message, userLogin=None, userPassword=None):
 
 @bp.on.chat_message(text=["Вход <userLogin> <userPassword>", "Вход"])
 @bp.on.chat_message(payload={'cmd': 'login'})
-async def login(message: Message, userLogin=None, userPassword=None):
+async def chat_login(message: Message, userLogin=None, userPassword=None):
     logging.info(f'{message.peer_id}: I get login')
     chat_id = message.chat_id # Чат айди
 
