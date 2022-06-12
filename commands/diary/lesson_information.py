@@ -3,44 +3,18 @@ from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
 from PostgreSQLighter import db
 import logging
+from VKRules import PayloadStarts
 
 
 
 bp = Blueprint('diary_for_day')# Объявляем команду
+bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 
 
-
-
-
-
-
-@bp.on.private_message(payload=[{'cmd': 'lesson_information_0'},
-                        {'cmd': 'lesson_information_1'},
-                        {'cmd': 'lesson_information_2'},
-                        {'cmd': 'lesson_information_3'},
-                        {'cmd': 'lesson_information_4'},
-                        {'cmd': 'lesson_information_5'},
-                        {'cmd': 'lesson_information_6'},
-                        {'cmd': 'lesson_information_7'},
-                        {'cmd': 'back_lesson_information_0'},
-                        {'cmd': 'back_lesson_information_1'},
-                        {'cmd': 'back_lesson_information_2'},
-                        {'cmd': 'back_lesson_information_3'},
-                        {'cmd': 'back_lesson_information_4'},
-                        {'cmd': 'back_lesson_information_5'},
-                        {'cmd': 'back_lesson_information_6'},
-                        {'cmd': 'back_lesson_information_7'},
-                        {'cmd': 'next_lesson_information_0'},
-                        {'cmd': 'next_lesson_information_1'},
-                        {'cmd': 'next_lesson_information_2'},
-                        {'cmd': 'next_lesson_information_3'},
-                        {'cmd': 'next_lesson_information_4'},
-                        {'cmd': 'next_lesson_information_5'},
-                        {'cmd': 'next_lesson_information_6'},
-                        {'cmd': 'next_lesson_information_7'}])
+@bp.on.private_message(PayloadStarts='{"cmd":"lesson_information_')
 async def private_lesson_information(message: Message):
-    userInfo = await bp.api.users.get(message.from_id)# Информация о юзере
     logging.info(f'{message.peer_id}: I get lesson information')
+    userInfo = await bp.api.users.get(message.from_id)# Информация о юзере
 
     db.edit_account_lesson(userInfo[0].id, message.payload[27::29]) # Редактируем номер урока, на котором юзер
     db.commit()
@@ -85,8 +59,6 @@ async def private_lesson_information(message: Message):
         logging.info(f'{message.peer_id}: Get diary')
         
         lesson = diary['weekDays'][day]['lessons'][int(message.payload[27::29])]
-        
-
 
     marks = ''
     homework = ''
@@ -105,13 +77,6 @@ async def private_lesson_information(message: Message):
                 if homework == '':
                     homework = 'не задано'
 
-    #print(lesson.subject)
-    #print(lesson.room)
-    #print(f'{lesson.start:%H, %M} - {lesson.end:%H.%M}')
-    #print(lesson.assignments)
-    #print(lesson.assignments[0].content)
-    #print(marks)
-
     await message.answer(f"""
 Предмет: {lesson['subjectName']}
 Кабинет: {lesson['room']}
@@ -126,33 +91,10 @@ async def private_lesson_information(message: Message):
 
 
 
-@bp.on.chat_message(payload=[{'cmd': 'lesson_information_0'},
-                        {'cmd': 'lesson_information_1'},
-                        {'cmd': 'lesson_information_2'},
-                        {'cmd': 'lesson_information_3'},
-                        {'cmd': 'lesson_information_4'},
-                        {'cmd': 'lesson_information_5'},
-                        {'cmd': 'lesson_information_6'},
-                        {'cmd': 'lesson_information_7'},
-                        {'cmd': 'back_lesson_information_0'},
-                        {'cmd': 'back_lesson_information_1'},
-                        {'cmd': 'back_lesson_information_2'},
-                        {'cmd': 'back_lesson_information_3'},
-                        {'cmd': 'back_lesson_information_4'},
-                        {'cmd': 'back_lesson_information_5'},
-                        {'cmd': 'back_lesson_information_6'},
-                        {'cmd': 'back_lesson_information_7'},
-                        {'cmd': 'next_lesson_information_0'},
-                        {'cmd': 'next_lesson_information_1'},
-                        {'cmd': 'next_lesson_information_2'},
-                        {'cmd': 'next_lesson_information_3'},
-                        {'cmd': 'next_lesson_information_4'},
-                        {'cmd': 'next_lesson_information_5'},
-                        {'cmd': 'next_lesson_information_6'},
-                        {'cmd': 'next_lesson_information_7'}])
+@bp.on.chat_message(PayloadStarts='{"cmd":"lesson_information_')
 async def chat_lesson_information(message: Message):
-    chat_id = message.chat_id # Чат айди
     logging.info(f'{message.peer_id}: I get lesson information from chat')
+    chat_id = message.chat_id # Чат айди
 
     try:
         day = db.get_chat_day(chat_id)
@@ -206,8 +148,6 @@ async def chat_lesson_information(message: Message):
         logging.exception(f'{message.peer_id}: Exception occurred')
         await message.answer('К этой беседе не подключен аккаунт. \nДля подключение напишите "Вход <логин> <пароль>"')
         return
-        
-
 
     marks = ''
     homework = ''
@@ -225,13 +165,6 @@ async def chat_lesson_information(message: Message):
                 # ЕСли нет дз:
                 if homework == '':
                     homework = 'не задано'
-
-    #print(lesson.subject)
-    #print(lesson.room)
-    #print(f'{lesson.start:%H, %M} - {lesson.end:%H.%M}')
-    #print(lesson.assignments)
-    #print(lesson.assignments[0].content)
-    #print(marks)
 
     await message.answer(f"""
 Предмет: {lesson['subjectName']}
