@@ -11,8 +11,8 @@ bp = Blueprint('keyboard_diary')# Объявляем команду
 
 @bp.on.message(payload={'cmd': 'keyboard_diary'})
 async def keyboard_diary(message: Message):
-    userInfo = await bp.api.users.get(message.from_id)# Информация о юзере
     logging.info(f'{message.peer_id}: I get keyboard diary')
+    userInfo = await bp.api.users.get(message.from_id)# Информация о юзере
 
     db.edit_account_week(userInfo[0].id, 0)# Редактируем неделю, на которой юзер
     db.commit()
@@ -39,13 +39,10 @@ async def keyboard_diary(message: Message):
     await message.answer(f'Текущая неделя: \n{get_period()[0]}\n-\n{get_period()[1]} \nНа какой день хочешь узнать расписание?', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I send keyboard diary')
 
-
-
-
 @bp.on.message(payload={'cmd': 'keyboard_diary_back'})
 async def keyboard_diary(message: Message):
-    userInfo = await bp.api.users.get(message.from_id)# Информация о юзере
     logging.info(f'{message.peer_id}: I get keyboard diary')
+    userInfo = await bp.api.users.get(message.from_id)# Информация о юзере
 
     db.edit_account_week(userInfo[0].id, -1)# Редактируем неделю, на которой юзер
     db.commit()
@@ -72,12 +69,10 @@ async def keyboard_diary(message: Message):
     await message.answer(f'Текущая неделя: \n{get_back_period()[0]}\n-\n{get_back_period()[1]} \nНа какой день хочешь узнать расписание?', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I send back keyboard diary')
 
-
-
 @bp.on.message(payload={'cmd': 'keyboard_diary_next'})
 async def keyboard_diary(message: Message):
-    userInfo = await bp.api.users.get(message.from_id)# Информация о юзере
     logging.info(f'{message.peer_id}: I get keyboard diary')
+    userInfo = await bp.api.users.get(message.from_id)# Информация о юзере
 
     db.edit_account_week(userInfo[0].id, 1)# Редактируем неделю, на которой юзер
     db.commit()
