@@ -9,4 +9,7 @@ class PayloadStarts(ABCRule[Message]):
 
     async def check(self, event: Message) -> bool:
         payload = event.payload
-        return payload.startswith(self.text)
+        if payload is None:
+            return False
+        else:
+            return payload.startswith(self.text)
