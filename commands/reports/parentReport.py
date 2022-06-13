@@ -65,14 +65,13 @@ async def chat_parentReport(message: Message):
 
 @bp.on.private_message(PayloadStarts='{"cmd":"parentReport_')
 async def private_parentReport_with_term(message: Message):
-    logging.info(f'{message.peer_id}: I get parentReport')
+    logging.info(f'{message.peer_id}: I get parentReport with term')
     # Информация о юзере
     userInfo = await bp.api.users.get(message.from_id) 
     user_id = userInfo[0].id
 
     termId = message.payload[21:-2]
     
-    logging.info(f'{message.peer_id}: I sent parentReport')
     parentReport = await ns.getParentReport(
         db.get_account_login(user_id),
         db.get_account_password(user_id),
@@ -83,17 +82,17 @@ async def private_parentReport_with_term(message: Message):
     )
     for i in parentReport:
         await message.answer(i)
+    logging.info(f'{message.peer_id}: I sent parentReport')
 
 
 @bp.on.chat_message(PayloadStarts='{"cmd":"parentReport_')
 async def chat_parentReport_with_term(message: Message):
-    logging.info(f'{message.peer_id}: I get parentReport')
+    logging.info(f'{message.peer_id}: I get parentReport with term')
     # Айди чата:
     chat_id = message.chat_id
     
     termId = message.payload[21:-2]
     
-    logging.info(f'{message.peer_id}: I sent parentReport')
     parentReport = await ns.getParentReport(
         db.get_chat_login(chat_id),
         db.get_chat_password(chat_id),
@@ -104,3 +103,4 @@ async def chat_parentReport_with_term(message: Message):
     )
     for i in parentReport:
         await message.answer(i)
+    logging.info(f'{message.peer_id}: I sent parentReport')
