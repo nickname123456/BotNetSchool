@@ -17,9 +17,6 @@ async def private_reportTotal(message: Message):
     userInfo = await bp.api.users.get(message.from_id) 
     user_id = userInfo[0].id
 
-    
-    
-    logging.info(f'{message.peer_id}: I sent reportTotal')
     reportTotal = await ns.getReportTotal(
         db.get_account_login(user_id),
         db.get_account_password(user_id),
@@ -29,6 +26,7 @@ async def private_reportTotal(message: Message):
     )
     for i in reportTotal:
         await message.answer(reportTotal[i])
+    logging.info(f'{message.peer_id}: I sent reportTotal')
 
 
 @bp.on.chat_message(payload={'cmd': 'reportTotal'})
@@ -36,10 +34,7 @@ async def chat_reportTotal(message: Message):
     logging.info(f'{message.peer_id}: I get reportTotal')
     # Айди чата:
     chat_id = message.chat_id
-
     
-    
-    logging.info(f'{message.peer_id}: I sent reportTotal')
     reportTotal = await ns.getReportTotal(
         db.get_chat_login(chat_id),
         db.get_chat_password(chat_id),
@@ -49,3 +44,4 @@ async def chat_reportTotal(message: Message):
     )
     for i in reportTotal:
         await message.answer(reportTotal[i])
+    logging.info(f'{message.peer_id}: I sent reportTotal')
