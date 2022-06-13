@@ -11,8 +11,8 @@ bp = Blueprint('homework') # Объявляем команду
 
 @bp.on.private_message(payload={'cmd': 'homework'})
 async def private_homework(message: Message):
-    userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
     logging.info(f'{message.peer_id}: I get homework')
+    userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
     try:
         # Получаем дз
         homework = db.get_homework(
