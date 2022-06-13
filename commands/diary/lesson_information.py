@@ -11,54 +11,44 @@ bp = Blueprint('diary_for_day')# Объявляем команду
 bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 
 
-@bp.on.private_message(PayloadStarts='{"cmd":"lesson_information_')
+@bp.on.private_message(PayloadStarts=['{"cmd":"lesson_information_',
+    '{"cmd":"next_lesson_information_',
+    '{"cmd":"back_lesson_information_'])
 async def private_lesson_information(message: Message):
     logging.info(f'{message.peer_id}: I get lesson information')
     userInfo = await bp.api.users.get(message.from_id)# Информация о юзере
+    userId = userInfo[0].id
 
-    db.edit_account_lesson(userInfo[0].id, message.payload[27::29]) # Редактируем номер урока, на котором юзер
-    db.commit()
-
-    day = db.get_account_day(userInfo[0].id) # Получаем день, на котором юзер
+    day = db.get_account_day(userId) # Получаем день, на котором юзер
 
     # Если пользователь выбрал предыдущую неделю
     if 'back_' in message.payload:
-        diary = await get_diary(
-            db.get_account_login(userInfo[0].id),
-            db.get_account_password(userInfo[0].id),
-            get_back_week(),
-            db.get_account_school(userInfo[0].id),
-            db.get_account_link(userInfo[0].id),
-            db.get_account_studentId(userInfo[0].id))
-        logging.info(f'{message.peer_id}: Get back diary')
-
-        lesson = diary['weekDays'][day]['lessons'][int(message.payload[32::34])]
+        week = get_back_week()
+        lesson = message.payload[32:-2]
 
     # Если пользователь выбрал следующую неделю
     elif 'next_' in message.payload:
-        diary = await get_diary(
-            db.get_account_login(userInfo[0].id),
-            db.get_account_password(userInfo[0].id),
-            get_next_week(),
-            db.get_account_school(userInfo[0].id),
-            db.get_account_link(userInfo[0].id),
-            db.get_account_studentId(userInfo[0].id)) 
-        logging.info(f'{message.peer_id}: Get next diary')
-        
-        lesson = diary['weekDays'][day]['lessons'][int(message.payload[32::34])]
+        week = get_next_week()
+        lesson = message.payload[32:-2]
 
     # Если пользователь выбрал текущую неделю
     else:
-        diary = await get_diary(
-            db.get_account_login(userInfo[0].id),
-            db.get_account_password(userInfo[0].id),
-            get_week(),
-            db.get_account_school(userInfo[0].id),
-            db.get_account_link(userInfo[0].id),
-            db.get_account_studentId(userInfo[0].id))
-        logging.info(f'{message.peer_id}: Get diary')
-        
-        lesson = diary['weekDays'][day]['lessons'][int(message.payload[27::29])]
+        week = get_week()
+        lesson = message.payload[27:-2]
+    
+    db.edit_account_lesson(userId, lesson) # Редактируем номер урока, на котором юзер
+    db.commit()
+    
+    diary = await get_diary(
+        db.get_account_login(userId),
+        db.get_account_password(userId),
+        week,
+        db.get_account_school(userId),
+        db.get_account_link(userId),
+        db.get_account_studentId(userId))
+    logging.info(f'{message.peer_id}: Get diary')
+    
+    lesson = diary['weekDays'][day]['lessons'][int(lesson)]
 
     marks = ''
     homework = ''
@@ -91,63 +81,43 @@ async def private_lesson_information(message: Message):
 
 
 
-@bp.on.chat_message(PayloadStarts='{"cmd":"lesson_information_')
+@bp.on.chat_message(PayloadStarts=['{"cmd":"lesson_information_',
+    '{"cmd":"next_lesson_information_',
+    '{"cmd":"back_lesson_information_'])
 async def chat_lesson_information(message: Message):
-    logging.info(f'{message.peer_id}: I get lesson information from chat')
-    chat_id = message.chat_id # Чат айди
+    logging.info(f'{message.peer_id}: I get lesson information')
+    chat_id = message.chat_id
 
-    try:
-        day = db.get_chat_day(chat_id)
-    # Если чата нет в бд
-    except:
-        logging.info(f'{message.peer_id}: Not found chat in db')
-        await message.answer('К этой беседе не подключен аккаунт. \nДля подключение напишите "Вход <логин> <пароль>"')
-        return
+    day = db.get_chat_day(chat_id) # Получаем день, на котором юзер
 
+    # Если пользователь выбрал предыдущую неделю
+    if 'back_' in message.payload:
+        week = get_back_week()
+        lesson = message.payload[32:-2]
 
-    try:
-        # Если пользователь выбрал предыдущую неделю
-        if 'back_' in message.payload:
-            diary = await get_diary(
-                db.get_chat_login(chat_id),
-                db.get_chat_password(chat_id),
-                get_back_week(),
-                db.get_chat_school(chat_id),
-                db.get_chat_link(chat_id),
-                db.get_chat_studentId(chat_id))
-            logging.info(f'{message.peer_id}: Get back diary')
+    # Если пользователь выбрал следующую неделю
+    elif 'next_' in message.payload:
+        week = get_next_week()
+        lesson = message.payload[32:-2]
 
-            lesson = diary['weekDays'][day]['lessons'][int(message.payload[32::34])]
-
-        # Если пользователь выбрал следующую неделю
-        elif 'next_' in message.payload:
-            diary = await get_diary(
-                db.get_chat_login(chat_id),
-                db.get_chat_password(chat_id),
-                get_next_week(),
-                db.get_chat_school(chat_id),
-                db.get_chat_link(chat_id),
-                db.get_chat_studentId(chat_id))
-            logging.info(f'{message.peer_id}: Get next diary')
-            
-            lesson = diary['weekDays'][day]['lessons'][int(message.payload[32::34])]
-
-        # Если пользователь выбрал текущую неделю
-        else:
-            diary = await get_diary(
-                db.get_chat_login(chat_id),
-                db.get_chat_password(chat_id),
-                get_week(),
-                db.get_chat_school(chat_id),
-                db.get_chat_link(chat_id),
-                db.get_chat_studentId(chat_id))
-            logging.info(f'{message.peer_id}: Get diary')
-            
-            lesson = diary['weekDays'][day]['lessons'][int(message.payload[27::29])]
-    except:
-        logging.exception(f'{message.peer_id}: Exception occurred')
-        await message.answer('К этой беседе не подключен аккаунт. \nДля подключение напишите "Вход <логин> <пароль>"')
-        return
+    # Если пользователь выбрал текущую неделю
+    else:
+        week = get_week()
+        lesson = message.payload[27:-2]
+    
+    db.edit_chat_lesson(chat_id, lesson) # Редактируем номер урока, на котором юзер
+    db.commit()
+    
+    diary = await get_diary(
+        db.get_chat_login(chat_id),
+        db.get_chat_password(chat_id),
+        week,
+        db.get_chat_school(chat_id),
+        db.get_chat_link(chat_id),
+        db.get_chat_studentId(chat_id))
+    logging.info(f'{message.peer_id}: Get diary')
+    
+    lesson = diary['weekDays'][day]['lessons'][int(lesson)]
 
     marks = ''
     homework = ''

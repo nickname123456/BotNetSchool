@@ -7,20 +7,23 @@ from PostgreSQLighter import db
 from ns import get_diary
 import netschoolapi
 import logging
+from VKRules import PayloadStarts
 
 
 bp = Blueprint('diary_for_day') # Объявляем команду
+bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 
 
-@bp.on.private_message(payload=[{'cmd': 'diary_for_day'},
-                                {'cmd': 'back_diary_for_day'},
-                                {'cmd': 'next_diary_for_day'}])
+@bp.on.private_message(PayloadStarts=['{"cmd":"next_diary_for_day', 
+    '{"cmd":"back_diary_for_day', 
+    '{"cmd":"diary_for_day'])
 async def private_diary_for_day(message: Message):
     logging.info(f'{message.peer_id}: I get diary for day')
     userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
+    userId = userInfo[0].id
 
     #Если дневника нет в списке
-    if db.get_account_correctData(userInfo[0].id) != 1:
+    if db.get_account_correctData(userId) != 1:
         await message.answer('Ты не зарегистрирован! \nНапиши "Начать"\n Или у тебя неверный логин/пароль')
         logging.info(f'{message.peer_id}: User not found in db')
         return
@@ -31,72 +34,38 @@ async def private_diary_for_day(message: Message):
     )
 
     # Если пользователь выбрал текущую неделю
-    if message.payload == '{"cmd":"diary_for_day"}':
-        try:
-            diary = await get_diary(
-                db.get_account_login(userInfo[0].id),
-                db.get_account_password(userInfo[0].id),
-                get_week(),
-                db.get_account_school(userInfo[0].id),
-                db.get_account_link(userInfo[0].id),
-                db.get_account_studentId(userInfo[0].id)
-            )
-            period_in_payload = ''
-            logging.info(f'{message.peer_id}: Get diary from NetSchool')
-        except netschoolapi.errors.AuthError:
-            await message.answer('Неправильный логин или пароль!')
-            logging.info(f'{message.peer_id}: Incorrect login or password!')
-            return
-    
+    if message.payload.startswith('{"cmd":"diary_for_day_'):
+        week = get_week()
+        period_in_payload = ''
+        day = int(message.payload[22:-2])
     # Если пользователь выбрал предыдущую неделю
-    elif message.payload == '{"cmd":"back_diary_for_day"}':
-        try:
-            diary = await get_diary(
-                db.get_account_login(userInfo[0].id),
-                db.get_account_password(userInfo[0].id),
-                get_back_week(), # Получить предыдущую неделю
-                db.get_account_school(userInfo[0].id),
-                db.get_account_link(userInfo[0].id),
-                db.get_account_studentId(userInfo[0].id)
-            )
-            period_in_payload = 'back_'
-            logging.info(f'{message.peer_id}: Get diary from NetSchool')
-        except netschoolapi.errors.AuthError:
-            await message.answer('Неправильный логин или пароль!')
-            logging.info(f'{message.peer_id}: Incorrect login or password!')
-            return
-
+    elif message.payload.startswith('{"cmd":"back_diary_for_day_'):
+        week = get_back_week()
+        period_in_payload = 'back_'
+        day = int(message.payload[27:-2])
     # Если пользователь выбрал следующую неделю
-    elif message.payload == '{"cmd":"next_diary_for_day"}':    
-        try:
-            diary = await get_diary(
-                db.get_account_login(userInfo[0].id),
-                db.get_account_password(userInfo[0].id),
-                get_next_week(), # Получить следующую неделю
-                db.get_account_school(userInfo[0].id),
-                db.get_account_link(userInfo[0].id),
-                db.get_account_studentId(userInfo[0].id)
-            )
-            period_in_payload = 'next_'
-            logging.info(f'{message.peer_id}: Get diary from NetSchool')
-        except netschoolapi.errors.AuthError:
-            await message.answer('Неправильный логин или пароль!')
-            logging.info(f'{message.peer_id}: Incorrect login or password!')
-            return
+    elif message.payload.startswith('{"cmd":"next_diary_for_day_'):    
+        week = get_next_week()
+        period_in_payload = 'next_'
+        day = int(message.payload[27:-2])
     
+    try:
+        diary = await get_diary(
+            db.get_account_login(userId),
+            db.get_account_password(userId),
+            week,
+            db.get_account_school(userId),
+            db.get_account_link(userId),
+            db.get_account_studentId(userId)
+        )
+        logging.info(f'{message.peer_id}: Get diary from NetSchool')
+    except netschoolapi.errors.AuthError:
+        await message.answer('Неправильный логин или пароль!')
+        logging.info(f'{message.peer_id}: Incorrect login or password!')
+        return
 
-    if 'Понедельник' in message.text:
-        day = 0
-    elif 'Вторник' in message.text:
-        day = 1
-    elif 'Среда' in message.text:
-        day = 2
-    elif 'Четверг' in message.text:
-        day = 3
-    elif 'Пятница' in message.text:
-        day = 4
     # Меняем данные о дне в бд
-    db.edit_account_day(userInfo[0].id, day)
+    db.edit_account_day(userId, day)
     db.commit()
 
     
@@ -142,9 +111,9 @@ async def private_diary_for_day(message: Message):
 
 
 
-@bp.on.chat_message(payload=[{'cmd': 'diary_for_day'},
-                        {'cmd': 'back_diary_for_day'},
-                        {'cmd': 'next_diary_for_day'}])
+@bp.on.chat_message(PayloadStarts=['{"cmd":"next_diary_for_day', 
+    '{"cmd":"back_diary_for_day', 
+    '{"cmd":"diary_for_day'])
 async def chat_diary_for_day(message: Message):
     logging.info(f'{message.peer_id}: I get diary for day')
     chat_id = message.chat_id
@@ -154,60 +123,37 @@ async def chat_diary_for_day(message: Message):
         Keyboard()
     )
 
-
-    try:
-        # Если пользователь выбрал текущую неделю
-        if message.payload == '{"cmd":"diary_for_day"}':
-            diary = await get_diary(
-                db.get_chat_login(chat_id),
-                db.get_chat_password(chat_id),
-                get_week(),
-                db.get_chat_school(chat_id),
-                db.get_chat_link(chat_id),
-                db.get_chat_studentId(chat_id))
-            period_in_payload = ''
-            logging.info(f'{message.peer_id}: Get diary from NetSchool')
-            
-        # Если пользователь выбрал предыдущую неделю
-        elif message.payload == '{"cmd":"back_diary_for_day"}':
-            diary = await get_diary(
-                db.get_chat_login(chat_id),
-                db.get_chat_password(chat_id),
-                get_back_week(), # Получить предыдущую неделю
-                db.get_chat_school(chat_id),
-                db.get_chat_link(chat_id),
-                db.get_chat_studentId(chat_id))
-            period_in_payload = 'back_'
-            logging.info(f'{message.peer_id}: Get diary from NetSchool')
-
-        # Если пользователь выбрал следующую неделю
-        elif message.payload == '{"cmd":"next_diary_for_day"}':
-            diary = await get_diary(
-                db.get_chat_login(chat_id),
-                db.get_chat_password(chat_id),
-                get_next_week(), # Получить следующую неделю
-                db.get_chat_school(chat_id),
-                db.get_chat_link(chat_id),
-                db.get_chat_studentId(chat_id))
-            period_in_payload = 'next_'
-            logging.info(f'{message.peer_id}: Get diary from NetSchool')
-            
-    except:
-        logging.info(f'{message.peer_id}: Incorrect login or password or not linked chat!')
-        await message.answer('К этой беседе не подключен аккаунт. \nДля подключение напишите "Вход <логин> <пароль>"')
-        return
+    # Если пользователь выбрал текущую неделю
+    if message.payload.startswith('{"cmd":"diary_for_day_'):
+        week = get_week()
+        period_in_payload = ''
+        day = int(message.payload[22:-2])
+    # Если пользователь выбрал предыдущую неделю
+    elif message.payload.startswith('{"cmd":"back_diary_for_day_'):
+        week = get_back_week()
+        period_in_payload = 'back_'
+        day = int(message.payload[27:-2])
+    # Если пользователь выбрал следующую неделю
+    elif message.payload.startswith('{"cmd":"next_diary_for_day_'):    
+        week = get_next_week()
+        period_in_payload = 'next_'
+        day = int(message.payload[27:-2])
     
+    try:
+        diary = await get_diary(
+            db.get_chat_login(chat_id),
+            db.get_chat_password(chat_id),
+            week,
+            db.get_chat_school(chat_id),
+            db.get_chat_link(chat_id),
+            db.get_chat_studentId(chat_id)
+        )
+        logging.info(f'{message.peer_id}: Get diary from NetSchool')
+    except netschoolapi.errors.AuthError:
+        await message.answer('Неправильный логин или пароль!')
+        logging.info(f'{message.peer_id}: Incorrect login or password!')
+        return
 
-    if 'Понедельник' in message.text:
-        day = 0
-    elif 'Вторник' in message.text:
-        day = 1
-    elif 'Среда' in message.text:
-        day = 2
-    elif 'Четверг' in message.text:
-        day = 3
-    elif 'Пятница' in message.text:
-        day = 4
     # Меняем данные о дне в бд
     db.edit_chat_day(chat_id, day)
     db.commit()

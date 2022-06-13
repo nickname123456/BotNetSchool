@@ -40,39 +40,37 @@ async def logout(link):
 def get_week():
     today = datetime.date.today()
     monday = today - datetime.timedelta(days=today.weekday())
-    friday = monday + datetime.timedelta(days=4)
+    saturday = monday + datetime.timedelta(days=5)
 
-    period = [monday, friday]
+    week = [monday, saturday]
 
-    return period
+    return week
 
 
 # Получить следующую неделю
 def get_next_week():
     today = datetime.date.today()
     monday = today - datetime.timedelta(days=today.weekday())
-    friday = monday + datetime.timedelta(days=4)
 
     next_monday = monday + datetime.timedelta(days=7)
-    next_friday = friday + datetime.timedelta(days=7)
+    next_saturday = monday + datetime.timedelta(days=5)
 
-    period = [next_monday, next_friday]
+    week = [next_monday, next_saturday]
 
-    return period
+    return week
 
 
 # Получить предыдущую неделю
 def get_back_week():
     today = datetime.date.today()
     monday = today - datetime.timedelta(days=today.weekday())
-    friday = monday + datetime.timedelta(days=4)
 
     last_monday = monday - datetime.timedelta(days=7)
-    last_friday = friday - datetime.timedelta(days=7)
+    last_saturday = monday + datetime.timedelta(days=5)
 
-    period = [last_monday, last_friday]
+    week = [last_monday, last_saturday]
 
-    return period
+    return week
 
 
 # Получить дневник
