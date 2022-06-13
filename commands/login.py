@@ -38,8 +38,7 @@ async def private_login(message: Message, userLogin=None, userPassword=None):
                 userLogin,
                 userPassword, 
                 db.get_account_school(userInfo[0].id),
-                db.get_account_link(userInfo[0].id),
-                db.get_account_studentId(userInfo[0].id)))
+                db.get_account_link(userInfo[0].id)))
         db.commit()
         db.edit_account_correctData(userInfo[0].id, 0)
         db.commit()
@@ -104,8 +103,7 @@ async def chat_login(message: Message, userLogin=None, userPassword=None):
             await ns.getCurrentStudentId(
                 userLogin,userPassword, 
                 db.get_chat_school(chat_id),
-                db.get_chat_link(chat_id),
-                db.get_chat_studentId(chat_id)))
+                db.get_chat_link(chat_id)))
             logging.info(f'{message.peer_id}: Write new data to database')
 
         
