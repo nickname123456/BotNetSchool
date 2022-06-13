@@ -16,10 +16,7 @@ async def private_reportAverageMark(message: Message):
     # Информация о юзере
     userInfo = await bp.api.users.get(message.from_id) 
     user_id = userInfo[0].id
-
     
-    
-    logging.info(f'{message.peer_id}: I sent reportAverageMark')
     reportAverageMark = await ns.getReportAverageMark(
         db.get_account_login(user_id),
         db.get_account_password(user_id),
@@ -29,6 +26,7 @@ async def private_reportAverageMark(message: Message):
     )
     for i in reportAverageMark:
         await message.answer(i)
+    logging.info(f'{message.peer_id}: I sent reportAverageMark')
 
 
 @bp.on.chat_message(payload={'cmd': 'reportAverageMark'})
@@ -36,10 +34,7 @@ async def chat_reportAverageMark(message: Message):
     logging.info(f'{message.peer_id}: I get reportAverageMark')
     # Айди чата:
     chat_id = message.chat_id
-
     
-    
-    logging.info(f'{message.peer_id}: I sent reportAverageMark')
     reportAverageMark = await ns.getReportAverageMark(
         db.get_chat_login(chat_id),
         db.get_chat_password(chat_id),
@@ -49,3 +44,4 @@ async def chat_reportAverageMark(message: Message):
     )
     for i in reportAverageMark:
         await message.answer(i)
+    logging.info(f'{message.peer_id}: I sent reportAverageMark')
