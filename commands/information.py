@@ -11,7 +11,6 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр
 
 
 
-#Если написали "Меню" или нажали на соответствующую кнопку
 @bp.on.private_message(payload={'cmd': 'information'})
 async def private_information(message: Message):
     logging.info(f'{message.peer_id}: I get information')
@@ -37,10 +36,6 @@ async def private_information(message: Message):
     logging.info(f'{message.peer_id}: I sent information')
 
 
-
-
-
-#Если написали "Меню" или нажали на соответствующую кнопку
 @bp.on.chat_message(payload={'cmd': 'information'})
 async def chat_information(message: Message):
     logging.info(f'{message.peer_id}: I get information')

@@ -64,9 +64,6 @@ async def private_menu(message: Message):
 
 
 
-
-
-
 #Если написали "Меню" или нажали на соответствующую кнопку
 @bp.on.chat_message(text=["Меню"])
 @bp.on.chat_message(payload={'cmd': 'menu'})
