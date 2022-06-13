@@ -6,10 +6,6 @@ from settings import admin_id
 
 
 
-
-
-
-
 async def notification(bot):
     logging.info(f'Started mailing')
 

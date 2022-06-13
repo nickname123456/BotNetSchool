@@ -43,15 +43,6 @@ async def keyboard_settings_private(message: Message):
     await message.answer('Что хочешь изменить?', keyboard=keyboard)
 
 
-
-
-
-
-
-
-
-
-
 @bp.on.chat_message(payload={'cmd': 'keyboard_settings'})
 async def keyboard_settings_chat(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_settings')

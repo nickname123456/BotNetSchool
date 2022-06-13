@@ -27,12 +27,6 @@ async def private_keyboard_mark_notification(message: Message):
 
     await keyboard_settings_private(message)
 
-
-
-
-
-
-
 @bp.on.chat_message(payload={'cmd': 'keyboard_mark_notification'})
 async def chat_keyboard_mark_notification(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_mark_notification')

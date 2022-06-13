@@ -27,12 +27,6 @@ async def private_keyboard_announcements_notification(message: Message):
     await keyboard_settings_private(message)
 
 
-
-
-
-
-
-
 @bp.on.chat_message(payload={'cmd': 'keyboard_announcements_notification'})
 async def chat_keyboard_announcements_notification(message: Message):
     logging.info('I get keyboard_announcements_notification')
