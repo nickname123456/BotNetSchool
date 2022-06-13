@@ -2,7 +2,7 @@ from vkbottle.bot import Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
 from PostgreSQLighter import db
-from ns import get_next_period, get_back_period, get_period
+from ns import get_next_week, get_back_week, get_week
 import logging
 
 
@@ -36,7 +36,7 @@ async def keyboard_diary(message: Message):
         .add(Text('▶', {'cmd': 'keyboard_diary_next'}))
     )
 
-    await message.answer(f'Текущая неделя: \n{get_period()[0]}\n-\n{get_period()[1]} \nНа какой день хочешь узнать расписание?', keyboard=keyboard)
+    await message.answer(f'Текущая неделя: \n{get_week()[0]}\n-\n{get_week()[1]} \nНа какой день хочешь узнать расписание?', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I send keyboard diary')
 
 @bp.on.message(payload={'cmd': 'keyboard_diary_back'})
@@ -66,7 +66,7 @@ async def keyboard_diary(message: Message):
         .add(Text('▶', {'cmd': 'keyboard_diary'}))
     )
 
-    await message.answer(f'Текущая неделя: \n{get_back_period()[0]}\n-\n{get_back_period()[1]} \nНа какой день хочешь узнать расписание?', keyboard=keyboard)
+    await message.answer(f'Текущая неделя: \n{get_back_week()[0]}\n-\n{get_back_week()[1]} \nНа какой день хочешь узнать расписание?', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I send back keyboard diary')
 
 @bp.on.message(payload={'cmd': 'keyboard_diary_next'})
@@ -96,5 +96,5 @@ async def keyboard_diary(message: Message):
         .add(Text('🟦'))
     )
 
-    await message.answer(f'Текущая неделя: \n{get_next_period()[0]}\n-\n{get_next_period()[1]} \nНа какой день хочешь узнать расписание?', keyboard=keyboard)
+    await message.answer(f'Текущая неделя: \n{get_next_week()[0]}\n-\n{get_next_week()[1]} \nНа какой день хочешь узнать расписание?', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I send next keyboard diary')

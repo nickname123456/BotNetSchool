@@ -3,7 +3,7 @@ from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
 import logging
 from PostgreSQLighter import db
-from ns import get_diary, get_period
+from ns import get_diary, get_week
 import netschoolapi
 from settings import lessons_and_their_reduction
 
@@ -53,7 +53,7 @@ async def private_homework_for_day(message: Message):
         diary = await get_diary(
             db.get_account_login(userInfo[0].id),
             db.get_account_password(userInfo[0].id),
-            get_period(),
+            get_week(),
             db.get_account_school(userInfo[0].id),
             db.get_account_link(userInfo[0].id),
             db.get_account_studentId(userInfo[0].id)
@@ -117,7 +117,7 @@ async def chat_homework_for_day(message: Message):
         diary = await get_diary(
             db.get_chat_login(chat_id),
             db.get_chat_password(chat_id),
-            get_period(),
+            get_week(),
             db.get_chat_school(chat_id),
             db.get_chat_link(chat_id),
             db.get_chat_studentId(chat_id)

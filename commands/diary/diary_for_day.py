@@ -1,5 +1,5 @@
-from ns import get_back_period, get_next_period
-from ns import get_period
+from ns import get_back_week, get_next_week
+from ns import get_week
 from vkbottle.bot import Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Blueprint
@@ -36,7 +36,7 @@ async def private_diary_for_day(message: Message):
             diary = await get_diary(
                 db.get_account_login(userInfo[0].id),
                 db.get_account_password(userInfo[0].id),
-                get_period(),
+                get_week(),
                 db.get_account_school(userInfo[0].id),
                 db.get_account_link(userInfo[0].id),
                 db.get_account_studentId(userInfo[0].id)
@@ -54,7 +54,7 @@ async def private_diary_for_day(message: Message):
             diary = await get_diary(
                 db.get_account_login(userInfo[0].id),
                 db.get_account_password(userInfo[0].id),
-                get_back_period(), # Получить предыдущую неделю
+                get_back_week(), # Получить предыдущую неделю
                 db.get_account_school(userInfo[0].id),
                 db.get_account_link(userInfo[0].id),
                 db.get_account_studentId(userInfo[0].id)
@@ -72,7 +72,7 @@ async def private_diary_for_day(message: Message):
             diary = await get_diary(
                 db.get_account_login(userInfo[0].id),
                 db.get_account_password(userInfo[0].id),
-                get_next_period(), # Получить следующую неделю
+                get_next_week(), # Получить следующую неделю
                 db.get_account_school(userInfo[0].id),
                 db.get_account_link(userInfo[0].id),
                 db.get_account_studentId(userInfo[0].id)
@@ -161,7 +161,7 @@ async def chat_diary_for_day(message: Message):
             diary = await get_diary(
                 db.get_chat_login(chat_id),
                 db.get_chat_password(chat_id),
-                get_period(),
+                get_week(),
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id),
                 db.get_chat_studentId(chat_id))
@@ -173,7 +173,7 @@ async def chat_diary_for_day(message: Message):
             diary = await get_diary(
                 db.get_chat_login(chat_id),
                 db.get_chat_password(chat_id),
-                get_back_period(), # Получить предыдущую неделю
+                get_back_week(), # Получить предыдущую неделю
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id),
                 db.get_chat_studentId(chat_id))
@@ -185,7 +185,7 @@ async def chat_diary_for_day(message: Message):
             diary = await get_diary(
                 db.get_chat_login(chat_id),
                 db.get_chat_password(chat_id),
-                get_next_period(), # Получить следующую неделю
+                get_next_week(), # Получить следующую неделю
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id),
                 db.get_chat_studentId(chat_id))

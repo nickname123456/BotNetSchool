@@ -37,7 +37,7 @@ async def logout(link):
 
 
 # Получить текущую неделю
-def get_period():
+def get_week():
     today = datetime.date.today()
     monday = today - datetime.timedelta(days=today.weekday())
     friday = monday + datetime.timedelta(days=4)
@@ -48,7 +48,7 @@ def get_period():
 
 
 # Получить следующую неделю
-def get_next_period():
+def get_next_week():
     today = datetime.date.today()
     monday = today - datetime.timedelta(days=today.weekday())
     friday = monday + datetime.timedelta(days=4)
@@ -62,7 +62,7 @@ def get_next_period():
 
 
 # Получить предыдущую неделю
-def get_back_period():
+def get_back_week():
     today = datetime.date.today()
     monday = today - datetime.timedelta(days=today.weekday())
     friday = monday + datetime.timedelta(days=4)
