@@ -32,8 +32,8 @@ class SQLighter:
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS schedule ( 
                 school TEXT,
                 class TEXT,
-                day INT,
-                photo INT
+                day TEXT,
+                photo TEXT
                 )""")
         
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS chats ( 
@@ -101,15 +101,16 @@ class SQLighter:
 
     def get_schedule(self, school, clas, day):
         with self.connection:
-            self.cursor.execute('SELECT photo FROM schedule WHERE day = %s AND class = %s AND school = %s', (day, clas, school)).fetchone()
-    
+            self.cursor.execute('SELECT photo FROM schedule WHERE day = %s AND class = %s AND school = %s', (day, clas, school))
+            return self.cursor.fetchone()[0]
+
     def edit_schedule(self, school, clas, day, photo):
         with self.connection:
             return self.cursor.execute("UPDATE schedule SET photo = %s WHERE day = %s AND class = %s AND school = %s", (photo, day, clas, school))
 
     def add_schedule(self, school, clas, day, photo):
         with self.connection:
-            return self.cursor.execute('INSERT INTO EXISTS VALUES (%s,%s,%s,%s)',(school, clas, day, photo))
+            return self.cursor.execute('INSERT INTO schedule VALUES (%s,%s,%s,%s)',(school, clas, day, photo))
 
 
 

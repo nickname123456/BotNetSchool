@@ -14,11 +14,15 @@ async def private_schedule_for_day(message: Message):
     userInfo = await bp.api.users.get(message.from_id)
     user_id = userInfo[0].id
 
-    if message.text in ['Понедельник','Вторник','Среда','Четверг','Пятница']:
+    try:
         if db.get_schedule(db.get_account_school(user_id),db.get_account_class(user_id), message.text)[0] is not None:
             await message.answer(attachment=db.get_schedule(db.get_account_school(user_id), db.get_account_class(user_id), message.text))
+        elif db.get_schedule(db.get_account_school(user_id), 'all', message.text)[0] is not None:
+            await message.answer(attachment=db.get_schedule(db.get_account_school(user_id), 'all', message.text))
         else:
             await message.answer('На этот день еще нет расписания')
+    except:
+        await message.answer('На этот день еще нет расписания')
 
     logging.info(f'{message.peer_id}: I sent keyboard_schedule')
 
@@ -29,10 +33,14 @@ async def chat_schedule_for_day(message: Message):
     logging.info(f'{message.peer_id}: I get schedule_for_day')
     chat_id = message.chat_id
 
-    if message.text in ['Понедельник','Вторник','Среда','Четверг','Пятница']:
+    try:
         if db.get_schedule(db.get_chat_school(chat_id),db.get_chat_class(chat_id),message.text)[0] is not None:
-            await message.answer(attachment=db.get_schedule(db.get_chat_school(chat_id),db.get_chat_class(chat_id),message.text))
+            await message.answer(attachment=db.get_schedule(db.get_chat_school(chat_id), db.get_chat_class(chat_id), message.text))
+        elif db.get_schedule(db.get_chat_school(chat_id), 'all',message.text)[0] is not None:
+            await message.answer(attachment=db.get_schedule(db.get_chat_school(chat_id), 'all', message.text))
         else:
+            await message.answer('На этот день еще нет расписания')
+    except:
             await message.answer('На этот день еще нет расписания')
 
     logging.info(f'{message.peer_id}: I sent keyboard_schedule')
