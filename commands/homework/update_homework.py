@@ -47,7 +47,7 @@ async def private_keyboard_update_homework(message: Message):
     keyboard.row()
     keyboard.add(Text("Назад", {'cmd': 'keyboard_homework'}), color=KeyboardButtonColor.NEGATIVE)
 
-    await message.answer('На какой урок хочешь изменить дз?', keyboard=keyboard)
+    await message.answer('На какой урок хочешь изменить дз? Если для нужного предмета нет кнопки, то просто напиши название.', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I send list of lessons')
 
 
@@ -75,7 +75,7 @@ async def chat_keyboard_update_homework(message: Message):
     keyboard.row()
     keyboard.add(Text("Назад", {'cmd': 'keyboard_homework'}), color=KeyboardButtonColor.NEGATIVE)
 
-    await message.answer('На какой урок хочешь изменить дз?', keyboard=keyboard)
+    await message.answer('На какой урок хочешь изменить дз? Если для нужного предмета нет кнопки, то просто напиши название.', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I send list of lessons')
 
 
@@ -170,7 +170,6 @@ async def private_edit_hamework(message: Message):
         await bp.state_dispenser.delete(message.peer_id) # Удаляем цепочку
         user_id = int(message.payload[28:-2])
 
-
         await bp.api.messages.send(message=f'Администратор отказал вам в измение дз по {lesson} на:\n{homework}', user_id=user_id, keyboard=keyboard, random_id=0)
         logging.info(f'{message.peer_id}: I sent a refusal')
 
@@ -192,70 +191,51 @@ async def private_edit_hamework(message: Message):
     if message.payload and 'chat' in message.payload:
         chat_id = peer_id - 2000000000
 
+    upd_date = f'{datetime.now().day}-{datetime.now().month}-{datetime.now().year} {datetime.now().hour}:{datetime.now().minute}'
+    
     try:
         # Если дз обновляют из чата
         if message.payload and 'chat' in message.payload:
-            db.edit_homework(
-            db.get_chat_school(chat_id),
-            db.get_chat_class(chat_id),
-            lesson,
-            homework)
-            db.commit()
-
-            db.edit_upd_date(
-                db.get_chat_school(chat_id),
-                db.get_chat_class(chat_id),
-                lesson,
-                str(f'{datetime.now().day}-{datetime.now().month}-{datetime.now().year} {datetime.now().hour}:{datetime.now().minute}')
-            )
+            if (lesson,) in lessons:
+                db.edit_homework(
+                    db.get_chat_school(chat_id),
+                    db.get_chat_class(chat_id),
+                    lesson,
+                    homework
+                )
+                db.edit_upd_date(
+                    db.get_chat_school(chat_id),
+                    db.get_chat_class(chat_id),
+                    lesson,
+                    upd_date
+                )
+            else:
+                db.add_lesson_with_homework(lesson, db.get_chat_school(chat_id), db.get_chat_class(chat_id), homework, upd_date)
             db.commit()
 
             await message.answer('Ты успешно обновил дз', keyboard=keyboard)
             logging.info(f'{message.peer_id}: I sent a success')
 
-            homework = db.get_homework(
-                db.get_chat_school(chat_id),
-                db.get_chat_class(chat_id),
-                lesson
-            )
-
-            upd_date = db.get_upd_date(
-                db.get_chat_school(chat_id),
-                db.get_chat_class(chat_id),
-                lesson
-            )
         # Если обновляют не из чата
         else:
-            db.edit_homework(
-                db.get_account_school(userInfo[0].id),
-                db.get_account_class(userInfo[0].id),
-                lesson,
-                homework
-            )
+            if (lesson,) in lessons:
+                db.edit_homework(
+                    db.get_account_school(userInfo[0].id),
+                    db.get_account_class(userInfo[0].id),
+                    lesson,
+                    homework
+                )
+                db.edit_upd_date(
+                    db.get_account_school(userInfo[0].id),
+                    db.get_account_class(userInfo[0].id),
+                    lesson,
+                    upd_date)
+            else:
+                db.add_lesson_with_homework(lesson, db.get_account_school(userInfo[0].id), db.get_account_class(userInfo[0].id), homework, upd_date)
             db.commit()
 
-            db.edit_upd_date(
-                db.get_account_school(userInfo[0].id),
-                db.get_account_class(userInfo[0].id),
-                lesson,
-                str(f'{datetime.now().day}-{datetime.now().month}-{datetime.now().year} {datetime.now().hour}:{datetime.now().minute}')
-            )
-            db.commit()
-
-            await message.answer('Ты успешно обновил дз')
+            await message.answer('Ты успешно обновил дз', keyboard=keyboard)
             logging.info(f'{message.peer_id}: I sent a success')
-
-            homework = db.get_homework(
-                db.get_account_school(userInfo[0].id),
-                db.get_account_class(userInfo[0].id),
-                lesson
-            )
-
-            upd_date = db.get_upd_date(
-                db.get_account_school(userInfo[0].id),
-                db.get_account_class(userInfo[0].id),
-                lesson
-            )
 
     except TypeError:
         await message.answer(f'Человек не зарегистрирован!')
@@ -330,37 +310,28 @@ async def chat_edit_hamework(message: Message):
 
     await bp.state_dispenser.delete(peer_id) # Удаляем цепочку
 
+    upd_date = f'{datetime.now().day}-{datetime.now().month}-{datetime.now().year} {datetime.now().hour}:{datetime.now().minute}'
     try:
-        db.edit_homework(
-            db.get_chat_school(chat_id),
-            db.get_chat_class(chat_id),
-            lesson,
-            homework
-        )
-        db.commit()
-
-        db.edit_upd_date(
-            db.get_chat_school(chat_id),
-            db.get_chat_class(chat_id),
-            lesson,
-            str(f'{datetime.now().day}-{datetime.now().month}-{datetime.now().year} {datetime.now().hour}:{datetime.now().minute}')
-        )
+        if (lesson,) in lessons:
+            db.edit_homework(
+                db.get_chat_school(chat_id),
+                db.get_chat_class(chat_id),
+                lesson,
+                homework
+            )
+            db.edit_upd_date(
+                db.get_chat_school(chat_id),
+                db.get_chat_class(chat_id),
+                lesson,
+                upd_date
+            )
+        else:
+            db.add_lesson_with_homework(lesson, db.get_chat_school(chat_id), db.get_chat_class(chat_id), homework, upd_date)
         db.commit()
 
         await message.answer('Ты успешно обновил дз')
         logging.info(f'{message.peer_id}: I sent a success')
 
-        homework = db.get_homework(
-            db.get_chat_school(chat_id),
-            db.get_chat_class(chat_id),
-            lesson
-        )
-
-        upd_date = db.get_upd_date(
-            db.get_chat_school(chat_id),
-            db.get_chat_class(chat_id),
-            lesson
-        )
     except Exception as e:
         logging.exception(f'{message.peer_id}: Exception occurred')
         await message.answer(f'Произошла ошибка\n{e} Сообщи админу')

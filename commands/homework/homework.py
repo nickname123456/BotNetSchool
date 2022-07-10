@@ -65,5 +65,5 @@ async def chat_homework(message: Message):
         await message.answer(f'Ошибка: {e} \nСообщи админу!')
         return
 
-    await message.answer(f'Урок: {message.text[30:]} \nБыло обновлено: {upd_date} \nЗадание: {homework}')
+    await message.answer(f'Урок: {message.text} \nБыло обновлено: {upd_date} \nЗадание: {homework}')
     logging.info(f'{message.peer_id}: Send homework')

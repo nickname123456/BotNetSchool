@@ -88,6 +88,11 @@ class SQLighter:
             return self.cursor.fetchone()[0]
 
 
+    def add_lesson_with_homework(self, lesson, school, clas, homework, upd_date):
+        with self.connection:
+            return self.cursor.execute('INSERT INTO homeworks VALUES (%s,%s,%s,%s,%s)',(lesson, school, clas, homework, upd_date))
+
+
     def edit_homework(self, school, clas, lesson, homework):
         with self.connection:
             return self.cursor.execute("UPDATE homeworks SET homework = %s WHERE school = %s AND class = %s AND lesson = %s", (homework, school, clas, lesson))
