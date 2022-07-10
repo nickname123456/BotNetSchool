@@ -27,8 +27,12 @@ class ScheduleData(BaseStateGroup):
     SCHOOL3 = 5
     FINISH = 6
 
+@bp.on.message(payload={'cmd': 'schedule_download'})
+@bp.on.chat_message(text=['/загрузить расписание', '/загрузить расп', '/лоадрасп', '/loadshedule'])
+async def start_schedule_download(message: Message):
+    await message.answer("Доступно только в л/с!")
 
-
+@bp.on.message(payload={'cmd': 'schedule_download'})
 @bp.on.private_message(text=['/загрузить расписание', '/загрузить расп', '/лоадрасп', '/loadshedule'])
 async def start_schedule_download(message: Message):
     logging.info(f'{message.peer_id}: I get /loadshedule')
