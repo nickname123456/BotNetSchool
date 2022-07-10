@@ -207,6 +207,10 @@ class SQLighter:
             self.cursor.execute('SELECT correction_mark FROM students WHERE id = %s', (account_id,))
             return self.cursor.fetchone()[0]
 
+    def get_account_any_with_filter(self, column, filter_name, filter_value):
+        with self.connection:
+            self.cursor.execute(f'SELECT {column} FROM students WHERE {filter_name} = %s', (filter_value,))
+            return self.cursor.fetchall()
 
 
     def add_user(self, user_id, login, password, link, school, clas, studentId):
@@ -374,6 +378,11 @@ class SQLighter:
         with self.connection:
             self.cursor.execute('SELECT correction_mark FROM chats WHERE id = %s', (chat_id,))
             return self.cursor.fetchone()[0]
+
+    def get_chat_any_with_filter(self, column, filter_name, filter_value):
+        with self.connection:
+            self.cursor.execute(f'SELECT {column} FROM chats WHERE {filter_name} = %s', (filter_value,))
+            return self.cursor.fetchall()
 
 
 

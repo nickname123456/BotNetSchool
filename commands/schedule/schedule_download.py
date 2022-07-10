@@ -50,7 +50,7 @@ async def start_schedule_download(message: Message):
         .add(Text('Назад', {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
     )
 
-    await bp.state_dispenser.set(message.peer_id, ScheduleData.PHOTO) # Говорим, что следующий шаг - выбор дня
+    await bp.state_dispenser.set(message.peer_id, ScheduleData.PHOTO) # Говорим, что следующий шаг - выбор фото
     await message.answer("На какой день хочешь загрузить расписание?", keyboard=keyboard)
 
 
@@ -166,14 +166,24 @@ async def finish_schedule_download(message: Message):
     photo = ctx.get('photo')
     school = ctx.get('school')
 
-    if message.text == 'Это расписание для всей школы': clas = 'all'
-    else: clas = message.text
+    if message.text == 'Это расписание для всей школы':
+        for i in set(db.get_account_any_with_filter('class', 'school', school)):
+            clas = i[0]
+            try:
+                old_shedule = db.get_schedule(school, clas, day)
+                db.edit_schedule(school, clas, day, photo)
+            except:
+                db.add_schedule(school, clas, day, photo)
+        clas = 'all'
 
-    try:
-        old_shedule = db.get_schedule(school, clas, day)
-        db.edit_schedule(school, clas, day, photo)
-    except:
-        db.add_schedule(school, clas, day, photo)
+    else: 
+        clas = message.text
+
+        try:
+            old_shedule = db.get_schedule(school, clas, day)
+            db.edit_schedule(school, clas, day, photo)
+        except:
+            db.add_schedule(school, clas, day, photo)
 
     users_with_notification = db.get_accounts_schedule_notification()
     chats_with_notification = db.get_chats_schedule_notification()
@@ -192,6 +202,7 @@ async def finish_schedule_download(message: Message):
                 await asyncio.sleep(1)
 
     await message.answer('Расписание успешно обновлено!', attachment=photo)
+    await bp.state_dispenser.delete(message.from_id)
     logging.info(f'{message.peer_id}: I sent success')
 
     await private_menu(message)
