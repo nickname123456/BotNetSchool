@@ -27,7 +27,7 @@ class ScheduleData(BaseStateGroup):
     SCHOOL3 = 5
     FINISH = 6
 
-@bp.on.message(payload={'cmd': 'schedule_download'})
+@bp.on.chat_message(payload={'cmd': 'schedule_download'})
 @bp.on.chat_message(text=['/загрузить расписание', '/загрузить расп', '/лоадрасп', '/loadshedule'])
 async def start_schedule_download(message: Message):
     await message.answer("Доступно только в л/с!")
@@ -181,7 +181,7 @@ async def finish_schedule_download(message: Message):
         clas = 'all'
 
     else: 
-        clas = message.text
+        clas = message.text.lower()
 
         try:
             old_shedule = db.get_schedule(school, clas, day)

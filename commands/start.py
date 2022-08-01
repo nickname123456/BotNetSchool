@@ -84,7 +84,7 @@ async def registration3(message: Message):
 @bp.on.message(state=NewaccountState.INCLASS)
 async def registration4(message: Message):
     if message.text:
-        ctx.set('clas', message.text) # Загружаем во временное хранилище класс
+        ctx.set('clas', message.text.lower()) # Загружаем во временное хранилище класс
 
         await message.answer('🖊Введите свой логин из СГО (Пример: "nickname123456").')
         await bp.state_dispenser.set(message.peer_id, NewaccountState.INLOGIN)
