@@ -601,7 +601,7 @@ class NetSchoolAPI:
     async def _address(self, school: Union[str, int]) -> Dict[str, int]:
         try:
             response = await self._client.get(
-                'webapi/addresses/schools', params={'funcType': 2}
+                'webapi/addresses/schools'
             )
             response.raise_for_status()
             schools_reference = response.json()
