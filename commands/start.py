@@ -272,4 +272,3 @@ async def chat_registration6(message: Message):
     await bp.state_dispenser.delete(message.peer_id)
     await message.answer(f'Ты успешно зашел в систему под логином: {login}', keyboard=keyboard)
     logging.info(f'{message.peer_id}: Start COMPLETED')
-

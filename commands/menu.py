@@ -36,6 +36,7 @@ async def private_menu(message: Message):
         return
 
     settings = await api.userInfo()
+    await api.logout()
     name = settings['Имя']
 
     #Создаем клавиатуру
@@ -87,6 +88,7 @@ async def chat_menu(message: Message):
         return
 
     settings = await api.userInfo()
+    await api.logout()
     name = settings['Имя']
 
     #Создаем клавиатуру

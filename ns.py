@@ -28,11 +28,6 @@ async def login(login, password, school, link, studentId = None):
         password,
         school,
         studentId)
-
-
-# Выход из сго
-async def logout(link):
-    api = NetSchoolAPI(link)
     await api.logout()
 
 
