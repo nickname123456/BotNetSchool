@@ -1,4 +1,4 @@
-# NetSchoolBot
+# BotNetSchool
 [Бот](https://vk.com/botnetschool), буквально связывающий апи СГО (огромное спасибо [этим ребятам](https://github.com/nm17/netschoolapi)) и ВК.
 
 В работе находится с сентября 2021 года до сих пор.
