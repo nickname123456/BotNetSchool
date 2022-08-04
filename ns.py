@@ -144,6 +144,9 @@ async def get_marks(login, password, school, url, studentId, subject = None):
         if not result:
             result = '❌Нет оценок'
         return result
+        
+    elif subject == 'all':
+        return marks
     else:
         return marks[subject]
 
@@ -242,7 +245,7 @@ async def correction_mark(login, password, school, url, studentId, subject, mark
         return 'У тебя и так норм оценка'
     
     for i in corrective_marks:
-        all_marks = await get_marks(login, password, school, url, subject)
+        all_marks = await get_marks(login, password, school, url, studentId, subject)
 
         if len(all_marks) != 0:
             average_mark = float(round(sum(all_marks) / len(all_marks), 2))
