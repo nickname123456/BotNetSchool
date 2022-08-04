@@ -1,3 +1,4 @@
+import asyncio
 from typing import Text
 from vkbottle.bot import Message
 from vkbottle.bot import Blueprint
@@ -26,11 +27,11 @@ async def private_marks(message: Message):
         #Добавить кнопки
         .add(Text('Исправление оценок', {'cmd': 'correction_mark_choice_lesson'}), color=KeyboardButtonColor.POSITIVE)
         .row()
-        .add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
+        .add(Text("Назад", {'cmd': 'reports'}), color=KeyboardButtonColor.NEGATIVE)
     )
 
-    
-    logging.info(f'{message.peer_id}: I sent marks')
+    await message.answer('⚠Внимание! Этот отчет НЕ официальный СГО. Оценки берутся путем "перелистывания" всего Дневника. Из-за этого могут быть ошибки. \n❗НО плюсы этого отчета в том, что можно посмотреть как можно исправить текущие оценки!')
+    await asyncio.sleep(1)
     await message.answer(
         await get_marks(    
             db.get_account_login(user_id),
@@ -41,6 +42,7 @@ async def private_marks(message: Message):
         ), 
         keyboard=keyboard
     )
+    logging.info(f'{message.peer_id}: I sent marks')
 
 
 
@@ -57,11 +59,11 @@ async def chat_marks(message: Message):
         #Добавить кнопки
         .add(Text('Исправление оценок', {'cmd': 'correction_mark_choice_lesson'}), color=KeyboardButtonColor.POSITIVE)
         .row()
-        .add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
+        .add(Text("Назад", {'cmd': 'reports'}), color=KeyboardButtonColor.NEGATIVE)
     )
 
     
-    logging.info(f'{message.peer_id}: I sent marks')
+    await message.answer('⚠Внимание! Этот отчет НЕ официальный СГО. Оценки берутся путем "перелистывания" всего Дневника. Из-за этого могут быть ошибки. \n❗НО плюсы этого отчета в том, что можно посмотреть как можно исправить текущие оценки!')
     await message.answer(
         await get_marks(    
             db.get_chat_login(chat_id),
@@ -72,3 +74,4 @@ async def chat_marks(message: Message):
         ), 
         keyboard=keyboard
     )
+    logging.info(f'{message.peer_id}: I sent marks')

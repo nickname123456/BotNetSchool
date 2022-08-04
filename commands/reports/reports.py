@@ -19,6 +19,8 @@ async def reports(message: Message):
     keyboard = (
         Keyboard()
         #Добавить кнопки
+        .add(Text('Средний балл (БЕТА)', {'cmd': 'marks'}), color=KeyboardButtonColor.SECONDARY)
+        .row()
         .add(Text('Итоговые отметки', {'cmd': 'reportTotal'}), color=KeyboardButtonColor.SECONDARY)
         .add(Text('Средний балл', {'cmd': 'reportAverageMark'}), color=KeyboardButtonColor.SECONDARY)
         .row()
