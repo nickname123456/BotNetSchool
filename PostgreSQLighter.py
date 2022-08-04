@@ -23,6 +23,7 @@ class SQLighter:
                 mark_notification INT,
                 announcements_notification INT,
                 schedule_notification INT,
+                homework_notification INT,
                 old_mark TEXT,
                 old_announcements TEXT,
                 correction_lesson TEXT,
@@ -50,6 +51,7 @@ class SQLighter:
                 mark_notification INT,
                 announcements_notification INT,
                 schedule_notification INT,
+                homework_notification INT,
                 old_mark TEXT,
                 old_announcements TEXT,
                 correction_lesson TEXT,
@@ -192,6 +194,11 @@ class SQLighter:
                 self.cursor.execute('SELECT schedule_notification FROM students WHERE id = %s', (account_id,))
             return bool(self.cursor.fetchone()[0])
 
+    def get_account_homework_notification(self, account_id):
+            with self.connection:
+                self.cursor.execute('SELECT homework_notification FROM students WHERE id = %s', (account_id,))
+            return bool(self.cursor.fetchone()[0])
+
     def get_account_old_mark(self, account_id):
         with self.connection:
             self.cursor.execute('SELECT old_mark FROM students WHERE id = %s', (account_id,))
@@ -220,7 +227,7 @@ class SQLighter:
 
     def add_user(self, user_id, login, password, link, school, clas, studentId):
         with self.connection:
-            return self.cursor.execute('INSERT INTO students VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',(user_id, login, password, studentId, 1, 0, 0, 0, 0, link, school, clas, 0, 0, 0, '[]','[]',0,0))
+            return self.cursor.execute('INSERT INTO students VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',(user_id, login, password, studentId, 1, 0, 0, 0, 0, link, school, clas, 0, 0, 0, 0, '[]','[]',0,0))
 
 
 
@@ -283,6 +290,10 @@ class SQLighter:
     def edit_account_schedule_notification(self, account_id, value):
         with self.connection:
             return self.cursor.execute("UPDATE students SET schedule_notification = %s WHERE id = %s", (value, account_id))
+
+    def edit_account_homework_notification(self, account_id, value):
+        with self.connection:
+            return self.cursor.execute("UPDATE students SET homework_notification = %s WHERE id = %s", (value, account_id))
 
     def edit_account_old_mark(self, account_id, value):
         with self.connection:
@@ -364,6 +375,11 @@ class SQLighter:
             self.cursor.execute('SELECT schedule_notification FROM chats WHERE id = %s', (chat_id,))
             return bool(self.cursor.fetchone()[0])
 
+    def get_chat_homework_notification(self, chat_id):
+        with self.connection:
+            self.cursor.execute('SELECT homework_notification FROM chats WHERE id = %s', (chat_id,))
+            return bool(self.cursor.fetchone()[0])
+
     def get_chat_old_mark(self, chat_id):
         with self.connection:
             self.cursor.execute('SELECT old_mark FROM chats WHERE id = %s', (chat_id,))
@@ -393,7 +409,7 @@ class SQLighter:
 
     def add_chat(self, chat_id, login, password, link, school, clas, studentId):
         with self.connection:
-            return self.cursor.execute('INSERT INTO chats VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',(chat_id, 0, 0, 0, login, password,studentId, link, school, clas, 0, 0, 0,'[]','[]',0,0))
+            return self.cursor.execute('INSERT INTO chats VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',(chat_id, 0, 0, 0, login, password,studentId, link, school, clas, 0, 0, 0, 0,'[]','[]',0,0))
 
 
 
@@ -449,6 +465,10 @@ class SQLighter:
         with self.connection:
             return self.cursor.execute("UPDATE chats SET schedule_notification = %s WHERE id = %s", (value, chat_id))
 
+    def edit_chat_homework_notification(self, chat_id, value):
+        with self.connection:
+            return self.cursor.execute("UPDATE chats SET homework_notification = %s WHERE id = %s", (value, chat_id))
+
     def edit_chat_old_mark(self, chat_id, value):
         with self.connection:
             return self.cursor.execute("UPDATE chats SET old_mark = %s WHERE id = %s", (str(value), chat_id))
@@ -497,6 +517,17 @@ class SQLighter:
     def get_chats_schedule_notification(self):
         with self.connection:
             self.cursor.execute("SELECT * FROM chats WHERE schedule_notification = %s", (1,))
+            return self.cursor.fetchall()
+
+
+    def get_accounts_homework_notification(self):
+        with self.connection:
+            self.cursor.execute("SELECT * FROM students WHERE homework_notification = %s", (1,))
+            return self.cursor.fetchall()
+
+    def get_chats_homework_notification(self):
+        with self.connection:
+            self.cursor.execute("SELECT * FROM chats WHERE homework_notification = %s", (1,))
             return self.cursor.fetchall()
 
 

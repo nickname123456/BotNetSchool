@@ -38,6 +38,13 @@ async def keyboard_settings_private(message: Message):
         keyboard.add(Text('Уведомления о новых объявлениях', {"cmd": "keyboard_announcements_notification"}), color=KeyboardButtonColor.NEGATIVE)
     
     keyboard.row()
+
+    if db.get_account_homework_notification(user_id):
+        keyboard.add(Text('Уведомления о новом д/з', {'cmd': 'keyboard_homework_notification'}), color=KeyboardButtonColor.POSITIVE)
+    else:
+        keyboard.add(Text('Уведомления о новом д/з', {'cmd': 'keyboard_homework_notification'}), color=KeyboardButtonColor.NEGATIVE)
+    
+    keyboard.row()
     keyboard.add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.SECONDARY)
 
     await message.answer('Что хочешь изменить?', keyboard=keyboard)
@@ -69,6 +76,13 @@ async def keyboard_settings_chat(message: Message):
         keyboard.add(Text('Уведомления о новых объявлениях', {'cmd': 'keyboard_announcements_notification'}), color=KeyboardButtonColor.POSITIVE)
     else:
         keyboard.add(Text('Уведомления о новых объявлениях', {'cmd': 'keyboard_announcements_notification'}), color=KeyboardButtonColor.NEGATIVE)
+    
+    keyboard.row()
+
+    if db.get_chat_homework_notification(chat_id):
+        keyboard.add(Text('Уведомления о новом д/з', {'cmd': 'keyboard_homework_notification'}), color=KeyboardButtonColor.POSITIVE)
+    else:
+        keyboard.add(Text('Уведомления о новом д/з', {'cmd': 'keyboard_homework_notification'}), color=KeyboardButtonColor.NEGATIVE)
     
     keyboard.row()
     keyboard.add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.SECONDARY)

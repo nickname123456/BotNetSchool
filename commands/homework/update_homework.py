@@ -7,6 +7,7 @@ from vkbottle import BaseStateGroup
 from datetime import datetime
 from settings import admin_id
 import logging
+import asyncio
 
 
 bp = Blueprint('update_homework') # Объявляем команду
@@ -196,21 +197,24 @@ async def private_edit_hamework(message: Message):
     try:
         # Если дз обновляют из чата
         if message.payload and 'chat' in message.payload:
+            clas = db.get_chat_class(chat_id)
+            school = db.get_chat_school(chat_id)
+
             if (lesson,) in lessons:
                 db.edit_homework(
-                    db.get_chat_school(chat_id),
-                    db.get_chat_class(chat_id),
+                    school,
+                    clas,
                     lesson,
                     homework
                 )
                 db.edit_upd_date(
-                    db.get_chat_school(chat_id),
-                    db.get_chat_class(chat_id),
+                    school,
+                    clas,
                     lesson,
                     upd_date
                 )
             else:
-                db.add_lesson_with_homework(lesson, db.get_chat_school(chat_id), db.get_chat_class(chat_id), homework, upd_date)
+                db.add_lesson_with_homework(lesson, school, clas, homework, upd_date)
             db.commit()
 
             await message.answer('Ты успешно обновил дз', keyboard=keyboard)
@@ -218,20 +222,23 @@ async def private_edit_hamework(message: Message):
 
         # Если обновляют не из чата
         else:
+            school = db.get_account_school(userInfo[0].id)
+            clas = db.get_account_class(userInfo[0].id)
+
             if (lesson,) in lessons:
                 db.edit_homework(
-                    db.get_account_school(userInfo[0].id),
-                    db.get_account_class(userInfo[0].id),
+                    school,
+                    clas,
                     lesson,
                     homework
                 )
                 db.edit_upd_date(
-                    db.get_account_school(userInfo[0].id),
-                    db.get_account_class(userInfo[0].id),
+                    school,
+                    clas,
                     lesson,
                     upd_date)
             else:
-                db.add_lesson_with_homework(lesson, db.get_account_school(userInfo[0].id), db.get_account_class(userInfo[0].id), homework, upd_date)
+                db.add_lesson_with_homework(lesson, school, clas, homework, upd_date)
             db.commit()
 
             await message.answer('Ты успешно обновил дз', keyboard=keyboard)
@@ -254,6 +261,26 @@ async def private_edit_hamework(message: Message):
     if message.payload and 'yes_update_homework_' in message.payload:
         await bp.api.messages.send(message='Админ одобрил вашу заявку на обновление дз.', user_id=user_id, keyboard=keyboard, random_id=0)
         await bp.api.messages.send(message=f'Урок: {lesson} \nБыло обновлено: {upd_date} \nЗадание: {homework}', user_id=user_id, keyboard=keyboard, random_id=0)
+    
+    
+    users_with_notification = db.get_accounts_homework_notification()
+    chats_with_notification = db.get_chats_homework_notification()
+    for i in users_with_notification:
+        i_id = i[0]
+        if db.get_account_school(i_id) == school:
+            if db.get_account_class(i_id) == clas:
+                await bp.api.messages.send(message=f'Новое домашнее задание по {lesson}!\nБыло обновлено: {upd_date}\nЗадание: {homework}', user_id=i_id, random_id=0)
+                await asyncio.sleep(1)
+
+    for i in chats_with_notification:
+        i_id = i[0]
+        if db.get_chat_school(i_id) == school:
+            if db.get_chat_class(i_id) == clas:
+                await bp.api.messages.send(message=f'Новое домашнее задание по {lesson}!\nБыло обновлено: {upd_date}\nЗадание: {homework}', peer_id=2000000000+i_id, random_id=0)
+                await asyncio.sleep(1)
+
+
+    
     await message.answer(f'Урок: {lesson} \nБыло обновлено: {upd_date} \nЗадание: {homework}', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I sent a success')
 
@@ -311,22 +338,24 @@ async def chat_edit_hamework(message: Message):
     await bp.state_dispenser.delete(peer_id) # Удаляем цепочку
 
     upd_date = f'{datetime.now().day}-{datetime.now().month}-{datetime.now().year} {datetime.now().hour}:{datetime.now().minute}'
+    school = db.get_chat_school(chat_id)
+    clas = db.get_chat_class(chat_id)
     try:
         if (lesson,) in lessons:
             db.edit_homework(
-                db.get_chat_school(chat_id),
-                db.get_chat_class(chat_id),
+                school,
+                clas,
                 lesson,
                 homework
             )
             db.edit_upd_date(
-                db.get_chat_school(chat_id),
-                db.get_chat_class(chat_id),
+                school,
+                clas,
                 lesson,
                 upd_date
             )
         else:
-            db.add_lesson_with_homework(lesson, db.get_chat_school(chat_id), db.get_chat_class(chat_id), homework, upd_date)
+            db.add_lesson_with_homework(lesson, school, clas, homework, upd_date)
         db.commit()
 
         await message.answer('Ты успешно обновил дз')
@@ -335,7 +364,22 @@ async def chat_edit_hamework(message: Message):
     except Exception as e:
         logging.exception(f'{message.peer_id}: Exception occurred')
         await message.answer(f'Произошла ошибка\n{e} Сообщи админу')
-       
+
+    users_with_notification = db.get_accounts_homework_notification()
+    chats_with_notification = db.get_chats_homework_notification()
+    for i in users_with_notification:
+        i_id = i[0]
+        if db.get_account_school(i_id) == school:
+            if db.get_account_class(i_id) == clas:
+                await bp.api.messages.send(message=f'Новое домашнее задание по {lesson}!\nБыло обновлено: {upd_date}\nЗадание: {homework}', user_id=i_id, random_id=0)
+                await asyncio.sleep(1)
+
+    for i in chats_with_notification:
+        i_id = i[0]
+        if db.get_chat_school(i_id) == school:
+            if db.get_chat_class(i_id) == clas:
+                await bp.api.messages.send(message=f'Новое домашнее задание по {lesson}!\nБыло обновлено: {upd_date}\nЗадание: {homework}', peer_id=2000000000+i_id, random_id=0)
+                await asyncio.sleep(1)
 
     await message.answer(f'Урок: {lesson} \nБыло обновлено: {upd_date} \nЗадание: {homework}', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I sent a success')
