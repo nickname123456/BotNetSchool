@@ -350,6 +350,24 @@ async def getParentReport(login, password, school, url, studentId, termId):
 
     return result
 
+async def getReportGrades(login, password, school, url, studentId, subjectId):
+    api = NetSchoolAPI(url)
+    await api.login(login, password, school, studentId)
+    reportGrades = await api.reportStudentAttendanceGrades(subjectId)
+    await api.logout()
+
+    result = []
+    for i in reportGrades.keys():
+        result.append(f'Месяц: {i} \nУченик: {reportGrades[i]["student"]}% \nСреднее по классу: {reportGrades[i]["class"]}% \nСреднее по параллели: {reportGrades[i]["parallel"]}%')
+    return result
+
+async def getSubjectsId(login, password, school, url, studentId):
+    api = NetSchoolAPI(url)
+    await api.login(login, password, school, studentId)
+    subjects = await api.getSubjectId()
+    await api.logout()
+    return subjects
+
 async def getTerms(login, password, school, url, studentId):
     api = NetSchoolAPI(url)
     await api.login(login, password, school, studentId)
