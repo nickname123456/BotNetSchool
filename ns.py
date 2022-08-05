@@ -308,6 +308,20 @@ async def getReportAverageMark(login, password, school, url, studentId):
 
     return result
 
+async def getReportAverageMarkDyn(login, password, school, url, studentId):
+    api = NetSchoolAPI(url)
+    await api.login(login, password, school, studentId)
+    reportAverageMarkDyn = await api.reportAverageMarkDyn()
+    await api.logout()
+    
+    result = []
+    for period in reportAverageMarkDyn['average'].keys():
+        result.append(f'Ср. балл ученика за {period}: {reportAverageMarkDyn["average"][period]}')
+    for period in reportAverageMarkDyn['AverageInClass'].keys():
+        result.append(f'Ср. балл класса за {period}: {reportAverageMarkDyn["AverageInClass"][period]}')
+    
+    return result
+
 async def getParentReport(login, password, school, url, studentId, termId):
     api = NetSchoolAPI(url)
     await api.login(login, password, school, studentId)
