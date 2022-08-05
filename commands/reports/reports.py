@@ -27,6 +27,8 @@ async def reports(message: Message):
         .add(Text('Информационное письмо для родителей', {'cmd': 'parentReport'}), color=KeyboardButtonColor.SECONDARY)
         .add(Text('Динамика среднего балла ученика', {'cmd': 'reportAverageMarkDyn'}), color=KeyboardButtonColor.SECONDARY)
         .row()
+        .add(Text('Итоги успеваемости и качества знаний', {'cmd': 'reportGrades'}), color=KeyboardButtonColor.SECONDARY)
+        .row()
         .add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
     )
     

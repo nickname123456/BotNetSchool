@@ -129,3 +129,41 @@ def parseAverageMarkDyn(html_page: str) -> Dict:
 		counter += 1
 	
 	return report_dict
+
+def parseReportStudentAttendanceGrades(html_page: str) -> Dict:
+	result = {}
+	html = bs4(html_page, 'lxml')
+	table = html.find_all('table', 'table-print-num chart-table chart-bars')[0]
+	
+	months = table.find_all('tr', 'chart-labels-row')[0].find_all('th')
+	for month in months[1:]:
+		result[month.text] = {'student': None, 'class': None, 'parallel': None}
+	
+	qualities = table.find_all('tr', 'chart-data-row')[0].find_all('td')
+	counter = 0
+	for quality in qualities[1:]:
+		result[list(result.keys())[counter]]['student'] = quality.text
+		counter += 1
+
+	qualities = table.find_all('tr', 'chart-data-row')[1].find_all('td')
+	counter = 0
+	for quality in qualities[1:]:
+		result[list(result.keys())[counter]]['class'] = quality.text
+		counter += 1
+	
+	qualities = table.find_all('tr', 'chart-data-row')[2].find_all('td')
+	counter = 0
+	for quality in qualities[1:]:
+		result[list(result.keys())[counter]]['parallel'] = quality.text
+		counter += 1
+	
+	return result
+
+def parseSubjectId(html_page) -> Dict:
+	result = {}
+	html = bs4(html_page, 'lxml')
+	subjectsId = html.find_all(name = 'select', attrs={'name': 'SCLID'})
+	subjectsId = subjectsId[0].find_all('option')
+	for subjectId in subjectsId:
+		result[subjectId.text] = subjectId.attrs['value']
+	return result
