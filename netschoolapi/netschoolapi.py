@@ -463,7 +463,39 @@ class NetSchoolAPI:
                 'DDT': f"{end.day}.{end.month}.{end.year}",
             })
         return parser.parseAverageMark(response.text)
-    
+
+    async def reportAverageMarkDyn(self):
+        period = await self.get_period()
+        start = datetime.strptime(period['filterSources'][2]['range']['start'], '%Y-%m-%dT%H:%M:%S')
+        end = datetime.strptime(period['filterSources'][2]['range']['end'], '%Y-%m-%dT%H:%M:%S')
+        
+        response_with_cookies = await self._client.post(
+            'asp/Reports/ReportStudentAverageMarkDyn.asp',
+            data = {
+                'AT': self._at,
+                'VER': self._ver,
+                'RPNAME': 'Динамика среднего балла',
+                'RPTID': 'StudentAverageMarkDyn',
+                'LoginType': '0',
+                'SID': self._student_id,
+                'ADT': f"{start.day}.{start.month}.{start.year}",
+                'DDT': f"{end.day}.{end.month}.{end.year}",
+            })
+        self._client.cookies.extract_cookies(response_with_cookies)
+
+        response = await self._client.post(
+            'asp/Reports/StudentAverageMarkDyn.asp',
+            data = {
+                'AT': self._at,
+                'VER': self._ver,
+                'LoginType': '0',
+                'RPTID' :'StudentAverageMarkDyn',
+                'SID': self._student_id,
+                'ADT': f"{start.day}.{start.month}.{start.year}",
+                'DDT': f"{end.day}.{end.month}.{end.year}",
+            })
+        return parser.parseAverageMarkDyn(response.text)
+
     async def getStudents(self):
         response = await self._client.get('webapi/student/diary/init')
         diary_info = response.json()

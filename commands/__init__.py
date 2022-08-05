@@ -6,7 +6,7 @@ from .schedule import keyboard_schedule, schedule_download, schedule_for_day
 from .settings import keyboard_announcements_notification, keyboard_mark_notification, keyboard_settings, keyboard_schedule_notification, keyboard_homework_notification
 from .announcements import announcements
 from .admin import admin_panel
-from .reports import reports, reportTotal, reportAverageMark, parentReport
+from .reports import reports, reportTotal, reportAverageMark, parentReport, reportAverageMarkDyn
 from .change_anything import change_anything_kb, change_student
 
 
@@ -40,6 +40,7 @@ bps = [not_found.bp,
        reportTotal.bp,
        reportAverageMark.bp,
        parentReport.bp,
+       reportAverageMarkDyn.bp,
        change_anything_kb.bp,
        change_student.bp
        ]
