@@ -169,7 +169,7 @@ async def getMarkNotify(login, password, school, url, studentId, oldmarks):
                     if 'mark' in assignment.keys() and 'mark' in assignment['mark']:
                         if assignment['mark']['mark']:
                             date = datetime.datetime.strptime(assignment['dueDate'], '%Y-%m-%dT%H:%M:%S')
-                            result = html2markdown.convert(f"Новая оценка по {lesson['subjectName']}: {assignment['mark']['mark']} за {assignment['assignmentName']}. Дата: {date.day}.{date.month}")
+                            result = html2markdown.convert(f"Новая оценка по предмету {lesson['subjectName']}: {assignment['mark']['mark']} за {assignment['assignmentName']}. Дата: {date.day}.{date.month}.{date.year}")
                             clean = re.compile(r'([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
                             result = re.sub(clean, '', result)
                             marks.append(result)
@@ -200,7 +200,7 @@ async def getAnnouncementsNotify(login, password, school, url, studentId, old_an
         announcement = ''
         needed_announcements = []
         for i in announcements:
-            announcement = "Дата: " + i['postDate'] +"\n"+ i['name'] + ":" + i['description']
+            announcement = f"❗Новое объявление \nДата: {i['postDate']}\n {i['name']}: {i['description']}"
 
             announcement = re.sub(r'\<[^>]*\>', '', announcement)
 
