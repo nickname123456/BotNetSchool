@@ -49,6 +49,7 @@ async def registration2(message: Message):
             ctx.set('link', link) # Загружаем во временное хранилище ссылку
 
             schools = await get_school(link)
+            await bp.state_dispenser.set(message.peer_id, NewaccountState.INSCHOOL)
             await message.answer('📋Введи ID школы из списка ниже(ID - Школа)')
             await asyncio.sleep(2)
             text = ''
@@ -61,7 +62,6 @@ async def registration2(message: Message):
                 await message.answer('✅Всё!')
             else:
                 await message.answer(text)
-            await bp.state_dispenser.set(message.peer_id, NewaccountState.INSCHOOL)
         except Exception as e:
             print(traceback.print_exc())
             await message.answer(f'❌Ошибка: {e}\nПопробуйте еще раз или обратитесь к [kirillarz|разработчику]')
@@ -72,7 +72,7 @@ async def registration2(message: Message):
 
 @bp.on.message(state=NewaccountState.INSCHOOL)
 async def registration3(message: Message):
-    if message.text:
+    if message.text.isdigit():
         ctx.set('school', message.text) # Загружаем во временное хранилище школу
 
         await message.answer('🖊Введите свой класс (Пример: "8б").')
@@ -126,7 +126,14 @@ async def private_registration6(message: Message):
         else:
             login+=i
 
-    studentId = await ns.getCurrentStudentId(login, password, school, link)
+    try:
+        studentId = await ns.getCurrentStudentId(login, password, school, link)
+        logging.info(f'{message.peer_id}: Login in NetSchool')
+    except:
+        logging.exception(f'{message.peer_id}: Exception occurred')
+        await message.answer('Неправильный логин или пароль!')
+        return
+
     try:
         # Если юзера нет в бд:
         if db.get_account_isFirstLogin(userInfo[0].id) is None:
@@ -153,26 +160,6 @@ async def private_registration6(message: Message):
         logging.info(f'{message.peer_id}: Changed database: studentId')
         db.commit()
 
-
-    
-    login = db.get_account_login(userInfo[0].id)
-    password = db.get_account_password(userInfo[0].id)
-    school = db.get_account_school(userInfo[0].id)
-    link = db.get_account_link(userInfo[0].id)
-    try:
-        #Авторезируемся в Сетевом Городе
-        await ns.login(
-            login,
-            password,
-            school,
-            link
-        )
-        logging.info(f'{message.peer_id}: Login in NetSchool')
-    except:
-        logging.exception(f'{message.peer_id}: Exception occurred')
-        await message.answer('Неправильный логин или пароль!')
-        return
-
     db.edit_account_correctData(userInfo[0].id, 1) # Делаем пометку в бд, что у юзера логин и пароль верны
     db.commit()
     logging.info(f'{message.peer_id}: We make a note in the database that the user login and password are correct')
@@ -182,7 +169,6 @@ async def private_registration6(message: Message):
         .add(Text('Назад', {'cmd': 'menu'}))
     )
 
-    
     await bp.state_dispenser.delete(message.from_id)
     await message.answer(f'{userInfo[0].first_name}, ты успешно зашел в систему под логином: {login}', keyboard=keyboard)
     logging.info(f'{message.peer_id}: Start COMPLETED')
@@ -215,7 +201,14 @@ async def chat_registration6(message: Message):
         else:
             login+=i
             
-    studentId = await ns.getCurrentStudentId(login, password, school, link)
+    try:
+        studentId = await ns.getCurrentStudentId(login, password, school, link)
+        logging.info(f'{message.peer_id}: Login in NetSchool')
+    except:
+        logging.exception(f'{message.peer_id}: Exception occurred')
+        await message.answer('Неправильный логин или пароль!')
+        return
+
     try:
         # Если юзера нет в бд:
         if db.get_chat_id(chat_id) is None:
@@ -241,28 +234,6 @@ async def chat_registration6(message: Message):
         db.edit_chat_studentId(chat_id, studentId) # Редактируем бд под новые данные
         logging.info(f'{message.peer_id}: Changed database: studentId')
         db.commit()
-
-
-    
-    login = db.get_chat_login(chat_id)
-    password = db.get_chat_password(chat_id)
-    school = db.get_chat_school(chat_id)
-    link = db.get_chat_link(chat_id)
-    try:
-        #Авторезируемся в Сетевом Городе
-        await ns.login(
-            login,
-            password,
-            school,
-            link
-        )
-        logging.info(f'{message.peer_id}: Login in NetSchool')
-    except:
-        logging.exception(f'{message.peer_id}: Exception occurred')
-        await message.answer('Неправильный логин или пароль!')
-        return
-
-    logging.info(f'{message.peer_id}: We make a note in the database that the user login and password are correct')
 
     keyboard = (
         Keyboard()

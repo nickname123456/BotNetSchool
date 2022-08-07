@@ -20,13 +20,12 @@ async def notification(bot):
                     db.get_account_password(user_id),
                     db.get_account_school(user_id),
                     db.get_account_link(user_id),
-                    db.get_account_studentId(user_id),
                     db.get_account_old_mark(user_id)
                 )
 
                 db.edit_account_old_mark(user_id, marks)
                 db.commit()
-                for mark in result:
+                for mark in result[-15:]:
                     await bot.api.messages.send(message=mark, user_id=user_id, random_id=0)
                     await asyncio.sleep(1)	
             #except Exception as e:
@@ -68,13 +67,12 @@ async def notification(bot):
                 db.get_chat_password(chat_id),
                 db.get_chat_school(chat_id),
                 db.get_chat_link(chat_id),
-                db.get_chat_studentId(chat_id),
                 db.get_chat_old_mark(chat_id)
             )
 
             db.edit_chat_old_mark(chat_id, marks)
             db.commit()
-            for mark in result:
+            for mark in result[-15:]:
                 await bot.api.messages.send(message=mark, peer_id=2000000000+chat_id, random_id=0)
                 await asyncio.sleep(1)
             #except Exception as e:
