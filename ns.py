@@ -152,27 +152,38 @@ async def get_marks(login, password, school, url, studentId, subject = None):
 
 
 
-async def getMarkNotify(login, password, school, url, studentId, oldmarks):
+async def getMarkNotify(login, password, school, url, oldmarks):
     api = NetSchoolAPI(url)
-    await api.login(login, password, school, studentId)
-    period = await api.get_period()
-    period = period['filterSources'][2]['defaultValue'].split(' - ')
-    start = datetime.datetime.strptime(period[0], '%Y-%m-%dT%H:%M:%S.0000000')
-    end = datetime.datetime.strptime(period[1], '%Y-%m-%dT%H:%M:%S.0000000')
-    diary = await api.diary(start=start, end=end)
+    await api.login(login, password, school)
+    students = await api.getStudents()
     await api.logout()
+
+    
     marks = []
-    for days in diary['weekDays']:
-        for lesson in days['lessons']:
-            if 'assignments' in lesson.keys():
-                for assignment in lesson['assignments']:
-                    if 'mark' in assignment.keys() and 'mark' in assignment['mark']:
-                        if assignment['mark']['mark']:
-                            date = datetime.datetime.strptime(assignment['dueDate'], '%Y-%m-%dT%H:%M:%S')
-                            result = html2markdown.convert(f"Новая оценка по предмету {lesson['subjectName']}: {assignment['mark']['mark']} за {assignment['assignmentName']}. Дата: {date.day}.{date.month}.{date.year}")
-                            clean = re.compile(r'([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
-                            result = re.sub(clean, '', result)
-                            marks.append(result)
+    for student in students:
+        studentId = student['studentId']
+        studentNick = student['nickName']
+
+        api = NetSchoolAPI(url)
+        await api.login(login, password, school, studentId)
+        period = await api.get_period()
+        period = period['filterSources'][2]['defaultValue'].split(' - ')
+        start = datetime.datetime.strptime(period[0], '%Y-%m-%dT%H:%M:%S.0000000')
+        end = datetime.datetime.strptime(period[1], '%Y-%m-%dT%H:%M:%S.0000000')
+        diary = await api.diary(start=start, end=end)
+        await api.logout()
+
+        for days in diary['weekDays']:
+            for lesson in days['lessons']:
+                if 'assignments' in lesson.keys():
+                    for assignment in lesson['assignments']:
+                        if 'mark' in assignment.keys() and 'mark' in assignment['mark']:
+                            if assignment['mark']['mark']:
+                                date = datetime.datetime.strptime(assignment['dueDate'], '%Y-%m-%dT%H:%M:%S')
+                                result = html2markdown.convert(f"У ученика {studentNick} новая оценка по предмету {lesson['subjectName']}: {assignment['mark']['mark']} за {assignment['assignmentName']}. Дата: {date.day}.{date.month}.{date.year}")
+                                clean = re.compile(r'([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
+                                result = re.sub(clean, '', result)
+                                marks.append(result)
 
     difference = []
     for item in marks:
