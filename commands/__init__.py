@@ -5,7 +5,7 @@ from .marks import marks, correction_mark_choice_lesson, correction_mark_choice_
 from .schedule import keyboard_schedule, schedule_download, schedule_for_day
 from .settings import keyboard_announcements_notification, keyboard_mark_notification, keyboard_settings, keyboard_schedule_notification, keyboard_homework_notification
 from .announcements import announcements
-from .admin import admin_panel
+from .admin import admin_panel, give_adm, all_users, view_user
 from .reports import reports, reportTotal, reportAverageMark, parentReport, reportAverageMarkDyn, reportGrades
 from .change_anything import change_anything_kb, change_student
 
@@ -36,6 +36,9 @@ bps = [not_found.bp,
        homework_for_day.bp,
        keyboard_schedule_notification.bp,
        admin_panel.bp,
+       give_adm.bp,
+       all_users.bp,
+       view_user.bp,
        reports.bp,
        reportTotal.bp,
        reportAverageMark.bp,
