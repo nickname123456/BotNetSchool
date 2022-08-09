@@ -27,7 +27,8 @@ class SQLighter:
                 old_mark TEXT,
                 old_announcements TEXT,
                 correction_lesson TEXT,
-                correction_mark INT
+                correction_mark INT,
+                isAdmin INT
                 )""")
         
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS schedule ( 
@@ -219,15 +220,30 @@ class SQLighter:
             self.cursor.execute('SELECT correction_mark FROM students WHERE id = %s', (account_id,))
             return self.cursor.fetchone()[0]
 
+    def get_account_isAdmin(self, account_id):
+        with self.connection:
+            self.cursor.execute('SELECT isAdmin FROM students WHERE id = %s', (account_id,))
+            return self.cursor.fetchone()[0]
+
     def get_account_any_with_filter(self, column, filter_name, filter_value):
         with self.connection:
             self.cursor.execute(f'SELECT {column} FROM students WHERE {filter_name} = %s', (filter_value,))
             return self.cursor.fetchall()
 
+    def get_account_all(self):
+        with self.connection:
+            self.cursor.execute('SELECT * FROM students')
+            return self.cursor.fetchall()
+
+    def get_account_all_with_id(self, id):
+        with self.connection:
+            self.cursor.execute('SELECT * FROM students WHERE id = %s', (id,))
+            return self.cursor.fetchall()
+
 
     def add_user(self, user_id, login, password, link, school, clas, studentId):
         with self.connection:
-            return self.cursor.execute('INSERT INTO students VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',(user_id, login, password, studentId, 1, 0, 0, 0, 0, link, school, clas, 0, 0, 0, 0, '[]','[]',0,0))
+            return self.cursor.execute('INSERT INTO students VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',(user_id, login, password, studentId, 1, 0, 0, 0, 0, link, school, clas, 0, 0, 0, 0, '[]','[]',0,0,0))
 
 
 
@@ -310,6 +326,10 @@ class SQLighter:
     def edit_account_correction_mark(self, account_id, value):
         with self.connection:
             return self.cursor.execute("UPDATE students SET correction_mark = %s WHERE id = %s", (str(value), account_id))
+    
+    def edit_account_isAdmin(self, account_id, value):
+        with self.connection:
+            return self.cursor.execute("UPDATE students SET isAdmin = %s WHERE id = %s", (str(value), account_id))
 
 
 
