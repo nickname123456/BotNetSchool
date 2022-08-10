@@ -235,6 +235,11 @@ class SQLighter:
             self.cursor.execute('SELECT * FROM students')
             return self.cursor.fetchall()
 
+    def get_account_all_admins(self):
+        with self.connection:
+            self.cursor.execute('SELECT * FROM students WHERE isAdmin = 1')
+            return self.cursor.fetchall()
+
     def get_account_all_with_id(self, id):
         with self.connection:
             self.cursor.execute('SELECT * FROM students WHERE id = %s', (id,))

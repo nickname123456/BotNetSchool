@@ -31,7 +31,7 @@ async def admpanel(message: Message, userId=None):
         .add(Text('Назад', {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
     )
 
-    admins = [user for user in db.get_account_all() if user[20] == 1]
+    admins = db.get_account_all_admins()
     admins_id = [admin[0] for admin in admins]
     admins = await bp.api.users.get(admins_id)
     admins = [f'{admin.first_name} {admin.last_name}' for admin in admins]
