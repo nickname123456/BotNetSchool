@@ -1,6 +1,5 @@
-from vkbottle.bot import Message
+from vkbottle.bot import Message, Blueprint
 from vkbottle import Keyboard, KeyboardButtonColor, Text
-from vkbottle.bot import Blueprint
 import logging
 from PostgreSQLighter import db
 from ns import get_diary, get_week
@@ -41,22 +40,22 @@ async def keyboard_homework_for_day(message: Message):
 @bp.on.private_message(payload={'cmd': 'homework_for_day'})
 async def private_homework_for_day(message: Message):
     logging.info(f'{message.peer_id}: I get homework_for_day')
-    userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
+    userId = message.from_id # ID юзера
     
-    #Если дневника нет в списке
-    if db.get_account_correctData(userInfo[0].id) != 1:
+    #Если логин или пароль не правильнй
+    if db.get_account_correctData(userId) != 1:
         await message.answer('Ты не зарегистрирован! \nНапиши "Начать"\n Или у тебя неверный логин/пароль')
         logging.info(f'{message.peer_id}: User not found in db')
         return
 
     try:
-        diary = await get_diary(
-            db.get_account_login(userInfo[0].id),
-            db.get_account_password(userInfo[0].id),
+        diary = await get_diary( # Получаем дневник
+            db.get_account_login(userId),
+            db.get_account_password(userId),
             get_week(),
-            db.get_account_school(userInfo[0].id),
-            db.get_account_link(userInfo[0].id),
-            db.get_account_studentId(userInfo[0].id)
+            db.get_account_school(userId),
+            db.get_account_link(userId),
+            db.get_account_studentId(userId)
         )
         logging.info(f'{message.peer_id}: Get diary in NetSchool')
     except netschoolapi.errors.AuthError:
@@ -75,6 +74,7 @@ async def private_homework_for_day(message: Message):
     elif 'Пятница' in message.text:
         day = 4
 
+    # Перебираем уроки
     for lesson in diary['weekDays'][day]['lessons']:
         lesson = lesson['subjectName']
         if lesson == 'Проектная деятельность':
@@ -83,15 +83,15 @@ async def private_homework_for_day(message: Message):
         try:
             # Получаем дз
             homework = db.get_homework(
-                db.get_account_school(userInfo[0].id),
-                db.get_account_class(userInfo[0].id),
+                db.get_account_school(userId),
+                db.get_account_class(userId),
                 lesson
             )
 
             # Получаем дату обновления дз
             upd_date = db.get_upd_date(
-                db.get_account_school(userInfo[0].id),
-                db.get_account_class(userInfo[0].id),
+                db.get_account_school(userId),
+                db.get_account_class(userId),
                 lesson
             )
         except TypeError:
@@ -114,7 +114,7 @@ async def chat_homework_for_day(message: Message):
     chat_id = message.chat_id
 
     try:
-        diary = await get_diary(
+        diary = await get_diary( # Получаем дневник
             db.get_chat_login(chat_id),
             db.get_chat_password(chat_id),
             get_week(),
@@ -139,6 +139,7 @@ async def chat_homework_for_day(message: Message):
     elif 'Пятница' in message.text:
         day = 4
 
+    # Перебираем уроки
     for lesson in diary['weekDays'][day]['lessons']:
         lesson = lesson['subjectName']
         lesson = lessons_and_their_reduction[lesson]

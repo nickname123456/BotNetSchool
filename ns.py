@@ -83,16 +83,16 @@ async def get_diary(login, password, period, school, link, studentId):
 
 # Получить объявления
 async def get_announcements(login, password, amount, school, link, studentId):
-    api = NetSchoolAPI(link)
+    api = NetSchoolAPI(link) # Логинимся в СГО
     await api.login(
         login,
         password,
         school,
         studentId)
-    announcements = await api.announcements()
-    await api.logout()
+    announcements = await api.announcements() # Получаем объявления
+    await api.logout() # Выходим из СГО
 
-    announcements = announcements[:int(amount)]
+    announcements = announcements[:int(amount)] # Обрезаем только нужные объявления
 
     # Если есть объявления:
     if announcements:
@@ -114,14 +114,15 @@ async def get_announcements(login, password, amount, school, link, studentId):
 
 
 async def get_marks(login, password, school, url, studentId, subject = None):
-    api = NetSchoolAPI(url)
+    api = NetSchoolAPI(url) # Логинимся в СГО
     await api.login(login,password,school,studentId)
-    period = await api.get_period()
+    period = await api.get_period() # Получаем текущий триместр/четверть
     period = period['filterSources'][2]['defaultValue'].split(' - ')
     start = datetime.datetime.strptime(period[0], '%Y-%m-%dT%H:%M:%S.0000000')
     end = datetime.datetime.strptime(period[1], '%Y-%m-%dT%H:%M:%S.0000000')
-    diary = await api.diary(start=start, end=end)
-    await api.logout()
+    diary = await api.diary(start=start, end=end) # Получаем дневник
+    await api.logout() # Выходим из СГО
+    # Перебираем оценки
     marks = {}
     for days in diary['weekDays']:
         for lesson in days['lessons']:
@@ -153,26 +154,27 @@ async def get_marks(login, password, school, url, studentId, subject = None):
 
 
 async def getMarkNotify(login, password, school, url, oldmarks):
-    api = NetSchoolAPI(url)
+    api = NetSchoolAPI(url) # Логинимся в СГО
     await api.login(login, password, school)
-    students = await api.getStudents()
-    await api.logout()
+    students = await api.getStudents() # Получаем детей, привязанных к аккаунту СГО
+    await api.logout() # Выходим из СГО
 
     
     marks = []
-    for student in students:
+    for student in students: # Перебираем детей
         studentId = student['studentId']
         studentNick = student['nickName']
 
-        api = NetSchoolAPI(url)
+        api = NetSchoolAPI(url) # Логинимся в СГО
         await api.login(login, password, school, studentId)
-        period = await api.get_period()
+        period = await api.get_period() # Получаем текущий триместр/четверть
         period = period['filterSources'][2]['defaultValue'].split(' - ')
         start = datetime.datetime.strptime(period[0], '%Y-%m-%dT%H:%M:%S.0000000')
         end = datetime.datetime.strptime(period[1], '%Y-%m-%dT%H:%M:%S.0000000')
-        diary = await api.diary(start=start, end=end)
-        await api.logout()
+        diary = await api.diary(start=start, end=end) # Получаем весь дневник за период/триместр
+        await api.logout() # Выходим из СГО
 
+        # Перебираем все оценки
         for days in diary['weekDays']:
             for lesson in days['lessons']:
                 if 'assignments' in lesson.keys():
@@ -184,7 +186,7 @@ async def getMarkNotify(login, password, school, url, oldmarks):
                                 clean = re.compile(r'([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
                                 result = re.sub(clean, '', result)
                                 marks.append(result)
-
+    # Смотрим какие оценки новые
     difference = []
     for item in marks:
         try:
@@ -200,10 +202,10 @@ async def getMarkNotify(login, password, school, url, oldmarks):
 
 
 async def getAnnouncementsNotify(login, password, school, url, studentId, old_announcements):
-    api = NetSchoolAPI(url)
+    api = NetSchoolAPI(url) # Логинимся в СГО
     await api.login(login, password, school, studentId)
-    announcements = await api.announcements()
-    await api.logout()
+    announcements = await api.announcements() # Получаем все объявления
+    await api.logout() # Выходим из СГО
 
     # Если есть объявления:
     if announcements:
@@ -216,7 +218,7 @@ async def getAnnouncementsNotify(login, password, school, url, studentId, old_an
             announcement = re.sub(r'\<[^>]*\>', '', announcement)
 
             needed_announcements.append(announcement)
-
+    # Смотрим какие объявления новые
     difference = []
     try:
         for item in needed_announcements:
@@ -233,40 +235,42 @@ async def getAnnouncementsNotify(login, password, school, url, studentId, old_an
 
 
 async def correction_mark(login, password, school, url, studentId, subject, mark):
-    all_marks = await get_marks(login, password, school, url, studentId, subject)
+    all_marks = await get_marks(login, password, school, url, studentId, subject) # Получаем текущие оценки по этому предмету
 
-    if len(all_marks) != 0:
-        average_mark = float(round(sum(all_marks) / len(all_marks), 2))
+    if len(all_marks) != 0: # Если есть оценки
+        average_mark = float(round(sum(all_marks) / len(all_marks), 2)) # Считаем ср. балл
     else:
-        average_mark = 0.0
+        average_mark = 0.0 # Ср. балл = 0
 
-    lower_threshold = float(mark) - 0.4
-    len_5 = 0
-    len_4 = 0
-    len_3 = 0
+    lower_threshold = float(mark) - 0.4 # Считаем нижний порог
+    len_5 = 0 # Кол-во пятерок
+    len_4 = 0 # Кол-во четверок
+    len_3 = 0 # Кол-во троек
 
-    if mark == 5:
-        corrective_marks = [5]
-    elif mark == 4:
-        corrective_marks = [5,4]
-    elif mark == 3:
-        corrective_marks = [5,4,3]
+    if mark == 5: # Если нужна пятерка
+        corrective_marks = [5] # Исправлять можно только пятерками
+    elif mark == 4: # Если нужна четверка
+        corrective_marks = [5,4] # Нужно исправлять пятерками и четверками
+    elif mark == 3: # Если нужна тройка
+        corrective_marks = [5,4,3] # исправлять можно пятерками, четверками и тройками
 
-    if average_mark >= lower_threshold:
-        return 'У тебя и так норм оценка'
+    if average_mark >= lower_threshold: # если оценка уже нужная или выше
+        return 'У тебя и так оценка, которая тебе нужна'
     
-    for i in corrective_marks:
-        all_marks = await get_marks(login, password, school, url, studentId, subject)
+    for i in corrective_marks: # Перебираем оценки, которыми можно исправлять
+        all_marks = await get_marks(login, password, school, url, studentId, subject) # Получаем все текущие оценки
 
+         # Считаем ср. балл
         if len(all_marks) != 0:
             average_mark = float(round(sum(all_marks) / len(all_marks), 2))
         else:
             average_mark = 0.0
         
-        while average_mark <= lower_threshold:
-            all_marks.append(i)
-            average_mark = float(round(sum(all_marks) / len(all_marks), 2))
+        while average_mark <= lower_threshold: # Пока ср. балл ниже нужной оценки
+            all_marks.append(i) # добавляем ко всем оценкам новую
+            average_mark = float(round(sum(all_marks) / len(all_marks), 2)) # Считаем ср. балл
 
+            # Добавляем к кол-во нужных оценок еще одну
             if i == 5:
                 len_5 += 1
             elif i == 4:
@@ -279,11 +283,12 @@ async def correction_mark(login, password, school, url, studentId, subject, mark
 
 
 async def getReportTotal(login, password, school, url, studentId):
-    api = NetSchoolAPI(url)
+    api = NetSchoolAPI(url) # Логинимся в СГО
     await api.login(login, password, school, studentId)
-    reportTotal = await api.reportTotal()
-    await api.logout()
+    reportTotal = await api.reportTotal() # Получаем отчет
+    await api.logout() # Выходим из СГО
     result = {}
+    # Приводим в нужный вид
     for period in reportTotal.keys():
         if period == 'year': result[period] = f'Оценки за год:'
         else: result[period] = f'Оценки за {period} триместр/четверть:'
@@ -294,15 +299,17 @@ async def getReportTotal(login, password, school, url, studentId):
             else:
                 result[period] += f'\n📖{i}: {reportTotal[period][i]}'
 
+    # Предупреждение
     result['Warning'] = '⚠️Внимание⚠️ \nЕсли у вас триместры, то оценки за год стоят под названием "Оценки за 4 триместр/четверть"'
     return result
 
 async def getReportAverageMark(login, password, school, url, studentId):
-    api = NetSchoolAPI(url)
+    api = NetSchoolAPI(url) # Логинимся в СГО
     await api.login(login, password, school, studentId)
-    reportAverageMark = await api.reportAverageMark()
-    await api.logout()
+    reportAverageMark = await api.reportAverageMark() # Получаем отчет
+    await api.logout() # Выходим из СГО
     
+    # Приводим в нужный вид
     result = ['Вот твой средний балл на текущий триместр/четверть:', 'Вот средний балл твоего класса на текущий триместр/четверть:']
 
     for i in reportAverageMark['average'].keys():
@@ -320,11 +327,12 @@ async def getReportAverageMark(login, password, school, url, studentId):
     return result
 
 async def getReportAverageMarkDyn(login, password, school, url, studentId):
-    api = NetSchoolAPI(url)
+    api = NetSchoolAPI(url) # Логинимся в СГО
     await api.login(login, password, school, studentId)
-    reportAverageMarkDyn = await api.reportAverageMarkDyn()
-    await api.logout()
+    reportAverageMarkDyn = await api.reportAverageMarkDyn() # Получаем отчет
+    await api.logout() # Выходим из СГО
     
+    # Приводим в нужный вид
     result = []
     for period in reportAverageMarkDyn['average'].keys():
         result.append(f'Ср. балл ученика за {period}: {reportAverageMarkDyn["average"][period]}')
@@ -334,13 +342,13 @@ async def getReportAverageMarkDyn(login, password, school, url, studentId):
     return result
 
 async def getParentReport(login, password, school, url, studentId, termId):
-    api = NetSchoolAPI(url)
+    api = NetSchoolAPI(url) # Логинимся в СГО
     await api.login(login, password, school, studentId)
-    parentReport = await api.parentReport(termId)
-    await api.logout()
+    parentReport = await api.parentReport(termId) # Получаем отчет
+    await api.logout() # Выходим из СГО
     
     result = []
-
+    # Приводим в нужный вид
     for subject in parentReport['subjects'].keys():
         if subject in lessons_and_their_smiles:
             result.append(f"{lessons_and_their_smiles[subject]}{subject}:")
@@ -362,49 +370,50 @@ async def getParentReport(login, password, school, url, studentId, termId):
     return result
 
 async def getReportGrades(login, password, school, url, studentId, subjectId):
-    api = NetSchoolAPI(url)
+    api = NetSchoolAPI(url) # Логинимся в СГО
     await api.login(login, password, school, studentId)
-    reportGrades = await api.reportStudentAttendanceGrades(subjectId)
-    await api.logout()
+    reportGrades = await api.reportStudentAttendanceGrades(subjectId) # Получаем отчет
+    await api.logout() # Выходим из СГО
 
+    # Приводим в нужный вид
     result = []
     for i in reportGrades.keys():
         result.append(f'Месяц: {i} \nУченик: {reportGrades[i]["student"]}% \nСреднее по классу: {reportGrades[i]["class"]}% \nСреднее по параллели: {reportGrades[i]["parallel"]}%')
     return result
 
 async def getSubjectsId(login, password, school, url, studentId):
-    api = NetSchoolAPI(url)
+    api = NetSchoolAPI(url) # Логинимся в СГО
     await api.login(login, password, school, studentId)
-    subjects = await api.getSubjectId()
-    await api.logout()
+    subjects = await api.getSubjectId() # Получаем ID предмета
+    await api.logout() # Выходим из СГО
     return subjects
 
 async def getTerms(login, password, school, url, studentId):
-    api = NetSchoolAPI(url)
+    api = NetSchoolAPI(url) # Логинимся в СГО
     await api.login(login, password, school, studentId)
-    terms = await api.getTerms()
-    await api.logout()
+    terms = await api.getTerms() # Получаем все триместры/четверти
+    await api.logout() # Выходим из СГО
     return terms
 
 async def getStudents(login, password, school, url, studentId):
-    api = NetSchoolAPI(url)
+    api = NetSchoolAPI(url) # Логинимся в СГО
     await api.login(login, password, school, studentId)
     students = await api.getStudents()
-    await api.logout()
+    await api.logout() # Выходим из СГО
     return students
 
 async def getCurrentStudentId(login, password, school, url, studentId=None):
-    api = NetSchoolAPI(url)
+    api = NetSchoolAPI(url) # Логинимся в СГО
     await api.login(login, password, school, studentId)
-    studentId = await api.getCurrentStudentId()
-    await api.logout()
+    studentId = await api.getCurrentStudentId() # Получаем ID выбранного ребенка
+    await api.logout() # Выходим из СГО
     return studentId
 
 async def getSettings(login, password, school, url, studentId, clas):
-    api = NetSchoolAPI(url)
+    api = NetSchoolAPI(url) # Логинимся в СГО
     await api.login(login, password, school, studentId)
-    settings = await api.userInfo()
-    await api.logout()
+    settings = await api.userInfo() # Получаем личную инфу из СГО
+    await api.logout() # Выходим из СГО
     result = '🔐Твои личные данные из СГО:\n\n'
     result +=  f'Школа: {school}\n'
     result +=  f'Класс: {clas}\n'

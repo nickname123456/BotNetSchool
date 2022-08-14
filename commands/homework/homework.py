@@ -1,5 +1,4 @@
-from vkbottle.bot import Message
-from vkbottle.bot import Blueprint
+from vkbottle.bot import Message, Blueprint
 from PostgreSQLighter import db
 import logging
 
@@ -12,19 +11,19 @@ bp = Blueprint('homework') # Объявляем команду
 @bp.on.private_message(payload={'cmd': 'homework'})
 async def private_homework(message: Message):
     logging.info(f'{message.peer_id}: I get homework')
-    userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
+    userId = message.from_id # ID юзера
     try:
         # Получаем дз
         homework = db.get_homework(
-            db.get_account_school(userInfo[0].id),
-            db.get_account_class(userInfo[0].id),
+            db.get_account_school(userId),
+            db.get_account_class(userId),
             message.text
         )
 
         # Получаем дату обновления дз
         upd_date = db.get_upd_date(
-            db.get_account_school(userInfo[0].id),
-            db.get_account_class(userInfo[0].id),
+            db.get_account_school(userId),
+            db.get_account_class(userId),
             message.text
         )
     except TypeError:

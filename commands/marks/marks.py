@@ -1,7 +1,6 @@
 import asyncio
 from typing import Text
-from vkbottle.bot import Message
-from vkbottle.bot import Blueprint
+from vkbottle.bot import Message, Blueprint
 from PostgreSQLighter import db
 from ns import get_marks
 from vkbottle import Keyboard, KeyboardButtonColor, Text
@@ -17,9 +16,7 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр сообще
 @bp.on.private_message(text = 'оценки')
 async def private_marks(message: Message):
     logging.info(f'{message.peer_id}: I get marks')
-    # Информация о юзере
-    userInfo = await bp.api.users.get(message.from_id) 
-    user_id = userInfo[0].id
+    user_id = message.from_id # ID юзера
 
     #Создаем клавиатуру
     keyboard = (
@@ -38,7 +35,7 @@ async def private_marks(message: Message):
             db.get_account_password(user_id),
             db.get_account_school(user_id),
             db.get_account_link(user_id),
-            db.get_account_studentId(userInfo[0].id)
+            db.get_account_studentId(user_id)
         ), 
         keyboard=keyboard
     )

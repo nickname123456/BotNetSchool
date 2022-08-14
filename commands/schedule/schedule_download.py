@@ -1,8 +1,6 @@
-from vkbottle.bot import Message
-from vkbottle.bot import Blueprint
+from vkbottle.bot import Message, Blueprint
 from PostgreSQLighter import db
-from vkbottle import CtxStorage
-from vkbottle import BaseStateGroup
+from vkbottle import CtxStorage, BaseStateGroup
 import logging
 import asyncio
 from vkbottle import Keyboard, KeyboardButtonColor, Text, EMPTY_KEYBOARD
@@ -135,8 +133,7 @@ async def itsnotmyschool2_schedule_download(message: Message):
 @bp.on.private_message(state=ScheduleData.CLAS)
 async def class_schedule_download(message: Message):
     logging.info(f'{message.peer_id}: I get itsmyschool in schedule_download')
-    userInfo = await bp.api.users.get(message.from_id)
-    userId = userInfo[0].id
+    userId = message.from_id # ID юзера
 
     if message.payload is None:
         link = ctx.get('link')

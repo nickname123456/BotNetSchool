@@ -3,11 +3,9 @@ from vkbottle.bot import Message, Blueprint
 from PostgreSQLighter import db
 from ns import get_school
 import traceback
-from vkbottle import Keyboard,  Text
-from vkbottle import BaseStateGroup
+from vkbottle import BaseStateGroup, CtxStorage, Keyboard, Text
 import logging
 import ns
-from vkbottle import CtxStorage
 
 bp = Blueprint('registration')
 

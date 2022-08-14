@@ -1,5 +1,4 @@
-from vkbottle.bot import Message
-from vkbottle.bot import Blueprint
+from vkbottle.bot import Message, Blueprint
 from PostgreSQLighter import db
 from ns import getSettings
 import logging
@@ -14,12 +13,10 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр
 @bp.on.private_message(payload={'cmd': 'information'})
 async def private_information(message: Message):
     logging.info(f'{message.peer_id}: I get information')
-    # Информация о юзере
-    userInfo = await bp.api.users.get(message.from_id) 
-    user_id = userInfo[0].id
+    user_id = message.from_id # ID юзера
 
     try:
-        result= await getSettings(
+        result= await getSettings( # Получаем приватные данные из СГО
             db.get_account_login(user_id),
             db.get_account_password(user_id),
             db.get_account_school(user_id),
@@ -43,7 +40,7 @@ async def chat_information(message: Message):
     chat_id = message.chat_id
 
     try:
-        result= await getSettings(
+        result= await getSettings( # Получаем приватные данные СГО
             db.get_chat_login(chat_id),
             db.get_chat_password(chat_id),
             db.get_chat_school(chat_id),

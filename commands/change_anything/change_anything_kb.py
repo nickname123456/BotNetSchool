@@ -1,6 +1,5 @@
-from vkbottle.bot import Message
+from vkbottle.bot import Message, Blueprint
 from vkbottle import Keyboard, KeyboardButtonColor, Text
-from vkbottle.bot import Blueprint
 import logging
 
 
@@ -10,7 +9,6 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр
 
 
 
-#Если написали "Меню" или нажали на соответствующую кнопку
 @bp.on.message(payload={'cmd': 'change_anything_kb'})
 async def change_anything_kb(message: Message):
     logging.info(f'{message.peer_id}: I get change_anything_kb')

@@ -1,6 +1,5 @@
 from typing import Text
-from vkbottle.bot import Message
-from vkbottle.bot import Blueprint
+from vkbottle.bot import Message, Blueprint
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 import logging
 from ns import get_marks
@@ -15,12 +14,10 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр сообще
 @bp.on.private_message(payload={'cmd': 'correction_mark_choice_lesson'})
 async def correction_mark_choice_lesson(message: Message):
     logging.info(f'{message.peer_id}: I get correction_mark_choice_lesson')
-    # Информация о юзере
-    userInfo = await bp.api.users.get(message.from_id) 
-    user_id = userInfo[0].id
+    user_id = message.from_id # ID юзера
 
     keyboard = Keyboard()
-    lessons = await get_marks(
+    lessons = await get_marks( # Получаем уроки
         db.get_account_login(user_id),
         db.get_account_password(user_id),
         db.get_account_school(user_id),
@@ -29,8 +26,8 @@ async def correction_mark_choice_lesson(message: Message):
         'all')
 
     counter = 1
-    for i in lessons.keys():
-        if counter == 4: 
+    for i in lessons.keys(): # Перебираем уроки
+        if counter == 4: # Если на строке уже 4 урока, то переходим на след строку
             keyboard.row()
             counter = 1
         keyboard.add(Text(i, {"cmd": "correction_mark_choice_mark"}))
@@ -52,7 +49,7 @@ async def correction_mark_choice_lesson(message: Message):
     chat_id = message.chat_id
 
     keyboard = Keyboard()
-    lessons = await get_marks(
+    lessons = await get_marks( # Получаем уроки
         db.get_chat_login(chat_id),
         db.get_chat_password(chat_id),
         db.get_chat_school(chat_id),
@@ -61,8 +58,8 @@ async def correction_mark_choice_lesson(message: Message):
         'all')
 
     counter = 1
-    for i in lessons.keys():
-        if counter == 4: 
+    for i in lessons.keys(): # Перебираем уроки
+        if counter == 4: # Если на строке уже 4 урока, то переходим на след строку
             keyboard.row()
             counter = 1
         keyboard.add(Text(i, {"cmd": "correction_mark_choice_mark"}))
