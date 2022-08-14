@@ -32,7 +32,7 @@ async def private_reportGrades(message: Message):
         if counter == 4: # Если в строке уже 4 урока, то переходим на след строку
             keyboard.row()
             counter = 0
-        keyboard.add(Text(i, {'cmd': f'reportGrades_{subjects[i]}'}), color=KeyboardButtonColor.SECONDARY)
+        keyboard.add(Text(i[:40], {'cmd': f'reportGrades_{subjects[i]}'}), color=KeyboardButtonColor.SECONDARY)
         counter += 1
         
     keyboard.row()
@@ -60,7 +60,7 @@ async def chat_reportGrades(message: Message):
         if counter == 4: # Если на строке уже 4 урока, переходим на след строку
             keyboard.row()
             counter = 0
-        keyboard.add(Text(i, {'cmd': f'reportGrades_{subjects[i]}'}), color=KeyboardButtonColor.SECONDARY)
+        keyboard.add(Text(i[:40], {'cmd': f'reportGrades_{subjects[i]}'}), color=KeyboardButtonColor.SECONDARY)
         counter += 1
         
     keyboard.row()

@@ -30,7 +30,7 @@ async def correction_mark_choice_lesson(message: Message):
         if counter == 4: # Если на строке уже 4 урока, то переходим на след строку
             keyboard.row()
             counter = 1
-        keyboard.add(Text(i, {"cmd": "correction_mark_choice_mark"}))
+        keyboard.add(Text(i[:40], {"cmd": "correction_mark_choice_mark"}))
         counter += 1
     
     keyboard.row()
@@ -62,7 +62,7 @@ async def correction_mark_choice_lesson(message: Message):
         if counter == 4: # Если на строке уже 4 урока, то переходим на след строку
             keyboard.row()
             counter = 1
-        keyboard.add(Text(i, {"cmd": "correction_mark_choice_mark"}))
+        keyboard.add(Text(i[:40], {"cmd": "correction_mark_choice_mark"}))
         counter += 1
     
     keyboard.row()
