@@ -536,7 +536,8 @@ class NetSchoolAPI:
                 "at": self._at,
                 "VER": self._ver,
                 "RPNAME": "Итоги+успеваемости+и+качества+знаний",
-                "RPTID": "StudentAttendanceGrades"
+                "RPTID": "StudentAttendanceGrades",
+                "SID": self._student_id,
             }
         )
         return parser.parseSubjectId(response.text)
