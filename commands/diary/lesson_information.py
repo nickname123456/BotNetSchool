@@ -1,6 +1,5 @@
 from ns import get_back_week, get_next_week, get_week, get_diary
-from vkbottle.bot import Message
-from vkbottle.bot import Blueprint
+from vkbottle.bot import Message, Blueprint
 from PostgreSQLighter import db
 import logging
 from VKRules import PayloadStarts
@@ -16,8 +15,7 @@ bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
     '{"cmd":"back_lesson_information_'])
 async def private_lesson_information(message: Message):
     logging.info(f'{message.peer_id}: I get lesson information')
-    userInfo = await bp.api.users.get(message.from_id)# Информация о юзере
-    userId = userInfo[0].id
+    userId = message.from_id # ID юзера
 
     day = db.get_account_day(userId) # Получаем день, на котором юзер
 
@@ -39,7 +37,7 @@ async def private_lesson_information(message: Message):
     db.edit_account_lesson(userId, lesson) # Редактируем номер урока, на котором юзер
     db.commit()
     
-    diary = await get_diary(
+    diary = await get_diary( # Получаем дневник
         db.get_account_login(userId),
         db.get_account_password(userId),
         week,
@@ -48,7 +46,7 @@ async def private_lesson_information(message: Message):
         db.get_account_studentId(userId))
     logging.info(f'{message.peer_id}: Get diary')
     
-    lesson = diary['weekDays'][day]['lessons'][int(lesson)]
+    lesson = diary['weekDays'][day]['lessons'][int(lesson)] # Получаем урок
 
     marks = ''
     homework = ''

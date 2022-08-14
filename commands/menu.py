@@ -1,6 +1,5 @@
-from vkbottle.bot import Message
+from vkbottle.bot import Message, Blueprint
 from vkbottle import Keyboard, KeyboardButtonColor, Text
-from vkbottle.bot import Blueprint
 from netschoolapi import NetSchoolAPI
 from PostgreSQLighter import db
 import logging
@@ -17,13 +16,11 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр
 @bp.on.private_message(payload={'cmd': 'menu'})
 async def private_menu(message: Message):
     logging.info(f'{message.peer_id}: I get menu')
-    # Информация о юзере
-    userInfo = await bp.api.users.get(message.from_id) 
-    user_id = userInfo[0].id
+    user_id = message.from_id
 
     studentId = db.get_account_studentId(user_id)
     try:
-        api = NetSchoolAPI(db.get_account_link(user_id))
+        api = NetSchoolAPI(db.get_account_link(user_id)) # Логинимся в СГО
         await api.login(
             db.get_account_login(user_id), 
             db.get_account_password(user_id), 
@@ -75,7 +72,7 @@ async def chat_menu(message: Message):
 
     studentId = db.get_chat_studentId(chat_id)
     try:
-        api = NetSchoolAPI(db.get_chat_link(chat_id))
+        api = NetSchoolAPI(db.get_chat_link(chat_id)) # Логинимся в СГО
         await api.login(
             db.get_chat_login(chat_id), 
             db.get_chat_password(chat_id), 

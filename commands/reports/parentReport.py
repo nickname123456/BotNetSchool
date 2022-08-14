@@ -1,6 +1,5 @@
 from typing import Text
-from vkbottle.bot import Message
-from vkbottle.bot import Blueprint
+from vkbottle.bot import Message, Blueprint
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 import logging
 import ns
@@ -17,11 +16,9 @@ bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 @bp.on.private_message(payload={'cmd': 'parentReport'})
 async def private_parentReport(message: Message):
     logging.info(f'{message.peer_id}: I get parentReport')
-    # Информация о юзере
-    userInfo = await bp.api.users.get(message.from_id) 
-    user_id = userInfo[0].id
+    user_id = message.from_id # ID юзера
     
-    terms = await ns.getTerms(
+    terms = await ns.getTerms( # Получаем триместры/четверти
         db.get_account_login(user_id),
         db.get_account_password(user_id),
         db.get_account_school(user_id),
@@ -30,7 +27,7 @@ async def private_parentReport(message: Message):
     )
 
     keyboard = Keyboard()
-    for i in terms.keys():
+    for i in terms.keys(): # Перебираем триместры/четверти
         keyboard.add(Text(i, {'cmd': f'parentReport_{terms[i]}'}), color=KeyboardButtonColor.SECONDARY)
         keyboard.row()
     keyboard.add(Text('Назад', {'cmd': 'reports'}), color=KeyboardButtonColor.NEGATIVE)
@@ -43,7 +40,7 @@ async def chat_parentReport(message: Message):
     # Айди чата:
     chat_id = message.chat_id
     
-    terms = await ns.getTerms(
+    terms = await ns.getTerms( # Получаем триместры/четверти
         db.get_chat_login(chat_id),
         db.get_chat_password(chat_id),
         db.get_chat_school(chat_id),
@@ -52,7 +49,7 @@ async def chat_parentReport(message: Message):
     )
 
     keyboard = Keyboard()
-    for i in terms.keys():
+    for i in terms.keys(): # перебираем триместры/четверти
         keyboard.add(Text(i, {'cmd': f'parentReport_{terms[i]}'}), color=KeyboardButtonColor.SECONDARY)
         keyboard.row()
     keyboard.add(Text('Назад', {'cmd': 'reports'}), color=KeyboardButtonColor.NEGATIVE)
@@ -66,13 +63,11 @@ async def chat_parentReport(message: Message):
 @bp.on.private_message(PayloadStarts='{"cmd":"parentReport_')
 async def private_parentReport_with_term(message: Message):
     logging.info(f'{message.peer_id}: I get parentReport with term')
-    # Информация о юзере
-    userInfo = await bp.api.users.get(message.from_id) 
-    user_id = userInfo[0].id
+    user_id = message.from_id # ID юзера
 
-    termId = message.payload[21:-2]
+    termId = message.payload[21:-2] # ID триместра/четверти
     
-    parentReport = await ns.getParentReport(
+    parentReport = await ns.getParentReport( # Получаем отчёт
         db.get_account_login(user_id),
         db.get_account_password(user_id),
         db.get_account_school(user_id),
@@ -91,9 +86,9 @@ async def chat_parentReport_with_term(message: Message):
     # Айди чата:
     chat_id = message.chat_id
     
-    termId = message.payload[21:-2]
+    termId = message.payload[21:-2] # ID триместра/четверти
     
-    parentReport = await ns.getParentReport(
+    parentReport = await ns.getParentReport( # Получаем отчет
         db.get_chat_login(chat_id),
         db.get_chat_password(chat_id),
         db.get_chat_school(chat_id),

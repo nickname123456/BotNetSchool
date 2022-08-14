@@ -1,5 +1,4 @@
-from vkbottle.bot import Message
-from vkbottle.bot import Blueprint
+from vkbottle.bot import Message, Blueprint
 from PostgreSQLighter import db
 from netschoolapi import NetSchoolAPI
 import re
@@ -16,9 +15,7 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр сообще
 @bp.on.private_message(payload={'cmd': 'announcements'})
 async def private_announcements(message: Message, amount=3):
     logging.info(f'{message.peer_id}: I get "announcements {amount}"')
-    # Информация о юзере
-    userInfo = await bp.api.users.get(message.from_id) 
-    user_id = userInfo[0].id
+    user_id = message.from_id # ID юзера
 
     studentId = db.get_account_studentId(user_id)
     try:
@@ -38,7 +35,7 @@ async def private_announcements(message: Message, amount=3):
 
     # Копируем объявления из сго
     announcements = await api.announcements()
-    # Берем только те объявления, которые нужны
+    # Обрезаем нужное кол-во объявлений
     announcements = announcements[:int(amount)]
 
     # Если есть объявления:
@@ -102,7 +99,7 @@ async def chat_announcements(message: Message, amount=3):
 
     # Копируем объявления из сго
     announcements = await api.announcements()
-    # Берем только те объявления, которые нужны
+    # Обрезаем нужное кол-во объявлений
     announcements = announcements[:int(amount)]
 
     # Если есть объявления:

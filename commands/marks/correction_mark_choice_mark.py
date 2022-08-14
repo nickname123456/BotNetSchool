@@ -1,6 +1,5 @@
 from typing import Text
-from vkbottle.bot import Message
-from vkbottle.bot import Blueprint
+from vkbottle.bot import Message, Blueprint
 from PostgreSQLighter import db
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 import logging
@@ -14,13 +13,11 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр сообще
 @bp.on.private_message(payload={'cmd': 'correction_mark_choice_mark'})
 async def private_correction_mark_choice_mark(message: Message):
     logging.info(f'{message.peer_id}: I get correction_mark_choice_mark')
-    # Информация о юзере
-    userInfo = await bp.api.users.get(message.from_id) 
-    user_id = userInfo[0].id
+    user_id = message.from_id # ID юзера
 
-    lesson = message.text
+    lesson = message.text # Получаем нужный урок
 
-    db.edit_account_correction_lesson(user_id, lesson)
+    db.edit_account_correction_lesson(user_id, lesson) # Изменяем урок в бд
     db.commit()
 
     #Создаем клавиатуру
@@ -53,9 +50,9 @@ async def chat_correction_mark_choice_mark(message: Message):
     # Айди чата:
     chat_id = message.chat_id
     
-    lesson = message.text
+    lesson = message.text # Получаем нужный урок
 
-    db.edit_chat_correction_lesson(chat_id, lesson)
+    db.edit_chat_correction_lesson(chat_id, lesson) # Изменяем урок
     db.commit()
 
     #Создаем клавиатуру

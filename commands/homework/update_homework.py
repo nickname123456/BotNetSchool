@@ -1,9 +1,6 @@
-from vkbottle.bot import Message
-from vkbottle import Keyboard, KeyboardButtonColor, Text, EMPTY_KEYBOARD 
-from vkbottle.bot import Blueprint
+from vkbottle import Keyboard, KeyboardButtonColor, Text, EMPTY_KEYBOARD,  CtxStorage, BaseStateGroup
+from vkbottle.bot import Message, Blueprint
 from PostgreSQLighter import db
-from vkbottle import CtxStorage
-from vkbottle import BaseStateGroup
 from datetime import datetime
 from settings import admin_id
 import logging
@@ -26,20 +23,19 @@ class HomeworkData(BaseStateGroup):
 @bp.on.private_message(payload={'cmd': 'keyboard_update_homework'})
 async def private_keyboard_update_homework(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_update_homework')
-    userInfo = await bp.api.users.get(message.from_id)
-    userId = userInfo[0].id
+    userId = message.from_id # ID юзера
 
     await bp.state_dispenser.set(message.peer_id, HomeworkData.lesson) # Говорим, что следующий шаг - выбор урока
 
     keyboard = Keyboard()
 
-    lessons = db.get_lessons_with_homework(
+    lessons = db.get_lessons_with_homework( # Получаем уроки
         db.get_account_school(userId),
         db.get_account_class(userId)
     )
     counter = 1
-    for i in lessons:
-        if counter == 4: 
+    for i in lessons: # Перебираем уроки
+        if counter == 4: # Если на строке уже 4 урока, то переходим на след строку
             keyboard.row()
             counter = 1
         keyboard.add(Text(i[0], {"cmd": "update_homework"}))
@@ -61,13 +57,13 @@ async def chat_keyboard_update_homework(message: Message):
 
     keyboard = Keyboard()
 
-    lessons = db.get_lessons_with_homework(
+    lessons = db.get_lessons_with_homework( # Получаем уроки
         db.get_chat_school(chat_id),
         db.get_chat_class(chat_id)
     )
     counter = 1
-    for i in lessons:
-        if counter == 4: 
+    for i in lessons: # Перебираем уроки
+        if counter == 4: # Если на строке уже 4 урока, то переходим на след строку
             keyboard.row()
             counter = 1
         keyboard.add(Text(i[0], {"cmd": "update_homework"}))
@@ -137,8 +133,7 @@ async def chat_check_admin(message: Message):
 @bp.on.private_message(state=HomeworkData.homework)
 async def private_edit_hamework(message: Message):
     logging.info(f'{message.peer_id}: Im at the end of update_homework')
-    userInfo = await bp.api.users.get(message.from_id)
-    userId = userInfo[0].id
+    userId = message.from_id # ID юзера
 
     if message.payload is None: # если человек попал в этот стейт прямиком из указания дз (у админа не спрашивалось разрешение)
         ctx.set('homework', message.text)# Загружаем во временное хранилище дз

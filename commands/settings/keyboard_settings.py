@@ -1,6 +1,5 @@
-from vkbottle.bot import Message
+from vkbottle.bot import Message, Blueprint
 from vkbottle import Keyboard, KeyboardButtonColor, Text
-from vkbottle.bot import Blueprint
 from PostgreSQLighter import db
 import logging
 
@@ -13,11 +12,12 @@ bp = Blueprint('keyboard_settings')# Объявляем команду
 @bp.on.private_message(payload={'cmd': 'keyboard_settings'})
 async def keyboard_settings_private(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_settings')
-    userInfo = await bp.api.users.get(message.from_id) 
-    user_id = userInfo[0].id
+    user_id = message.from_id # ID юзера
 
     keyboard = Keyboard()
-
+    # 
+    # Если человек подписан, то кнопка зеленная, в ином случае - красная
+    # 
     if db.get_account_mark_notification(user_id):
         keyboard.add(Text('Уведомления о новых оценках', {"cmd": "keyboard_mark_notification"}), color=KeyboardButtonColor.POSITIVE)
     else:
@@ -57,7 +57,9 @@ async def keyboard_settings_chat(message: Message):
     chat_id = message.chat_id
 
     keyboard = Keyboard()
-
+    # 
+    # Если человек подписан, то кнопка зеленная, в ином случае - красная
+    # 
     if db.get_chat_mark_notification(chat_id):
         keyboard.add(Text('Уведомления о новых оценках', {'cmd': 'keyboard_mark_notification'}), color=KeyboardButtonColor.POSITIVE)
     else:

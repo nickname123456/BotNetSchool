@@ -1,6 +1,4 @@
-from typing import Text
-from vkbottle.bot import Message
-from vkbottle.bot import Blueprint
+from vkbottle.bot import Message, Blueprint
 from PostgreSQLighter import db
 import ns
 import logging
@@ -14,9 +12,7 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр сообще
 @bp.on.private_message(payload={'cmd': 'correction_mark'})
 async def private_correction_mark(message: Message):
     logging.info(f'{message.peer_id}: I get correction_mark')
-    # Информация о юзере
-    userInfo = await bp.api.users.get(message.from_id) 
-    user_id = userInfo[0].id
+    user_id = message.from_id # ID юзера
 
     if message.text == '5️⃣':
         mark = 5
@@ -25,7 +21,7 @@ async def private_correction_mark(message: Message):
     elif message.text == '3️⃣':
         mark = 3
 
-    db.edit_account_correction_mark(user_id, mark)
+    db.edit_account_correction_mark(user_id, mark) # Изменяем желаемую оценку в бд
     db.commit()
 
     await message.answer(await ns.correction_mark(
@@ -62,7 +58,7 @@ async def chat_correction_mark(message: Message):
     elif message.text == '3️⃣':
         mark = 3
 
-    db.edit_chat_correction_mark(chat_id, mark)
+    db.edit_chat_correction_mark(chat_id, mark) # Изменяем желаемую оценку в бд
     db.commit()
 
     await message.answer(await ns.correction_mark(

@@ -1,6 +1,4 @@
-from vkbottle import Keyboard, KeyboardButtonColor, Text
-from vkbottle.bot import Message
-from vkbottle.bot import Blueprint
+from vkbottle.bot import Message, Blueprint
 from PostgreSQLighter import db
 import logging
 from VKRules import PayloadStarts
@@ -14,19 +12,18 @@ bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 
 
 @bp.on.private_message(PayloadStarts='{"cmd":"view_')
-async def view_user(message: Message, userId=None):
+async def view_user(message: Message):
     logging.info(f'{message.peer_id}: I get view_user')
-    # Информация о юзере
-    userInfo = await bp.api.users.get(message.from_id) 
-    user_id = userInfo[0].id
+    user_id = message.from_id # ID юзера
 
+    # Проверка на админа
     if db.get_account_isAdmin(user_id) == 0:
         await message.answer('У тебя нет админских прав!')
         return
     
-    user_id = int(message.payload[13:-2])
-    user = db.get_account_all_with_id(user_id)
-    data_from_vk = await bp.api.users.get(user_id)
+    user_id = int(message.payload[13:-2]) # ID юзера, которого мы смотрим
+    user = db.get_account_all_with_id(user_id) # Вся инфа из бд про юзера
+    data_from_vk = await bp.api.users.get(user_id) # Вся инфа из ВК про юзера
 
     last_name = data_from_vk[0].last_name
     first_name = data_from_vk[0].first_name

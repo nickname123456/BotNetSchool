@@ -1,6 +1,5 @@
-from vkbottle.bot import Message
+from vkbottle.bot import Message, Blueprint
 from vkbottle import Keyboard, KeyboardButtonColor, Text
-from vkbottle.bot import Blueprint
 from PostgreSQLighter import db
 from ns import get_next_week, get_back_week, get_week, get_diary
 import logging
@@ -15,9 +14,9 @@ bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 @bp.on.private_message(PayloadStarts='{"cmd":"keyboard_diary')
 async def keyboard_diary(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard diary')
-    userInfo = await bp.api.users.get(message.from_id)# Информация о юзере
-    userId = userInfo[0].id
+    userId = message.from_id # ID юзера
 
+    # Какая неделя? текущая, следущая или предыдущая?
     if len(message.payload) <= 24:
         period = ''
     else:
@@ -32,6 +31,7 @@ async def keyboard_diary(message: Message):
         week = get_next_week()
         period += '_'
 
+    # Получаем дневник
     diary = await get_diary(
         db.get_account_login(userId),
         db.get_account_password(userId),
@@ -41,6 +41,7 @@ async def keyboard_diary(message: Message):
         db.get_account_studentId(userId)
     )
 
+    # Перебирам дни недели и создаем кнопки
     keyboard = Keyboard()
     day_number = 0
     for day in diary['weekDays']:
@@ -50,16 +51,19 @@ async def keyboard_diary(message: Message):
                 keyboard.row()
         day_number += 1
     
+    # Если текущая неделя, то можно перелистнуть назад и вперед
     if period == '':
         keyboard.add(Text('◀', {'cmd': 'keyboard_diary_back'}))
         keyboard.add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
         keyboard.add(Text('▶', {'cmd': 'keyboard_diary_next'}))
 
+    # Если предыдущая неделя, то можно перелистнуть только вперед
     elif period == 'back_':
         keyboard.add(Text('🟦', {'cmd': ''}))
         keyboard.add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
         keyboard.add(Text('▶', {'cmd': 'keyboard_diary'}))
 
+    # Если следующая неделя, то можно перелистнуть только назад
     elif period == 'next_':
         keyboard.add(Text('◀', {'cmd': 'keyboard_diary'}))
         keyboard.add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
@@ -72,8 +76,9 @@ async def keyboard_diary(message: Message):
 @bp.on.chat_message(PayloadStarts='{"cmd":"keyboard_diary')
 async def keyboard_diary(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard diary')
-    chat_id = message.chat_id
+    chat_id = message.chat_id # ID чата
 
+    # Какая неделя? текущая, следущая или предыдущая?
     if len(message.payload) <= 24:
         period = ''
     else:
@@ -88,6 +93,7 @@ async def keyboard_diary(message: Message):
         week = get_next_week()
         period += '_'
 
+    # Получаем дневник
     diary = await get_diary(
         db.get_chat_login(chat_id),
         db.get_chat_password(chat_id),
@@ -97,6 +103,7 @@ async def keyboard_diary(message: Message):
         db.get_chat_studentId(chat_id)
     )
 
+    # Перебирам дни недели и создаем кнопки
     keyboard = Keyboard()
     day_number = 0
     for day in diary['weekDays']:
@@ -106,16 +113,19 @@ async def keyboard_diary(message: Message):
                 keyboard.row()
         day_number += 1
     
+    # Если текущая неделя, то можно перелистнуть назад и вперед
     if period == '':
         keyboard.add(Text('◀', {'cmd': 'keyboard_diary_back'}))
         keyboard.add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
         keyboard.add(Text('▶', {'cmd': 'keyboard_diary_next'}))
 
+    # Если предыдущая неделя, то можно перелистнуть только вперед
     elif period == 'back_':
         keyboard.add(Text('🟦', {'cmd': ''}))
         keyboard.add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
         keyboard.add(Text('▶', {'cmd': 'keyboard_diary'}))
 
+    # Если следующая неделя, то можно перелистнуть только назад
     elif period == 'next_':
         keyboard.add(Text('◀', {'cmd': 'keyboard_diary'}))
         keyboard.add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)

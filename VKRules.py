@@ -1,4 +1,4 @@
-from typing import Union, List, Text
+from typing import List, Text
 from vkbottle.bot import Message
 from vkbottle.dispatch.rules import ABCRule
 
@@ -9,11 +9,11 @@ class PayloadStarts(ABCRule[Message]):
 
     async def check(self, event: Message) -> bool:
         payload = event.payload
-        if payload is None:
+        if payload is None: # Если пэйлауда нет
             return False
 
-        if isinstance(self.text, List):
-            for i in self.text:
+        if isinstance(self.text, List): # Если нужно проверить список
+            for i in self.text: # Перебираем его
                 if payload.startswith(i): return True
             return False
 

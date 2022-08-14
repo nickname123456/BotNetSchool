@@ -1,5 +1,4 @@
-from vkbottle.bot import Message
-from vkbottle.bot import Blueprint
+from vkbottle.bot import Message, Blueprint
 from PostgreSQLighter import db
 import ns
 import logging
@@ -18,9 +17,10 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр
 async def private_login(message: Message, userLogin=None, userPassword=None):
     logging.info(f'{message.peer_id}: I get login')
     userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
+    userId = message.from_id # ID юзера
 
     # Если человека нет в бд
-    if db.get_account_isFirstLogin(userInfo[0].id) is None:
+    if db.get_account_isFirstLogin(userId) is None:
         logging.info(f'{message.peer_id}: User not in database')
         await message.answer("Так... Смотрю тебя теще нет в моей бд. Но ничего страшного сейчас все будет!")
         await message.answer('Напиши "Начать')
@@ -29,28 +29,28 @@ async def private_login(message: Message, userLogin=None, userPassword=None):
     #Если пароль и логин введены
     if userLogin != None and userPassword != None:
         #Записать их в бд
-        db.edit_account_login(userInfo[0].id, userLogin)
+        db.edit_account_login(userId, userLogin)
         db.commit()
-        db.edit_account_password(userInfo[0].id, userPassword)
+        db.edit_account_password(userId, userPassword)
         db.commit()
-        db.edit_account_studentId(userInfo[0].id, 
+        db.edit_account_studentId(userId, 
             await ns.getCurrentStudentId(
                 userLogin,
                 userPassword, 
-                db.get_account_school(userInfo[0].id),
-                db.get_account_link(userInfo[0].id)))
+                db.get_account_school(userId),
+                db.get_account_link(userId)))
         db.commit()
-        db.edit_account_correctData(userInfo[0].id, 0)
+        db.edit_account_correctData(userId, 0)
         db.commit()
         logging.info(f'{message.peer_id}: Write new data to database')
 
     
     #Записываем логин из бд в переменную
-    userLogin = db.get_account_login(userInfo[0].id)
-    userPassword = db.get_account_password(userInfo[0].id)
-    userSchool = db.get_account_school(userInfo[0].id)
-    userLink = db.get_account_link(userInfo[0].id)
-    studentId = db.get_account_studentId(userInfo[0].id)
+    userLogin = db.get_account_login(userId)
+    userPassword = db.get_account_password(userId)
+    userSchool = db.get_account_school(userId)
+    userLink = db.get_account_link(userId)
+    studentId = db.get_account_studentId(userId)
 
     try:
         #Авторезируемся в Сетевом Городе
@@ -67,19 +67,12 @@ async def private_login(message: Message, userLogin=None, userPassword=None):
         await message.answer('Неправильный логин или пароль!')
         return
 
-    db.edit_account_correctData(userInfo[0].id, 1) #Подтверждаем правильность логина и пароя в бд
+    db.edit_account_correctData(userId, 1) #Подтверждаем правильность логина и пароя в бд
     db.commit()
     logging.info(f'{message.peer_id}: Write correctData to database')
 
     await message.answer(f'{userInfo[0].first_name}, ты успешно зашел в систему под логином: {userLogin}')
     logging.info(f'{message.peer_id}: login COMPLETED')
-    #Выходим из СГ
-    #await ns.logout(userLink)
-
-    #Спустя 10 минут удаляем из памяти дневник ученика
-    #await asyncio.sleep(600)
-    #diarys.pop(userInfo[0].id)
-    #await message.answer('Ты был отключен от системы, из-за длительного пребывания в ней')
 
 
 
@@ -107,15 +100,11 @@ async def chat_login(message: Message, userLogin=None, userPassword=None):
             logging.info(f'{message.peer_id}: Write new data to database')
 
         
-        #Записываем логин из бд в переменную
+        #Записываем данные из бд в переменные
         chatLogin = db.get_chat_login(chat_id)
-        #Записываем пароль из бд в переменную
         chatPassword = db.get_chat_password(chat_id)
-        #Записываем школу из бд в переменную
         chatSchool = db.get_chat_school(chat_id)
-        #Записываем ссылку из бд в переменную
         chatLink = db.get_chat_link(chat_id)
-        #Записываем id ученика из бд в переменную
         studentId = db.get_chat_studentId(chat_id)
 
         #Авторезируемся в Сетевом Городе
@@ -140,10 +129,3 @@ async def chat_login(message: Message, userLogin=None, userPassword=None):
 
     await message.answer(f'Эта беседа успешно зашла в систему под логином: {chatLogin}')
     logging.info(f'{message.peer_id}: login COMPLETED')
-    #Выходим из СГ
-    #await ns.logout()
-
-    #Спустя 10 минут удаляем из памяти дневник ученика
-    #await asyncio.sleep(600)
-    #diarys.pop(userInfo[0].id)
-    #await message.answer('Ты был отключен от системы, из-за длительного пребывания в ней')

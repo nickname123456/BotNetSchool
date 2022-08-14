@@ -11,8 +11,7 @@ scheduler = AsyncIOScheduler()
 bot = Bot(token=token)
 
 logging.basicConfig(level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S',
-    filename='log.log')
+    format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 
 
 
@@ -25,7 +24,7 @@ print('  https://vk.com/kirillarz')
 print('-------------------------------')
 print('')
 
-# Загружаем команды из папки plugins
+# Загружаем команды из папки commands
 for bp in bps:
     bp.load(bot)
 
