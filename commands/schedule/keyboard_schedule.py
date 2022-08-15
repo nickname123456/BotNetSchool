@@ -31,4 +31,4 @@ async def keyboard_schedule(message: Message):
 
     
     logging.info(f'{message.peer_id}: I sent keyboard_schedule')
-    await message.answer('На какой день хочешь узнать расписание?', keyboard=keyboard)
+    await message.answer('🤔На какой день хотите узнать расписание?', keyboard=keyboard)

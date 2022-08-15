@@ -28,7 +28,7 @@ class ScheduleData(BaseStateGroup):
 @bp.on.chat_message(payload={'cmd': 'schedule_download'})
 @bp.on.chat_message(text=['/загрузить расписание', '/загрузить расп', '/лоадрасп', '/loadshedule'])
 async def start_schedule_download(message: Message):
-    await message.answer("Доступно только в л/с!")
+    await message.answer("❌Доступно только в л/с!")
 
 @bp.on.message(payload={'cmd': 'schedule_download'})
 @bp.on.private_message(text=['/загрузить расписание', '/загрузить расп', '/лоадрасп', '/loadshedule'])
@@ -53,7 +53,7 @@ async def start_schedule_download(message: Message):
     )
 
     await bp.state_dispenser.set(message.peer_id, ScheduleData.PHOTO) # Говорим, что следующий шаг - выбор фото
-    await message.answer("На какой день хочешь загрузить расписание?", keyboard=keyboard)
+    await message.answer("❓На какой день хотите загрузить расписание?", keyboard=keyboard)
 
 
 @bp.on.private_message(state=ScheduleData.PHOTO)
@@ -61,7 +61,7 @@ async def photo_schedule_download(message: Message):
     logging.info(f'{message.peer_id}: I get day in schedule_download')
     ctx.set('day', message.text) # Загружаем во внутренне хранилище день недели
     await bp.state_dispenser.set(message.peer_id, ScheduleData.SCHOOL) # Говорим, что следующий шаг - выбор школы
-    await message.answer("Отправь фото расписания", keyboard=EMPTY_KEYBOARD)
+    await message.answer("📅Отправьте фото расписания", keyboard=EMPTY_KEYBOARD)
 
 
 @bp.on.private_message(state=ScheduleData.SCHOOL)
@@ -78,12 +78,12 @@ async def school_schedule_download(message: Message):
         .add(Text('Нет, для другой', {'LoadShedule': 'itsnotmyschool'}), color=KeyboardButtonColor.SECONDARY)
     )
 
-    await message.answer("Это расписание для твоей школы?", keyboard=keyboard)
+    await message.answer("🤔Это расписание для вашей школы?", keyboard=keyboard)
 
 @bp.on.private_message(state=ScheduleData.SCHOOL2, payload={'LoadShedule': 'itsmyschool'})
 async def itsmyschool_schedule_download(message: Message):
     logging.info(f'{message.peer_id}: I get itsmyschool in schedule_download')
-    await message.answer('Хорошо, так и запишу')
+    await message.answer('✅Хорошо, так и запишу')
     await bp.state_dispenser.set(message.peer_id, ScheduleData.CLAS)
     await class_schedule_download(message)
 
@@ -156,7 +156,7 @@ async def class_schedule_download(message: Message):
         .add(Text('Это расписание для всей школы', {'LoadShedule': 'ItsSheduleForAllSchool'}), color=KeyboardButtonColor.SECONDARY)
     )
 
-    await message.answer("Теперь отправь класс, на который загружаешь расписание", keyboard=keyboard)
+    await message.answer("❓Теперь отправь класс, на который загружаешь расписание", keyboard=keyboard)
 
 
 @bp.on.private_message(state=ScheduleData.FINISH)
@@ -192,17 +192,17 @@ async def finish_schedule_download(message: Message):
         i_id = i[0]
         if db.get_account_school(i_id) == school:
             if db.get_account_class(i_id) == clas or clas == 'all':
-                await bp.api.messages.send(message='Новое расписание!', user_id=i_id, random_id=0, attachment=photo)
+                await bp.api.messages.send(message='🔄Новое расписание!', user_id=i_id, random_id=0, attachment=photo)
                 await asyncio.sleep(1)
 
     for i in chats_with_notification:
         i_id = i[0]
         if db.get_chat_school(i_id) == school:
             if db.get_chat_class(i_id) == clas or clas == 'all':
-                await bp.api.messages.send(message='Новое расписание!', peer_id=2000000000+i_id, random_id=0, attachment=photo)
+                await bp.api.messages.send(message='🔄Новое расписание!', peer_id=2000000000+i_id, random_id=0, attachment=photo)
                 await asyncio.sleep(1)
 
-    await message.answer('Расписание успешно обновлено!', attachment=photo)
+    await message.answer('✅Расписание успешно обновлено!', attachment=photo)
     await bp.state_dispenser.delete(message.from_id)
     logging.info(f'{message.peer_id}: I sent success')
 
