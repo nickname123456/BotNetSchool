@@ -28,7 +28,7 @@ async def private_announcements(message: Message, amount=3):
             studentId)
     except: # если произошла ошибка
         logging.exception(f'{message.peer_id}: Exception occurred')
-        await message.answer('Ты не зарегистрирован! \nНапиши "Начать"\n Или у тебя неверный логин/пароль')
+        await message.answer('❌Ты не зарегистрирован! \n🤔Напиши "Начать"\n ❌Или у тебя неверный логин/пароль')
         await api.logout()
         return
     logging.info(f'{message.peer_id}: Login in NetSchool')
@@ -92,7 +92,7 @@ async def chat_announcements(message: Message, amount=3):
             studentId)
     except: # если произошла ошибка
         logging.exception(f'{message.peer_id}: Exception occurred')
-        await message.answer('Ты не зарегистрирован! \nНапиши "Начать"\n Или у тебя неверный логин/пароль')
+        await message.answer('❌Ты не зарегистрирован! \n🤔Напиши "Начать"\n ❌Или у тебя неверный логин/пароль')
         await api.logout()
         return
     logging.info(f'{message.peer_id}: Login in NetSchool')
