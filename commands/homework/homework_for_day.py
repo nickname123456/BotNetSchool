@@ -30,7 +30,7 @@ async def keyboard_homework_for_day(message: Message):
         .add(Text("Назад", {'cmd': 'keyboard_homework'}), color=KeyboardButtonColor.NEGATIVE)
     )
 
-    await message.answer('На какой день хочешь узнать домашнее задание?', keyboard=keyboard)
+    await message.answer('🤔На какой день хотите узнать домашнее задание?', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I send keyboard_homework_for_day')
 
 
@@ -44,7 +44,7 @@ async def private_homework_for_day(message: Message):
     
     #Если логин или пароль не правильнй
     if db.get_account_correctData(userId) != 1:
-        await message.answer('Ты не зарегистрирован! \nНапиши "Начать"\n Или у тебя неверный логин/пароль')
+        await message.answer('❌Вы не зарегистрированы! \nНапишите "Начать"\n ❌Или у вас неверный логин/пароль')
         logging.info(f'{message.peer_id}: User not found in db')
         return
 
@@ -59,7 +59,7 @@ async def private_homework_for_day(message: Message):
         )
         logging.info(f'{message.peer_id}: Get diary in NetSchool')
     except netschoolapi.errors.AuthError:
-        await message.answer('Неправильный логин или пароль!')
+        await message.answer('❌Неправильный логин или пароль!')
         logging.info(f'{message.peer_id}: Incorrect login or password!')
         return
     
@@ -96,10 +96,10 @@ async def private_homework_for_day(message: Message):
             )
         except TypeError:
             logging.exception(f'{message.peer_id}: Exception occurred')
-            await message.answer('Ты не зарегистрирован! \nНапиши "Начать"\n Или у тебя неверный логин/пароль')
+            await message.answer('❌Вы не зарегистрированы! \nНапишите "Начать"\n ❌Или у вас неверный логин/пароль')
             return
 
-        await message.answer(f'Урок: {lesson} \nБыло обновлено: {upd_date} \nЗадание: {homework}')
+        await message.answer(f'📚Урок: {lesson} \n🆙Было обновлено: {upd_date} \n💬Задание: {homework}')
         logging.info(f'{message.peer_id}: Send homework')
 
     logging.info(f'{message.peer_id}: I send homework_for_day')
@@ -124,7 +124,7 @@ async def chat_homework_for_day(message: Message):
         )
         logging.info(f'{message.peer_id}: Get diary in NetSchool')
     except netschoolapi.errors.AuthError:
-        await message.answer('Неправильный логин или пароль!')
+        await message.answer('❌Неправильный логин или пароль!')
         logging.info(f'{message.peer_id}: Incorrect login or password!')
         return
     
@@ -159,10 +159,10 @@ async def chat_homework_for_day(message: Message):
             )
         except TypeError:
             logging.exception(f'{message.peer_id}: Exception occurred')
-            await message.answer('Ты не зарегистрирован! \nНапиши "Начать"\n Или у тебя неверный логин/пароль')
+            await message.answer('❌Вы не зарегистрированы! \nНапишите "Начать"\n ❌Или у вас неверный логин/пароль')
             return
 
-        await message.answer(f'Урок: {lesson} \nБыло обновлено: {upd_date} \nЗадание: {homework}')
+        await message.answer(f'📚Урок: {lesson} \n🆙Было обновлено: {upd_date} \n💬Задание: {homework}')
         logging.info(f'{message.peer_id}: Send homework')
 
     logging.info(f'{message.peer_id}: I send homework_for_day')

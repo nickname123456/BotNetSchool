@@ -28,10 +28,10 @@ async def private_homework(message: Message):
         )
     except TypeError:
         logging.exception(f'{message.peer_id}: Exception occurred')
-        await message.answer('Ты не зарегистрирован! \nНапиши "Начать"\n Или у тебя неверный логин/пароль')
+        await message.answer('❌Вы не зарегистрированы! \nНапишите "Начать"\n ❌Или у Вас неверный логин/пароль')
         return
 
-    await message.answer(f'Урок: {message.text} \nБыло обновлено: {upd_date} \nЗадание: {homework}')
+    await message.answer(f'📚Урок: {message.text} \n🆙Было обновлено: {upd_date} \n💬Задание: {homework}')
     logging.info(f'{message.peer_id}: Send homework')
 
 
@@ -57,12 +57,12 @@ async def chat_homework(message: Message):
         )
     except TypeError:
         logging.exception(f'{message.peer_id}: Exception occurred')
-        await message.answer('Неправильно выбран класс!\n Настоятельно рекомендую написать "Начать", для повторной регистрации')
+        await message.answer('❌Неправильно выбран класс!\n 🤔Настоятельно рекомендую написать "Начать", для повторной регистрации')
 
     except Exception as e:
         logging.exception(f'{message.peer_id}: Exception occurred')
-        await message.answer(f'Ошибка: {e} \nСообщи админу!')
+        await message.answer(f'❌Ошибка: {e} \nСообщите администратору!❌')
         return
 
-    await message.answer(f'Урок: {message.text} \nБыло обновлено: {upd_date} \nЗадание: {homework}')
+    await message.answer(f'📚Урок: {message.text} \n🆙Было обновлено: {upd_date} \n💬Задание: {homework}')
     logging.info(f'{message.peer_id}: Send homework')
