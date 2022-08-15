@@ -28,7 +28,7 @@ class NewaccountState(BaseStateGroup):
 @bp.on.message(payload={'cmd': 'start'})
 async def registration(message: Message):
     await message.answer('Приветствую!👋🏻 Для начала советую ознакомиться с https://vk.com/@botnetschool-spravka-po-ispolzovaniu-bota')
-    await message.answer('🖊Введите адрес сетевого города (Пример: "https://sgo.edu-74.ru/").')
+    await message.answer('🔗Введите адрес сетевого города (Пример: "https://sgo.edu-74.ru/").')
     await bp.state_dispenser.set(message.peer_id, NewaccountState.INLINK)
 
 
@@ -95,7 +95,7 @@ async def registration5(message: Message):
     if message.text:
         ctx.set('login', message.text) # Загружаем во временное хранилище логин
 
-        await message.answer('🖊Введите свой пароль из СГО (Пример: "qwerty1234").')
+        await message.answer('🔑Введите свой пароль из СГО (Пример: "qwerty1234").')
         await bp.state_dispenser.set(message.peer_id, NewaccountState.INPASSWORD)
     else:
         await message.answer('❌Не нашел в твоем сообщении данные, введи еще раз')
@@ -168,7 +168,7 @@ async def private_registration6(message: Message):
     )
 
     await bp.state_dispenser.delete(message.from_id)
-    await message.answer(f'{userInfo[0].first_name}, ты успешно зашел в систему под логином: {login}', keyboard=keyboard)
+    await message.answer(f'✅{userInfo[0].first_name}, вы успешно зашли в систему под логином: {login}', keyboard=keyboard)
     logging.info(f'{message.peer_id}: Start COMPLETED')
 
 
@@ -239,5 +239,5 @@ async def chat_registration6(message: Message):
     )
 
     await bp.state_dispenser.delete(message.peer_id)
-    await message.answer(f'Ты успешно зашел в систему под логином: {login}', keyboard=keyboard)
+    await message.answer(f'✅Вы успешно зашли в систему под логином: {login}', keyboard=keyboard)
     logging.info(f'{message.peer_id}: Start COMPLETED')
