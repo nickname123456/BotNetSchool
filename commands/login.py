@@ -22,8 +22,8 @@ async def private_login(message: Message, userLogin=None, userPassword=None):
     # Если человека нет в бд
     if db.get_account_isFirstLogin(userId) is None:
         logging.info(f'{message.peer_id}: User not in database')
-        await message.answer("Так... Смотрю тебя теще нет в моей бд. Но ничего страшного сейчас все будет!")
-        await message.answer('Напиши "Начать')
+        await message.answer("🤔Так... Смотрю тебя теще нет в моей бд. Но ничего страшного сейчас все будет!")
+        await message.answer('Напиши "Начать"')
         return
 
     #Если пароль и логин введены
@@ -64,14 +64,14 @@ async def private_login(message: Message, userLogin=None, userPassword=None):
         logging.info(f'{message.peer_id}: Login in NetSchool')
     except:
         logging.exception(f'{message.peer_id}: Exception occurred')
-        await message.answer('Неправильный логин или пароль!')
+        await message.answer('❌Неправильный логин или пароль!❌')
         return
 
     db.edit_account_correctData(userId, 1) #Подтверждаем правильность логина и пароя в бд
     db.commit()
     logging.info(f'{message.peer_id}: Write correctData to database')
 
-    await message.answer(f'{userInfo[0].first_name}, ты успешно зашел в систему под логином: {userLogin}')
+    await message.answer(f'✅{userInfo[0].first_name}, ты успешно зашел в систему под логином: {userLogin}')
     logging.info(f'{message.peer_id}: login COMPLETED')
 
 
@@ -119,7 +119,7 @@ async def chat_login(message: Message, userLogin=None, userPassword=None):
             
     except TypeError:
         logging.exception(f'{message.peer_id}: Exception occurred')
-        await message.answer('Нужно зарегистрировать беседу. \nНапиши "Начать"')
+        await message.answer('❌Нужно зарегистрировать беседу. \n🤔Напиши "Начать"')
         return
 
     except:
@@ -127,5 +127,5 @@ async def chat_login(message: Message, userLogin=None, userPassword=None):
         await message.answer('Неправильный логин или пароль!')
         return
 
-    await message.answer(f'Эта беседа успешно зашла в систему под логином: {chatLogin}')
+    await message.answer(f'✅Эта беседа успешно зашла в систему под логином: {chatLogin}')
     logging.info(f'{message.peer_id}: login COMPLETED')
