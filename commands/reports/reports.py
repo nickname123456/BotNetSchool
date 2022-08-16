@@ -31,5 +31,5 @@ async def reports(message: Message):
         .add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
     )
     
-    await message.answer('Вот доступные отчеты:', keyboard=keyboard)
+    await message.answer('✅Вот доступные отчеты:', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I sent reports')

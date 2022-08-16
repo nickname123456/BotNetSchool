@@ -38,7 +38,7 @@ async def private_reportGrades(message: Message):
     keyboard.row()
     keyboard.add(Text('Назад', {'cmd': 'reports'}), color=KeyboardButtonColor.NEGATIVE)
 
-    await message.answer('Выбери урок', keyboard=keyboard)
+    await message.answer('👆🏻Выберите урок', keyboard=keyboard)
 
 @bp.on.chat_message(payload={'cmd': 'reportGrades'})
 async def chat_reportGrades(message: Message):
@@ -66,7 +66,7 @@ async def chat_reportGrades(message: Message):
     keyboard.row()
     keyboard.add(Text('Назад', {'cmd': 'reports'}), color=KeyboardButtonColor.NEGATIVE)
 
-    await message.answer('Выбери урок', keyboard=keyboard)
+    await message.answer('👆🏻Выберите урок', keyboard=keyboard)
 
 
 
