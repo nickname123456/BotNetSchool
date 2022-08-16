@@ -4,6 +4,7 @@ from PostgreSQLighter import db
 import logging
 import ns
 from VKRules import PayloadStarts
+from commands.change_anything import change_anything_kb
 
 
 bp = Blueprint('change_student')# Объявляем команду
@@ -81,7 +82,7 @@ async def private_exactly_change_student(message: Message):
 
     await message.answer('✅Я успешно сменил выбранного ребенка')
     logging.info(f'{message.peer_id}: I sent change_student with studentId')
-    await private_change_student(message)
+    await change_anything_kb.change_anything_kb(message)
 
 @bp.on.chat_message(PayloadStarts='{"cmd":"change_student_')
 async def chat_exactly_change_student(message: Message):
@@ -95,4 +96,4 @@ async def chat_exactly_change_student(message: Message):
 
     await message.answer('✅Я успешно сменил выбранного ребенка')
     logging.info(f'{message.peer_id}: I sent change_student with studentId')
-    await chat_change_student(message)
+    await change_anything_kb.change_anything_kb(message)
