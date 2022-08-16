@@ -29,7 +29,7 @@ async def private_menu(message: Message):
         )
     except:
         logging.exception(f'{message.peer_id}: Exception occurred')
-        await message.answer('Неправильный логин или пароль!\n Настоятельно рекомендую написать "Начать", для повторной регистрации')
+        await message.answer('❌Неправильный логин или пароль!\n 🤔Настоятельно рекомендую написать "Начать", для повторной регистрации')
         return
 
     settings = await api.userInfo()
@@ -56,7 +56,7 @@ async def private_menu(message: Message):
     )
 
     #Ответ в чат
-    await message.answer('Ты в главном меню.', keyboard=keyboard)
+    await message.answer('Вы в главном меню.', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I sent menu')
 
 
@@ -81,7 +81,7 @@ async def chat_menu(message: Message):
         )
     except:
         logging.exception(f'{message.peer_id}: Exception occurred')
-        await message.answer('Неправильный логин или пароль!\n Настоятельно рекомендую написать "Начать", для повторной регистрации')
+        await message.answer('❌Неправильный логин или пароль!\n 🤔Настоятельно рекомендую написать "Начать", для повторной регистрации')
         return
 
     settings = await api.userInfo()
@@ -108,5 +108,5 @@ async def chat_menu(message: Message):
     )
 
     #Ответ в чат
-    await message.answer('Ты в главном меню.', keyboard=keyboard)
+    await message.answer('Вы в главном меню.', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I sent menu')
