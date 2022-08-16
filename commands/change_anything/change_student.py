@@ -38,7 +38,7 @@ async def private_change_student(message: Message):
             keyboard.row()
     keyboard.add(Text("Назад", {'cmd': 'change_anything_kb'}), color=KeyboardButtonColor.NEGATIVE)
 
-    await message.answer('Выбери ребенка', keyboard=keyboard)
+    await message.answer('👆🏻Выберите ребенка', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I sent change_student')
 
 @bp.on.chat_message(payload={'cmd': 'change_student'})
@@ -66,7 +66,7 @@ async def chat_change_student(message: Message):
             keyboard.row()
     keyboard.add(Text("Назад", {'cmd': 'change_anything_kb'}), color=KeyboardButtonColor.NEGATIVE)
 
-    await message.answer('Выбери ребенка', keyboard=keyboard)
+    await message.answer('👆🏻Выберите ребенка', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I sent change_student')
 
 
@@ -79,7 +79,7 @@ async def private_exactly_change_student(message: Message):
 
     db.edit_account_studentId(user_id, studentId) # Меняем в бд выбранного ребенка
 
-    await message.answer('Я успешно сменил выбранного ребенка')
+    await message.answer('✅Я успешно сменил выбранного ребенка')
     logging.info(f'{message.peer_id}: I sent change_student with studentId')
     await private_change_student(message)
 
@@ -93,6 +93,6 @@ async def chat_exactly_change_student(message: Message):
 
     db.edit_chat_studentId(chat_id, studentId) # Меняем в бд выбранного ребенка
 
-    await message.answer('Я успешно сменил выбранного ребенка')
+    await message.answer('✅Я успешно сменил выбранного ребенка')
     logging.info(f'{message.peer_id}: I sent change_student with studentId')
     await chat_change_student(message)
