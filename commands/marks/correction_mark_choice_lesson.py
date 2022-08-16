@@ -36,7 +36,7 @@ async def correction_mark_choice_lesson(message: Message):
     keyboard.row()
     keyboard.add(Text('Назад', {"cmd": "marks"}), KeyboardButtonColor.NEGATIVE)
 
-    await message.answer('Какой предмет хочешь исправить?', keyboard=keyboard)
+    await message.answer('🤔Какой предмет хотите исправить?', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I sent correction_mark_choice_lesson')
 
 
@@ -68,5 +68,5 @@ async def correction_mark_choice_lesson(message: Message):
     keyboard.row()
     keyboard.add(Text('Назад', {"cmd": "marks"}), KeyboardButtonColor.NEGATIVE)
 
-    await message.answer('Какой предмет хочешь исправить?', keyboard=keyboard)
+    await message.answer('🤔Какой предмет хотите исправить?', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I sent correction_mark_choice_lesson')
