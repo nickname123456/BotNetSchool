@@ -24,5 +24,5 @@ async def change_anything_kb(message: Message):
     )
 
     #Ответ в чат
-    await message.answer('🔄Что ты хочешь поменять?', keyboard=keyboard)
+    await message.answer('🔄Что вы хотите поменять?', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I sent change_anything_kb')

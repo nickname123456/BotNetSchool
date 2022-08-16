@@ -34,7 +34,7 @@ async def private_correction_mark_choice_mark(message: Message):
     )
     
     logging.info(f'{message.peer_id}: I sent correction_mark_choice_mark')
-    await message.answer('Какую оценку хочешь?', keyboard=keyboard)
+    await message.answer('👆🏻Какую оценку хотите?', keyboard=keyboard)
 
 
 
@@ -69,4 +69,4 @@ async def chat_correction_mark_choice_mark(message: Message):
     )
 
     logging.info(f'{message.peer_id}: I sent correction_mark_choice_mark')
-    await message.answer('Какую оценку хочешь?', keyboard=keyboard)
+    await message.answer('👆🏻Какую оценку хотите?', keyboard=keyboard)

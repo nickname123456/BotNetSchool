@@ -20,7 +20,7 @@ async def private_diary_for_day(message: Message):
 
     # Если у человека не правильный логин/пароль
     if db.get_account_correctData(userId) != 1:
-        await message.answer('Ты не зарегистрирован! \nНапиши "Начать"\n Или у тебя неверный логин/пароль')
+        await message.answer('❌Вы не зарегистрированы! \n🤔Напишите "Начать" \n❌Или у вас неверный логин/пароль')
         logging.info(f'{message.peer_id}: User not found in db')
         return
 
@@ -56,7 +56,7 @@ async def private_diary_for_day(message: Message):
         )
         logging.info(f'{message.peer_id}: Get diary from NetSchool')
     except netschoolapi.errors.AuthError:
-        await message.answer('Неправильный логин или пароль!')
+        await message.answer('❌Неправильный логин или пароль!')
         logging.info(f'{message.peer_id}: Incorrect login or password!')
         return
 
@@ -97,7 +97,7 @@ async def private_diary_for_day(message: Message):
     # Добавляем кнопку назад
     keyboard.add(
         Text("Назад", {'cmd': 'keyboard_diary'}), color=KeyboardButtonColor.NEGATIVE)
-    await message.answer('Нажми на предмет для того, чтобы увидеть информацию о нем', keyboard=keyboard)
+    await message.answer('👆Нажмите на предмет для того, чтобы увидеть информацию о нем', keyboard=keyboard)
     logging.info(f'{message.peer_id}: Send keyboard for day')
 
 
@@ -146,7 +146,7 @@ async def chat_diary_for_day(message: Message):
         )
         logging.info(f'{message.peer_id}: Get diary from NetSchool')
     except netschoolapi.errors.AuthError:
-        await message.answer('Неправильный логин или пароль!')
+        await message.answer('❌Неправильный логин или пароль!')
         logging.info(f'{message.peer_id}: Incorrect login or password!')
         return
 
@@ -186,5 +186,5 @@ async def chat_diary_for_day(message: Message):
     # Добавляем кнопку назад
     keyboard.add(
         Text("Назад", {'cmd': 'keyboard_diary'}), color=KeyboardButtonColor.NEGATIVE)
-    await message.answer('Нажми на предмет для того, чтобы увидеть информацию о нем', keyboard=keyboard)
+    await message.answer('👆Нажмите на предмет для того, чтобы увидеть информацию о нем', keyboard=keyboard)
     logging.info(f'{message.peer_id}: Send keyboard for day')

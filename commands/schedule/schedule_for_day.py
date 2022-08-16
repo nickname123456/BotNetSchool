@@ -16,9 +16,9 @@ async def private_schedule_for_day(message: Message):
         if db.get_schedule(db.get_account_school(user_id),db.get_account_class(user_id), message.text)[0] is not None:
             await message.answer(attachment=db.get_schedule(db.get_account_school(user_id), db.get_account_class(user_id), message.text))
         else:
-            await message.answer('На этот день еще нет расписания')
+            await message.answer('❌На этот день еще нет расписания')
     except:
-        await message.answer('На этот день еще нет расписания')
+        await message.answer('❌На этот день еще нет расписания')
 
     logging.info(f'{message.peer_id}: I sent keyboard_schedule')
 
@@ -33,8 +33,8 @@ async def chat_schedule_for_day(message: Message):
         if db.get_schedule(db.get_chat_school(chat_id),db.get_chat_class(chat_id),message.text)[0] is not None:
             await message.answer(attachment=db.get_schedule(db.get_chat_school(chat_id), db.get_chat_class(chat_id), message.text))
         else:
-            await message.answer('На этот день еще нет расписания')
+            await message.answer('❌На этот день еще нет расписания')
     except:
-            await message.answer('На этот день еще нет расписания')
+            await message.answer('❌На этот день еще нет расписания')
 
     logging.info(f'{message.peer_id}: I sent keyboard_schedule')

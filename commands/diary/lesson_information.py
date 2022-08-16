@@ -66,11 +66,11 @@ async def private_lesson_information(message: Message):
                     homework = 'не задано'
 
     await message.answer(f"""
-Предмет: {lesson['subjectName']}
-Кабинет: {lesson['room']}
-Время проведения урока: {lesson['startTime']} - {lesson['endTime']}
-Домашние задание: {homework}
-Оценка: {marks}
+📚Предмет: {lesson['subjectName']}
+🔎Кабинет: {lesson['room']}
+📅Время проведения урока: {lesson['startTime']} - {lesson['endTime']}
+💬Домашние задание: {homework}
+💢Оценка: {marks}
     """)
     logging.info(f'{message.peer_id}: Send lesson information')
 
@@ -135,10 +135,10 @@ async def chat_lesson_information(message: Message):
                     homework = 'не задано'
 
     await message.answer(f"""
-Предмет: {lesson['subjectName']}
-Кабинет: {lesson['room']}
-Время проведения урока: {lesson['startTime']} - {lesson['endTime']}
-Домашние задание: {homework}
-Оценка: {marks}
+📚Предмет: {lesson['subjectName']}
+🔎Кабинет: {lesson['room']}
+📅Время проведения урока: {lesson['startTime']} - {lesson['endTime']}
+💬Домашние задание: {homework}
+💢Оценка: {marks}
     """)
     logging.info(f'{message.peer_id}: Send lesson information')

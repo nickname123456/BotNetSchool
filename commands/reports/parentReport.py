@@ -32,7 +32,7 @@ async def private_parentReport(message: Message):
         keyboard.row()
     keyboard.add(Text('Назад', {'cmd': 'reports'}), color=KeyboardButtonColor.NEGATIVE)
 
-    await message.answer('Выбери триместр/четверть', keyboard=keyboard)
+    await message.answer('👆🏻Выберите триместр/четверть', keyboard=keyboard)
 
 @bp.on.chat_message(payload={'cmd': 'parentReport'})
 async def chat_parentReport(message: Message):
@@ -54,7 +54,7 @@ async def chat_parentReport(message: Message):
         keyboard.row()
     keyboard.add(Text('Назад', {'cmd': 'reports'}), color=KeyboardButtonColor.NEGATIVE)
 
-    await message.answer('Выбери триместр/четверть', keyboard=keyboard)
+    await message.answer('👆🏻Выберите триместр/четверть', keyboard=keyboard)
     
     
     

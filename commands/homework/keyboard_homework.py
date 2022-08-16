@@ -34,7 +34,7 @@ async def private_keyboard_homework(message: Message):
     keyboard.add(Text('Обновить', {"cmd": "keyboard_update_homework"}), color=KeyboardButtonColor.POSITIVE)
     keyboard.add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
 
-    await message.answer('На какой урок хочешь узнать домашнее задание?', keyboard=keyboard)
+    await message.answer('🤔На какой урок хотите узнать домашнее задание?', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I send keyboard_homework')
 
 
@@ -63,5 +63,5 @@ async def chat_keyboard_homework(message: Message):
     keyboard.add(Text('Обновить', {"cmd": "keyboard_update_homework"}), color=KeyboardButtonColor.POSITIVE)
     keyboard.add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
 
-    await message.answer('На какой урок хочешь узнать домашнее задание?', keyboard=keyboard)
+    await message.answer('🤔На какой урок хотите узнать домашнее задание?', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I send keyboard_homework')

@@ -182,7 +182,7 @@ async def getMarkNotify(login, password, school, url, oldmarks):
                         if 'mark' in assignment.keys() and 'mark' in assignment['mark']:
                             if assignment['mark']['mark']:
                                 date = datetime.datetime.strptime(assignment['dueDate'], '%Y-%m-%dT%H:%M:%S')
-                                result = html2markdown.convert(f"У ученика {studentNick} новая оценка по предмету {lesson['subjectName']}: {assignment['mark']['mark']} за {assignment['assignmentName']}. Дата: {date.day}.{date.month}.{date.year}")
+                                result = html2markdown.convert(f"❗У ученика {studentNick} новая оценка по предмету {lesson['subjectName']}: {assignment['mark']['mark']} за {assignment['assignmentName']}. Дата: {date.day}.{date.month}.{date.year}")
                                 clean = re.compile(r'([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
                                 result = re.sub(clean, '', result)
                                 marks.append(result)
@@ -255,7 +255,7 @@ async def correction_mark(login, password, school, url, studentId, subject, mark
         corrective_marks = [5,4,3] # исправлять можно пятерками, четверками и тройками
 
     if average_mark >= lower_threshold: # если оценка уже нужная или выше
-        return 'У тебя и так оценка, которая тебе нужна'
+        return '🤔У вас и так нужная оценка'
     
     for i in corrective_marks: # Перебираем оценки, которыми можно исправлять
         all_marks = await get_marks(login, password, school, url, studentId, subject) # Получаем все текущие оценки
@@ -335,9 +335,9 @@ async def getReportAverageMarkDyn(login, password, school, url, studentId):
     # Приводим в нужный вид
     result = []
     for period in reportAverageMarkDyn['average'].keys():
-        result.append(f'Ср. балл ученика за {period}: {reportAverageMarkDyn["average"][period]}')
+        result.append(f'🙍‍♂Ср. балл ученика за {period}: {reportAverageMarkDyn["average"][period]}')
     for period in reportAverageMarkDyn['AverageInClass'].keys():
-        result.append(f'Ср. балл класса за {period}: {reportAverageMarkDyn["AverageInClass"][period]}')
+        result.append(f'👫Ср. балл класса за {period}: {reportAverageMarkDyn["AverageInClass"][period]}')
     
     return result
 
@@ -378,7 +378,7 @@ async def getReportGrades(login, password, school, url, studentId, subjectId):
     # Приводим в нужный вид
     result = []
     for i in reportGrades.keys():
-        result.append(f'Месяц: {i} \nУченик: {reportGrades[i]["student"]}% \nСреднее по классу: {reportGrades[i]["class"]}% \nСреднее по параллели: {reportGrades[i]["parallel"]}%')
+        result.append(f'📅Месяц: {i} \n🙍‍♂Ученик: {reportGrades[i]["student"]}% \n👫Среднее по классу: {reportGrades[i]["class"]}% \n👯‍♂Среднее по параллели: {reportGrades[i]["parallel"]}%')
     return result
 
 async def getSubjectsId(login, password, school, url, studentId):
