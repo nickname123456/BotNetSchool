@@ -47,7 +47,7 @@ async def keyboard_settings_private(message: Message):
     keyboard.row()
     keyboard.add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.SECONDARY)
 
-    await message.answer('Что хочешь изменить?', keyboard=keyboard)
+    await message.answer('🤔Что хотите изменить?', keyboard=keyboard)
 
 
 @bp.on.chat_message(payload={'cmd': 'keyboard_settings'})
@@ -89,4 +89,4 @@ async def keyboard_settings_chat(message: Message):
     keyboard.row()
     keyboard.add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.SECONDARY)
 
-    await message.answer('Что хочешь изменить?', keyboard=keyboard)
+    await message.answer('🤔Что хотите изменить?', keyboard=keyboard)

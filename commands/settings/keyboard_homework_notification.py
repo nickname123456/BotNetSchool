@@ -16,11 +16,11 @@ async def private_keyboard_homework_notification(message: Message):
     if db.get_account_homework_notification(user_id): # Если человек подписан, то отписываем его
         db.edit_account_homework_notification(user_id, 0)
         db.commit()
-        await message.answer('Теперь ты не будешь получать уведомления о новом д/з.')
+        await message.answer('❌Теперь вы не будете получать уведомления о новом д/з.')
     else: # Если человек не подписан, то подписываем
         db.edit_account_homework_notification(user_id, 1)
         db.commit()
-        await message.answer('Теперь ты будешь получать уведомления о новом д/з.')
+        await message.answer('✅Теперь вы будете получать уведомления о новом д/з.')
 
     await keyboard_settings_private(message)
 
@@ -34,10 +34,10 @@ async def chat_keyboard_homeworks_notification(message: Message):
     if db.get_chat_homework_notification(chat_id): # Если человек подписан, то отписываем его
         db.edit_chat_homework_notification(chat_id, 0)
         db.commit()
-        await message.answer('Теперь вы не будете получать уведомления о новом д/з.')
+        await message.answer('❌Теперь вы не будете получать уведомления о новом д/з.')
     else: # Если человек не подписан, то подписываем
         db.edit_chat_homework_notification(chat_id, 1)
         db.commit()
-        await message.answer('Теперь вы будете получать уведомления о новом д/з.')
+        await message.answer('✅Теперь вы будете получать уведомления о новом д/з.')
 
     await keyboard_settings_chat(message)
