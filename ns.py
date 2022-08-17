@@ -48,7 +48,7 @@ def get_next_week():
     monday = today - datetime.timedelta(days=today.weekday())
 
     next_monday = monday + datetime.timedelta(days=7)
-    next_saturday = monday + datetime.timedelta(days=5)
+    next_saturday = next_monday + datetime.timedelta(days=5)
 
     week = [next_monday, next_saturday]
 
@@ -61,7 +61,7 @@ def get_back_week():
     monday = today - datetime.timedelta(days=today.weekday())
 
     last_monday = monday - datetime.timedelta(days=7)
-    last_saturday = monday + datetime.timedelta(days=5)
+    last_saturday = last_monday + datetime.timedelta(days=5)
 
     week = [last_monday, last_saturday]
 
