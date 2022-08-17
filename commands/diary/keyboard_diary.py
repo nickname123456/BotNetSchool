@@ -69,7 +69,7 @@ async def keyboard_diary(message: Message):
         keyboard.add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
         keyboard.add(Text('🟦'))
 
-    await message.answer(f'📅Текущая неделя: \n{week[0]}\n &#12288;&#12288;--\n{week[1]} \n🤔На какой день хочешь узнать расписание?', keyboard=keyboard)
+    await message.answer(f'📅Текущая неделя: \n{week[0].day}.{week[0].month}.{week[0].year}\n &#12288;&#12288;--\n{week[1].day}.{week[1].month}.{week[1].year}', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I send keyboard diary')
 
 
@@ -131,5 +131,5 @@ async def keyboard_diary(message: Message):
         keyboard.add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
         keyboard.add(Text('🟦'))
 
-    await message.answer(f'📅Текущая неделя: \n{week[0]}\n&#12288;&#12288;--\n{week[1]} \n🤔На какой день хочешь узнать расписание?', keyboard=keyboard)
+    await message.answer(f'📅Текущая неделя: \n{week[0].day}.{week[0].month}.{week[0].year}\n &#12288;&#12288;--\n{week[1].day}.{week[1].month}.{week[1].year}', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I send keyboard diary')
