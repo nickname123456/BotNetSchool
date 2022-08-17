@@ -129,7 +129,8 @@ async def private_registration6(message: Message):
         logging.info(f'{message.peer_id}: Login in NetSchool')
     except:
         logging.exception(f'{message.peer_id}: Exception occurred')
-        await message.answer('Неправильный логин или пароль!')
+        await message.answer('❌Неправильный логин, пароль или школа!\n 🤔Попробуйте еще раз')
+        await registration(message) # Отправляем обратно вводить все данные
         return
 
     try:
@@ -204,7 +205,8 @@ async def chat_registration6(message: Message):
         logging.info(f'{message.peer_id}: Login in NetSchool')
     except:
         logging.exception(f'{message.peer_id}: Exception occurred')
-        await message.answer('Неправильный логин или пароль!')
+        await message.answer('❌Неправильный логин, пароль или школа!\n 🤔Попробуйте еще раз')
+        await registration(message) # Отправляем обратно вводить все данные
         return
 
     try:
