@@ -12,9 +12,27 @@ async def get_student(url, login, password, school, studentId):
 	return student
 
     
-async def get_school(url):
+async def get_countries(url):
 	api = NetSchoolAPI(url)
-	result = await api.schools()
+	result = await api.countries()
+	await api.close()
+	return result
+    
+async def get_provinces(url, countryId):
+	api = NetSchoolAPI(url)
+	result = await api.provinces(countryId)
+	await api.close()
+	return result
+    
+async def get_cities(url, countryId, provincesId):
+	api = NetSchoolAPI(url)
+	result = await api.cities(countryId, provincesId)
+	await api.close()
+	return result
+    
+async def get_school(url, countryId = None, provincesId = None, cityId = None):
+	api = NetSchoolAPI(url)
+	result = await api.schools(countryId, provincesId, cityId)
 	await api.close()
 	return result
 

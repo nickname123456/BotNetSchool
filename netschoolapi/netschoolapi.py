@@ -210,18 +210,37 @@ class NetSchoolAPI:
         )
         return response.json()
 
-    async def schools(self):
-        try:
-            response = await self._client.get(
-                'webapi/addresses/schools', params={'funcType': 2}
-            )
-            response.raise_for_status()
-            schools_reference = response.json()
-        except httpx.HTTPError:
-            response = await self._client.get(
-                'webapi/prepareloginform'
-            )
-            schools_reference = response.json()['schools']
+    async def countries(self):
+        response = await self._client.get(
+            'webapi/prepareloginform'
+        )
+        countries_reference = response.json()['countries']
+        return countries_reference
+
+    async def provinces(self, countryId):
+        response = await self._client.get(
+            'webapi/prepareloginform', params={'cid': countryId}
+        )
+        provinces_reference = response.json()['provinces']
+        return provinces_reference
+
+    async def cities(self, countryId, provincesId):
+        response = await self._client.get(
+            'webapi/prepareloginform', params={
+                'cid': countryId,
+                'pid': provincesId}
+        )
+        cities_reference = response.json()['cities']
+        return cities_reference
+
+    async def schools(self, countryId, provincesId, cityId):
+        response = await self._client.get(
+            'webapi/prepareloginform', params={
+                'cid': countryId,
+                'pid': provincesId,
+                'cn': cityId}
+        )
+        schools_reference = response.json()['schools']
         return schools_reference
 
     async def birthdayMonth(self, period: Optional[date] = datetime.now(), student: Optional[bool] = True, parent: Optional[bool] = True, staff: Optional[bool] = True):

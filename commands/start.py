@@ -2,8 +2,7 @@ import asyncio
 from vkbottle.bot import Message, Blueprint
 from PostgreSQLighter import db
 from ns import get_school
-import traceback
-from vkbottle import BaseStateGroup, CtxStorage, Keyboard, Text
+from vkbottle import BaseStateGroup, CtxStorage, Keyboard, Text, KeyboardButtonColor
 import logging
 import ns
 
@@ -15,10 +14,13 @@ ctx = CtxStorage() # объявляем временное хранилище
 
 class NewaccountState(BaseStateGroup):
     INLINK = 11
-    INSCHOOL = 12
-    INCLASS = 13
-    INLOGIN = 14
-    INPASSWORD = 15
+    INCOUNTRIES = 12
+    INPROVINCES = 13
+    INCITIES = 14
+    INSCHOOL = 15
+    INCLASS = 16
+    INLOGIN = 17
+    INPASSWORD = 18
    
 
 
@@ -32,44 +34,117 @@ async def registration(message: Message):
     await bp.state_dispenser.set(message.peer_id, NewaccountState.INLINK)
 
 
-
 @bp.on.message(state=NewaccountState.INLINK)
-async def registration2(message: Message):
+async def registration_inLink(message: Message):
     if message.attachments:
         if message.attachments[0].link:
             link = 'https://' + str(message.attachments[0].link.caption) + '/'
 
     if message.text or link:
-        try:
             if message.text:
                 link = message.text
 
             ctx.set('link', link) # Загружаем во временное хранилище ссылку
+            await bp.state_dispenser.set(message.peer_id, NewaccountState.INCOUNTRIES)
 
-            schools = await get_school(link)
-            await bp.state_dispenser.set(message.peer_id, NewaccountState.INSCHOOL)
-            await message.answer('📋Введи ID школы из списка ниже(ID - Школа)')
-            await asyncio.sleep(2)
-            text = ''
-            for school in schools:
-                text += f"\n{school['id']} - {school['name']}"
-            if len(text) > 4096:
-                for x in range(0, len(text), 4096):
-                    await message.answer(text[x:x+4096])
-                    await asyncio.sleep(1,5)
-                await message.answer('✅Всё!')
-            else:
-                await message.answer(text)
-        except Exception as e:
-            print(traceback.print_exc())
-            await message.answer(f'❌Ошибка: {e}\nПопробуйте еще раз или обратитесь к [kirillarz|разработчику]')
+            countries = await ns.get_countries(link)
+            keyboard = Keyboard()
+            for i in countries:
+                keyboard.add(Text(i['name'], {'cmd': f'start_countries_{i["id"]}'}))
+                keyboard.row()
+            keyboard.add(Text('Назад', {'cmd': 'start'}), color = KeyboardButtonColor.NEGATIVE)
+
+            await message.answer('🌍В какой стране вы живете?', keyboard=keyboard)
     else:
         await message.answer('❌Не нашел в твоем сообщении данные, введи еще раз')
+
+@bp.on.message(state=NewaccountState.INCOUNTRIES)
+async def registration_inCountries(message: Message):
+    countryId = int(message.payload[24:-2])
+
+    ctx.set('countryId', countryId) # Загружаем во временное хранилище ссылку
+    await bp.state_dispenser.set(message.peer_id, NewaccountState.INPROVINCES)
+
+    keyboard = (
+        Keyboard()
+        .add(Text('Назад', {'cmd': 'start'}), color = KeyboardButtonColor.NEGATIVE)
+    )
+
+    provinces = await ns.get_provinces(ctx.get('link'), countryId)
+    text = ''
+    for i in provinces:
+        text += f'\n"{i["id"]}" - {i["name"]}'
+
+    await message.answer('📋Введите ID района/области из списка ниже', keyboard=keyboard)
+
+    if len(text) > 4096:
+        for x in range(0, len(text), 4096):
+            await message.answer(text[x:x+4096])
+            await asyncio.sleep(1,5)
+        await message.answer('✅Всё!')
+    else:
+        await message.answer(text)
+
+@bp.on.message(state=NewaccountState.INPROVINCES)
+async def registration_inProvinces(message: Message):
+    try:
+        provincesId = int(message.text)
+    except:
+        await message.answer('❌Не нашел в твоем сообщении данные, введите еще раз')
+        return
+
+    ctx.set('provincesId', provincesId) # Загружаем во временное хранилище ссылку
+    await bp.state_dispenser.set(message.peer_id, NewaccountState.INCITIES)
+
+    keyboard = Keyboard().add(Text('Назад', {'cmd': 'start'}), color = KeyboardButtonColor.NEGATIVE)
+
+    cities = await ns.get_cities(ctx.get('link'), ctx.get('countryId'), provincesId)
+    text = ''
+    for i in cities:
+        text += f"\n{i['id']} - {i['name']}"
+
+    await message.answer('📋Введите ID города из списка ниже', keyboard=keyboard)
+
+    if len(text) > 4096:
+        for x in range(0, len(text), 4096):
+            await message.answer(text[x:x+4096])
+            await asyncio.sleep(1,5)
+        await message.answer('✅Всё!')
+    else:
+        await message.answer(text)
+
+@bp.on.message(state=NewaccountState.INCITIES)
+async def registration_inCities(message: Message):
+    try:
+        cityId = int(message.text)
+    except:
+        await message.answer('❌Не нашел в твоем сообщении данные, введи еще раз')
+
+    ctx.set('cityId', cityId) # Загружаем во временное хранилище ссылку
+    await bp.state_dispenser.set(message.peer_id, NewaccountState.INSCHOOL)
+
+    keyboard = Keyboard().add(Text('Назад', {'cmd': 'start'}), color = KeyboardButtonColor.NEGATIVE)
+
+    schools = await get_school(ctx.get('link'), ctx.get('countryId'), ctx.get('provincesId'), cityId)
+    text = ''
+    for i in schools:
+        text += f"\n{i['id']} - {i['name']}"
+
+    await message.answer('📋Введите ID школы из списка ниже', keyboard=keyboard)
+
+    if len(text) > 4096:
+        for x in range(0, len(text), 4096):
+            await message.answer(text[x:x+4096])
+            await asyncio.sleep(1,5)
+        await message.answer('✅Всё!')
+    else:
+        await message.answer(text)
+   
 
 
 
 @bp.on.message(state=NewaccountState.INSCHOOL)
-async def registration3(message: Message):
+async def registration_inSchool(message: Message):
     if message.text.isdigit():
         ctx.set('school', message.text) # Загружаем во временное хранилище школу
 
@@ -80,7 +155,7 @@ async def registration3(message: Message):
 
 
 @bp.on.message(state=NewaccountState.INCLASS)
-async def registration4(message: Message):
+async def registration_inClass(message: Message):
     if message.text:
         ctx.set('clas', message.text.lower()) # Загружаем во временное хранилище класс
 
@@ -91,7 +166,7 @@ async def registration4(message: Message):
 
 
 @bp.on.message(state=NewaccountState.INLOGIN)
-async def registration5(message: Message):
+async def registration_inLogin(message: Message):
     if message.text:
         ctx.set('login', message.text) # Загружаем во временное хранилище логин
 
@@ -103,16 +178,19 @@ async def registration5(message: Message):
 
 
 @bp.on.private_message(state=NewaccountState.INPASSWORD)
-async def private_registration6(message: Message):
+async def private_registration_inPassword(message: Message):
     userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
 
     link = ctx.get('link')
+    countryId = ctx.get('countryId')
+    provincesId = ctx.get('provincesId')
+    cityId = ctx.get('cityId')
     school = ctx.get('school')
     clas = ctx.get('clas')
     login_without_spaces = ctx.get('login')
     password = message.text
 
-    for i in await get_school(link):
+    for i in await get_school(link, countryId, provincesId, cityId):
         if i['id'] == int(school):
             school = i['name']
             break
@@ -165,7 +243,7 @@ async def private_registration6(message: Message):
 
     keyboard = (
         Keyboard()
-        .add(Text('Назад', {'cmd': 'menu'}))
+        .add(Text('Главное меню', {'cmd': 'menu'}), KeyboardButtonColor.POSITIVE)
     )
 
     await bp.state_dispenser.delete(message.from_id)
@@ -179,16 +257,19 @@ async def private_registration6(message: Message):
 
 
 @bp.on.chat_message(state=NewaccountState.INPASSWORD)
-async def chat_registration6(message: Message):
+async def chat_registration_inPassword(message: Message):
     chat_id = message.chat_id
 
     link = ctx.get('link')
+    countryId = ctx.get('countryId')
+    provincesId = ctx.get('provincesId')
+    cityId = ctx.get('cityId')
     school = ctx.get('school')
     clas = ctx.get('clas')
     login_without_spaces = ctx.get('login')
     password = message.text
 
-    for i in await get_school(link):
+    for i in await get_school(link, countryId, provincesId, cityId):
         if i['id'] == int(school):
             school = i['name']
             break
@@ -237,7 +318,7 @@ async def chat_registration6(message: Message):
 
     keyboard = (
         Keyboard()
-        .add(Text('Назад', {'cmd': 'menu'}))
+        .add(Text('Главное меню', {'cmd': 'menu'}), KeyboardButtonColor.POSITIVE)
     )
 
     await bp.state_dispenser.delete(message.peer_id)
