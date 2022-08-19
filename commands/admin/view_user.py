@@ -42,35 +42,35 @@ async def view_user(message: Message):
     announcements_notification = user[0][13]
     schedule_notification = user[0][14]
     homework_notification = user[0][15]
-    old_mark = user[0][16]
-    old_announcements = user[0][17]
+    old_mark = len(eval(user[0][16]))
+    old_announcements = len(eval(user[0][17]))
     correction_lesson = user[0][18]
     correction_mark = user[0][19]
     isAdmin = user[0][20]
 
     await message.answer(
         f'''
-        Имя: {first_name}
-        Фаимилия: {last_name}
-        Логин: {login}
-        Пароль: {password}
-        studentId: {studentId}
-        isFirstLogin: {isFirstLogin}
-        week: {week}
-        day: {day}
-        lesson: {lesson}
-        correctData: {correctData}
-        link: {link}
-        school: {school}
-        clas: {clas}
-        mark_notification: {mark_notification}
-        announcements_notification: {announcements_notification}
-        schedule_notification: {schedule_notification}
-        homework_notification: {homework_notification}
-        old_mark: {old_mark}
-        old_announcements: {old_announcements}
-        correction_lesson: {correction_lesson}
-        correction_mark: {correction_mark}
-        isAdmin : {isAdmin}
+Имя: {first_name}
+Фаимилия: {last_name}
+Логин: {login}
+Пароль: {password}
+studentId: {studentId}
+isFirstLogin: {isFirstLogin}
+week: {week}
+day: {day}
+lesson: {lesson}
+correctData: {correctData}
+link: {link}
+school: {school}
+clas: {clas}
+mark_notification: {mark_notification}
+announcements_notification: {announcements_notification}
+schedule_notification: {schedule_notification}
+homework_notification: {homework_notification}
+len( old_mark ): {old_mark}
+len( old_announcements ): {old_announcements}
+correction_lesson: {correction_lesson}
+correction_mark: {correction_mark}
+isAdmin : {isAdmin}
         '''
     )
