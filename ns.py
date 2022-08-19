@@ -12,9 +12,27 @@ async def get_student(url, login, password, school, studentId):
 	return student
 
     
-async def get_school(url):
+async def get_countries(url):
 	api = NetSchoolAPI(url)
-	result = await api.schools()
+	result = await api.countries()
+	await api.close()
+	return result
+    
+async def get_provinces(url, countryId):
+	api = NetSchoolAPI(url)
+	result = await api.provinces(countryId)
+	await api.close()
+	return result
+    
+async def get_cities(url, countryId, provincesId):
+	api = NetSchoolAPI(url)
+	result = await api.cities(countryId, provincesId)
+	await api.close()
+	return result
+    
+async def get_school(url, countryId = None, provincesId = None, cityId = None):
+	api = NetSchoolAPI(url)
+	result = await api.schools(countryId, provincesId, cityId)
 	await api.close()
 	return result
 
@@ -48,7 +66,7 @@ def get_next_week():
     monday = today - datetime.timedelta(days=today.weekday())
 
     next_monday = monday + datetime.timedelta(days=7)
-    next_saturday = monday + datetime.timedelta(days=5)
+    next_saturday = next_monday + datetime.timedelta(days=5)
 
     week = [next_monday, next_saturday]
 
@@ -61,7 +79,7 @@ def get_back_week():
     monday = today - datetime.timedelta(days=today.weekday())
 
     last_monday = monday - datetime.timedelta(days=7)
-    last_saturday = monday + datetime.timedelta(days=5)
+    last_saturday = last_monday + datetime.timedelta(days=5)
 
     week = [last_monday, last_saturday]
 
