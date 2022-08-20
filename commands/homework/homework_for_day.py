@@ -105,8 +105,6 @@ async def private_homework_for_day(message: Message):
     for lesson in diary['weekDays'][day]['lessons']:
         lesson = lesson['subjectName']
 
-        if lesson in lessons_and_their_reduction: lesson = lessons_and_their_reduction[lesson]
-
         try:
             # Получаем дз
             homework = db.get_homework(
@@ -160,8 +158,6 @@ async def chat_homework_for_day(message: Message):
     # Перебираем уроки
     for lesson in diary['weekDays'][day]['lessons']:
         lesson = lesson['subjectName']
-
-        if lesson in lessons_and_their_reduction: lesson = lessons_and_their_reduction[lesson]
 
         try:
             # Получаем дз

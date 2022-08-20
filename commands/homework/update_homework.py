@@ -5,6 +5,7 @@ from datetime import datetime
 import logging
 import asyncio
 from commands.homework.keyboard_homework import private_keyboard_homework
+import ns
 
 
 bp = Blueprint('update_homework') # Объявляем команду
@@ -28,22 +29,25 @@ async def private_keyboard_update_homework(message: Message):
 
     keyboard = Keyboard()
 
-    lessons = db.get_lessons_with_homework( # Получаем уроки
+    lessons = await ns.getSubjectsId(
+        db.get_account_login(userId),
+        db.get_account_password(userId),
         db.get_account_school(userId),
-        db.get_account_class(userId)
+        db.get_account_link(userId),
+        db.get_account_studentId(userId)
     )
     counter = 1
     for i in lessons: # Перебираем уроки
         if counter == 4: # Если на строке уже 4 урока, то переходим на след строку
             keyboard.row()
             counter = 1
-        keyboard.add(Text(i[0], {"cmd": "update_homework"}))
+        keyboard.add(Text(i[:40], {"cmd": f"update_homework_{lessons[i]}"}))
         counter += 1
     
     keyboard.row()
     keyboard.add(Text("Назад", {'cmd': 'keyboard_homework'}), color=KeyboardButtonColor.NEGATIVE)
 
-    await message.answer('🤔На какой урок хотите изменить дз? Если для нужного предмета нет кнопки, то просто напиши название.', keyboard=keyboard)
+    await message.answer('🤔На какой урок хотите изменить дз?', keyboard=keyboard)
     logging.info(f'{message.peer_id}: I send list of lessons')
 
 
@@ -57,10 +61,7 @@ async def chat_keyboard_update_homework(message: Message):
 @bp.on.private_message(state=HomeworkData.lesson)
 async def get_new_homework(message: Message):
     logging.info(f'{message.peer_id}: I get lesson in update_homework')
-    if len(message.text) <= 40:
-        ctx.set('lesson', message.text) # Загружаем во временное хранилище урок
-    else:
-        return '❌Название урока не может быть больше 40 символов! \n🤔Попробуй еще раз'
+    ctx.set('lesson', message.payload[24:-2]) # Загружаем во временное хранилище id урока
 
     await bp.state_dispenser.set(message.peer_id, HomeworkData.homework)
     
@@ -76,20 +77,24 @@ async def private_edit_hamework(message: Message):
     userId = message.from_id # ID юзера
 
     await bp.state_dispenser.delete(message.peer_id) # Удаляем цепочку
-
-    lesson = ctx.get('lesson') # Берем из временного хранилища урок
+    lessonId = ctx.get('lesson') # Берем из временного хранилища урок
     homework = message.text # Берем дз
-    upd_date = f'{datetime.now().day}-{datetime.now().month}-{datetime.now().year} {datetime.now().hour}:{datetime.now().minute}'
-    lessons = db.get_lessons_with_homework(
-        db.get_account_school(userId),
-        db.get_account_class(userId)
-    )
-    
+    upd_date = f'{datetime.now().hour}:{datetime.now().minute} {datetime.now().day}.{datetime.now().month}.{datetime.now().year}'
+
     try:
         school = db.get_account_school(userId)
         clas = db.get_account_class(userId)
 
-        if (lesson,) in lessons:
+        lessons = await ns.getSubjectsId(
+            db.get_account_login(userId),
+            db.get_account_password(userId),
+            school,
+            db.get_account_link(userId),
+            db.get_account_studentId(userId)
+        )
+        lesson = [lesson for lesson in lessons if lessons[lesson] == lessonId][0]
+
+        if (lesson,) in db.get_lessons_with_homework(school, clas):
             db.edit_homework(
                 school,
                 clas,
@@ -103,6 +108,7 @@ async def private_edit_hamework(message: Message):
                 upd_date)
         else:
             db.add_lesson_with_homework(lesson, school, clas, homework, upd_date)
+            
         db.commit()
 
         await message.answer('✅Вы успешно обновили дз')
