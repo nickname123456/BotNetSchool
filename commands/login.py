@@ -22,8 +22,8 @@ async def private_login(message: Message, userLogin=None, userPassword=None):
     # Если человека нет в бд
     if db.get_account_isFirstLogin(userId) is None:
         logging.info(f'{message.peer_id}: User not in database')
-        await message.answer("🤔Так... Смотрю тебя теще нет в моей бд. Но ничего страшного сейчас все будет!")
-        await message.answer('Напиши "Начать"')
+        await message.answer("🤔Так... Смотрю вас теще нет в моей бд. Но ничего страшного сейчас все будет!")
+        await message.answer('Напишите "Начать"')
         return
 
     #Если пароль и логин введены
@@ -71,7 +71,7 @@ async def private_login(message: Message, userLogin=None, userPassword=None):
     db.commit()
     logging.info(f'{message.peer_id}: Write correctData to database')
 
-    await message.answer(f'✅{userInfo[0].first_name}, ты успешно зашел в систему под логином: {userLogin}')
+    await message.answer(f'✅{userInfo[0].first_name}, вы успешно зашли в систему под логином: {userLogin}')
     logging.info(f'{message.peer_id}: login COMPLETED')
 
 
@@ -119,7 +119,7 @@ async def chat_login(message: Message, userLogin=None, userPassword=None):
             
     except TypeError:
         logging.exception(f'{message.peer_id}: Exception occurred')
-        await message.answer('❌Нужно зарегистрировать беседу. \n🤔Напиши "Начать"')
+        await message.answer('❌Нужно зарегистрировать беседу. \n🤔Напишите "Начать"')
         return
 
     except:
