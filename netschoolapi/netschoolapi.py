@@ -106,7 +106,7 @@ class NetSchoolAPI:
             for assignment in assignment_reference
         }
         self._login_data = (user_name, password, school, studentId)
-        self._class_id = (await self.get_period())['filterSources'][1]['defaultValue']
+        self._class_id = await self.getClassId()
         return student
 
     async def _request_with_optional_relogin(
@@ -388,6 +388,21 @@ class NetSchoolAPI:
             })
         return parser.parseReportParent(response.text)
 
+    async def getClassId(self):
+        response = await self._client.post(
+            'asp/Reports/ReportParentInfoLetter.asp',
+            data = {
+                'AT': self._at,
+                'VER': self._ver,
+                'RPNAME': 'Информационное письмо для родителей',
+                'RPTID': 'ParentInfoLetter',
+                'LoginType': '0',
+                'SID': self._student_id,
+                'ReportType': 2,
+                'PCLID': self._class_id,
+            })
+        return parser.parseClassId(response.text)
+
     async def getTermId(self):
         response = await self._client.post(
             'asp/Reports/ReportParentInfoLetter.asp',
@@ -527,6 +542,7 @@ class NetSchoolAPI:
                 "VER": self._ver,
                 "RPNAME": "Итоги+успеваемости+и+качества+знаний",
                 "RPTID": "StudentAttendanceGrades",
+                "SID": self._student_id,
                 "SCLID": subject,
             }
         )

@@ -167,3 +167,8 @@ def parseSubjectId(html_page) -> Dict:
 	for subjectId in subjectsId:
 		result[subjectId.text] = subjectId.attrs['value']
 	return result
+
+def parseClassId(html_page):
+	html = bs4(html_page, 'lxml')
+	classId = html.find_all(name = 'input', attrs={'name': 'PCLID'})[0].attrs['value']
+	return classId
