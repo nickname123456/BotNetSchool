@@ -111,6 +111,11 @@ async def finish_schedule_download(message: Message):
         except:
             db.add_schedule(school, clas, day, photo)
 
+    await message.answer('✅Расписание успешно обновлено!', attachment=photo)
+    await bp.state_dispenser.delete(message.from_id)
+
+    await keyboard_schedule(message)
+
     users_with_notification = db.get_accounts_schedule_notification()
     chats_with_notification = db.get_chats_schedule_notification()
     for i in users_with_notification:
@@ -126,9 +131,4 @@ async def finish_schedule_download(message: Message):
             if db.get_chat_class(i_id) == clas or clas == 'all':
                 await bp.api.messages.send(message='🔄Новое расписание!', peer_id=2000000000+i_id, random_id=0, attachment=photo)
                 await asyncio.sleep(1)
-
-    await message.answer('✅Расписание успешно обновлено!', attachment=photo)
-    await bp.state_dispenser.delete(message.from_id)
     logging.info(f'{message.peer_id}: I sent success')
-
-    await keyboard_schedule(message)
