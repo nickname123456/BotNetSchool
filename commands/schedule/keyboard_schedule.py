@@ -25,6 +25,8 @@ async def keyboard_schedule(message: Message):
         .row()
         .add(Text('Пятница', {'cmd': 'schedule_for_day'}))
         .row()
+        .add(Text('Суббота', {'cmd': 'schedule_for_day'}))
+        .row()
         .add(Text("Обновить", {'cmd': 'schedule_download'}), color=KeyboardButtonColor.POSITIVE)
         .add(Text("Назад", {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
     )
