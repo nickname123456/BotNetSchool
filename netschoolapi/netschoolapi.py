@@ -586,7 +586,7 @@ class NetSchoolAPI:
     async def getCurrentStudentId(self):
         response = await self._client.get('webapi/student/diary/init')
         diary_info = response.json()
-        student = diary_info['students'][diary_info['currentStudentId']]
+        student = diary_info['students'][0]
         studentId = student['studentId']
         return studentId
 

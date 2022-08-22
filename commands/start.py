@@ -5,8 +5,10 @@ from ns import get_school
 from vkbottle import BaseStateGroup, CtxStorage, Keyboard, Text, KeyboardButtonColor
 import logging
 import ns
+from VKRules import PayloadStarts
 
 bp = Blueprint('registration')
+bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 
 
 
@@ -45,9 +47,12 @@ async def registration_inLink(message: Message):
                 link = message.text
 
             ctx.set('link', link) # Загружаем во временное хранилище ссылку
-            await bp.state_dispenser.set(message.peer_id, NewaccountState.INCOUNTRIES)
-
-            countries = await ns.get_countries(link)
+            
+            try:
+                countries = await ns.get_countries(link)
+            except:
+                await message.answer('❌Не нашел в твоем сообщении данные, введи еще раз')
+                return
             keyboard = Keyboard()
             for i in countries:
                 keyboard.add(Text(i['name'], {'cmd': f'start_countries_{i["id"]}'}))
@@ -55,10 +60,11 @@ async def registration_inLink(message: Message):
             keyboard.add(Text('Назад', {'cmd': 'start'}), color = KeyboardButtonColor.NEGATIVE)
 
             await message.answer('🌍В какой стране вы живете?', keyboard=keyboard)
+            await bp.state_dispenser.set(message.peer_id, NewaccountState.INCOUNTRIES)
     else:
         await message.answer('❌Не нашел в твоем сообщении данные, введи еще раз')
 
-@bp.on.message(state=NewaccountState.INCOUNTRIES)
+@bp.on.message(state=NewaccountState.INCOUNTRIES, PayloadStarts='{"cmd":"start_countries_')
 async def registration_inCountries(message: Message):
     countryId = int(message.payload[24:-2])
 
