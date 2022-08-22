@@ -24,18 +24,15 @@ async def private_correction_mark(message: Message):
     db.edit_account_correction_mark(user_id, mark) # Изменяем желаемую оценку в бд
     db.commit()
 
-    lessonID = db.get_account_correction_lesson(user_id)
-    lessonsIDs = await ns.getSubjectsId(
+    numLesson = int(db.get_account_correction_lesson(user_id))
+    lesson = (await ns.get_marks( # Получаем уроки
         db.get_account_login(user_id),
         db.get_account_password(user_id),
         db.get_account_school(user_id),
         db.get_account_link(user_id),
-        db.get_account_studentId(user_id)
-    )
-    for i in lessonsIDs:
-        if lessonsIDs[i] == lessonID:
-            lesson = i
-
+        db.get_account_studentId(user_id),
+        onlySubjects= True
+    ))[numLesson]
 
     await message.answer(await ns.correction_mark(
         db.get_account_login(user_id),
@@ -74,18 +71,15 @@ async def chat_correction_mark(message: Message):
     db.edit_chat_correction_mark(chat_id, mark) # Изменяем желаемую оценку в бд
     db.commit()
 
-    lessonID = db.get_chat_correction_lesson(chat_id)
-    lessonsIDs = await ns.getSubjectsId(
+    numLesson = int(db.get_chat_correction_lesson(chat_id))
+    lesson = (await ns.get_marks( # Получаем уроки
         db.get_chat_login(chat_id),
         db.get_chat_password(chat_id),
         db.get_chat_school(chat_id),
         db.get_chat_link(chat_id),
-        db.get_chat_studentId(chat_id)
-    )
-    for i in lessonsIDs:
-        if lessonsIDs[i] == lessonID:
-            lesson = i
-
+        db.get_chat_studentId(chat_id),
+        onlySubjects= True
+    ))[numLesson]
 
     await message.answer(await ns.correction_mark(
         db.get_chat_login(chat_id),

@@ -131,7 +131,7 @@ async def get_announcements(login, password, amount, school, link, studentId):
 
 
 
-async def get_marks(login, password, school, url, studentId, subject = None):
+async def get_marks(login, password, school, url, studentId, subject = None, onlySubjects: bool = None):
     api = NetSchoolAPI(url) # Логинимся в СГО
     await api.login(login,password,school,studentId)
     period = await api.get_period() # Получаем текущий триместр/четверть
@@ -151,6 +151,8 @@ async def get_marks(login, password, school, url, studentId, subject = None):
                     if 'mark' in assignment.keys() and 'mark' in assignment['mark']:
                         if assignment['mark']['mark'] != None:
                             marks[lesson['subjectName']].append(assignment['mark']['mark'])
+    if onlySubjects:
+        return list(marks.keys())
 
     if subject == None:                     
         result = ''
