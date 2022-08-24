@@ -2,6 +2,7 @@ from PostgreSQLighter import db
 from ns import getMarkNotify, getAnnouncementsNotify
 import asyncio
 import logging
+from vkbottle import DocMessagesUploader
 
 
 
@@ -43,10 +44,17 @@ async def notification(bot):
                 db.get_account_old_announcements(user_id)
             )
 
-            db.edit_account_old_announcements(user_id, announcements) # Сообщаем бд все объвления
+            db.edit_account_old_announcements(user_id, list(announcements.keys())) # Сообщаем бд все объвления
             db.commit()
             for announcement in result: # Отправляем все новые объявления
-                await bot.api.messages.send(message=announcement, user_id=user_id, random_id=0)			
+                await bot.api.messages.send(message=announcement['text'], user_id=user_id, random_id=0)
+                for attachment in announcement['attachments']:
+                    attach = await DocMessagesUploader(api=bot.api).upload(
+                        file_source = announcement['attachments'][attachment]['file_source'],
+                        title = announcement['attachments'][attachment]['title'],
+                        peer_id=user_id)
+                    await bot.api.messages.send(attachment=attach,user_id=user_id, random_id=0)
+                await bot.api.messages.send(message='&#12288;', user_id=user_id, random_id=0)
                 await asyncio.sleep(1)
 
 
@@ -83,10 +91,17 @@ async def notification(bot):
             db.get_chat_old_announcements(chat_id)
         )
 
-        db.edit_chat_old_announcements(chat_id, announcements) # Говорим бд все объявления
+        db.edit_chat_old_announcements(chat_id, list(announcements.keys())) # Сообщаем бд все объвления
         db.commit()
         for announcement in result: # Отправляем все новые объявления
-            await bot.api.messages.send(message=announcement, peer_id=2000000000+chat_id, random_id=0)			
+            await bot.api.messages.send(message=announcement['text'], peer_id=2000000000+chat_id, random_id=0)
+            for attachment in announcement['attachments']:
+                attach = await DocMessagesUploader(api=bot.api).upload(
+                    file_source = announcement['attachments'][attachment]['file_source'],
+                    title = announcement['attachments'][attachment]['title'],
+                    peer_id=2000000000+chat_id)
+                await bot.api.messages.send(attachment=attach,peer_id=2000000000+chat_id, random_id=0)
+            await bot.api.messages.send(message='&#12288;', peer_id=2000000000+chat_id, random_id=0)
             await asyncio.sleep(1)
 
         logging.info(f'I sleep for 60 minutes')

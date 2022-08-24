@@ -225,29 +225,39 @@ async def getAnnouncementsNotify(login, password, school, url, studentId, old_an
     api = NetSchoolAPI(url) # Логинимся в СГО
     await api.login(login, password, school, studentId)
     announcements = await api.announcements() # Получаем все объявления
-    await api.logout() # Выходим из СГО
 
     # Если есть объявления:
     if announcements:
         # Приводим объявления в нужный вид
-        announcement = ''
-        needed_announcements = []
+        needed_announcements = {}
         for i in announcements:
-            announcement = f"❗Новое объявление \nДата: {i['postDate']}\n {i['name']}: {i['description']}"
+            announcementId = i['id']
+            needed_announcements[announcementId] = {}
 
-            announcement = re.sub(r'\<[^>]*\>', '', announcement)
+            date = datetime.datetime.strptime(i['postDate'], '%Y-%m-%dT%H:%M:%S.%f')
+            date = f'{date.hour}:{date.minute} {date.day}.{date.month}.{date.year}'
+            announcement_text = f"❗Новое объявление \n📅Дата: {date} \n👩‍💼Автор: {i['author']['fio']} \n🔎Тема: {i['name']} \n💬Текст: {i['description']}"
 
-            needed_announcements.append(announcement)
+            announcement_text = re.sub(r'\<[^>]*\>', '', announcement_text)
+
+            needed_announcements[announcementId]['text'] = announcement_text
+            needed_announcements[announcementId]['attachments'] = {}
+            for attachment in i['attachments']:
+                needed_announcements[announcementId]['attachments'][attachment['id']] = {}
+                needed_announcements[announcementId]['attachments'][attachment['id']]['file_source'] = await api.download_attachment_as_bytes(attachment)
+                needed_announcements[announcementId]['attachments'][attachment['id']]['title'] = attachment['name']
+    await api.logout() # Выходим из СГО
+
     # Смотрим какие объявления новые
     difference = []
     try:
         for item in needed_announcements:
             if item not in eval(old_announcements):
-                difference.append(item)
+                difference.append(needed_announcements[item])
     except TypeError:
         for item in needed_announcements:
             if item not in old_announcements:
-                difference.append(item)
+                difference.append(needed_announcements[item])
 
     return needed_announcements, difference
 
