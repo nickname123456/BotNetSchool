@@ -32,6 +32,7 @@ class NewaccountState(BaseStateGroup):
 @bp.on.message(payload={'cmd': 'start'})
 async def registration(message: Message):
     await message.answer('Приветствую!👋🏻 Для начала советую ознакомиться с https://vk.com/@botnetschool-spravka-po-ispolzovaniu-bota')
+    await message.answer('Продолжая пользоваться этим ботом вы автоматически соглашаетесь с Политикой в отношении обработки персональных данных (https://vk.com/@botnetschool-politika-v-otnoshenii-obrabotki-personalnyh-dannyh)')
     await message.answer('🔗Введите адрес сетевого города (Пример: "https://sgo.edu-74.ru/").')
     await bp.state_dispenser.set(message.peer_id, NewaccountState.INLINK)
 
