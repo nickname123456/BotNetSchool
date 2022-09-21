@@ -24,25 +24,17 @@ async def private_diary_for_day(message: Message):
         logging.info(f'{message.peer_id}: User not found in db')
         return
 
-    # Создаем клавиатуру
-    keyboard = (
-        Keyboard()
-    )
-
     # Если пользователь выбрал текущую неделю
     if message.payload.startswith('{"cmd":"diary_for_day_'):
         week = get_week()
-        period_in_payload = ''
         day = int(message.payload[22:-2])
     # Если пользователь выбрал предыдущую неделю
     elif message.payload.startswith('{"cmd":"back_diary_for_day_'):
         week = get_back_week()
-        period_in_payload = 'back_'
         day = int(message.payload[27:-2])
     # Если пользователь выбрал следующую неделю
     elif message.payload.startswith('{"cmd":"next_diary_for_day_'):    
         week = get_next_week()
-        period_in_payload = 'next_'
         day = int(message.payload[27:-2])
     
     try:
@@ -60,45 +52,41 @@ async def private_diary_for_day(message: Message):
         logging.info(f'{message.peer_id}: Incorrect login or password!')
         return
 
-    # Меняем данные о дне в бд
-    db.edit_account_day(userId, day)
-    db.commit()
-
-    
-    #Число, нужное для запоминания, какой урок будет выбран
-    numberOfTimes = -1
-    #Добавляем кнопку с содержанием номера урока, названия урока, оценки
     for lesson in diary['weekDays'][day]['lessons']:
+        marks = ''
+        homework_sgo = ''
+        homework_db = ''
+        try:
+            homework_db = db.get_homework(
+                db.get_account_school(userId),
+                db.get_account_class(userId),
+                lesson['subjectName']
+            )
+        except: pass
+
         if 'assignments' in lesson:
-            for assignment in lesson['assignments']:
-                if 'mark' in assignment: # Если есть оценка
-                    numberOfTimes += 1
-                    # Добавляем кнопку с уроком
-                    keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson['subjectName'] +
-                                        ' ' + str(assignment['mark']['mark']), {'cmd': f'{period_in_payload}lesson_information_{numberOfTimes}'}))
-                    keyboard.row()
-                    break
-                else: # Если нет оценки:
-                    if assignment == lesson['assignments'][0] and len(lesson['assignments']) > 1: # Если помимо этого задания есть другое, то переходим к нему (например если задано дз, и была работа на уроке)
-                        continue
-                    # Добавляем кнопку с уроком
-                    numberOfTimes += 1
-                    keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson['subjectName'],
-                                    {'cmd': f'{period_in_payload}lesson_information_{numberOfTimes}'}))
-                    keyboard.row()
+            for i in lesson['assignments']:
+                #Если оценка не равна пустоте, то записываем ее
+                if 'mark' in i:
+                    marks += str(i['mark']['mark']) + ' '
 
-        else: # Если заданий вообще нет:
-            numberOfTimes += 1
-            # Добавляем кнопку с уроком
-            keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson['subjectName'],
-                            {'cmd': f'{period_in_payload}lesson_information_{numberOfTimes}'}))
-            keyboard.row()
+                #Если тип задание = дз, то записываем
+                if i['typeId'] == 3:
+                    homework_sgo = i['assignmentName']
+                else:
+                    # ЕСли нет дз:
+                    if homework_sgo == '':
+                        homework_sgo = 'не задано'
 
-    # Добавляем кнопку назад
-    keyboard.add(
-        Text("Назад", {'cmd': 'keyboard_diary'}), color=KeyboardButtonColor.NEGATIVE)
-    await message.answer('👆Нажмите на предмет для того, чтобы увидеть информацию о нем', keyboard=keyboard)
-    logging.info(f'{message.peer_id}: Send keyboard for day')
+        await message.answer(f"""
+📚Предмет: {lesson['subjectName']}
+🔎Кабинет: {lesson['room']}
+📅Время проведения урока: {lesson['startTime']} - {lesson['endTime']}
+💬Домашние задание из СГО: {homework_sgo}
+💬Последнее д/з из базы Бота (обновляли сами ученики): {homework_db}
+💢Оценка: {marks}
+        """)
+        logging.info(f'{message.peer_id}: Send lesson information')
 
 
 
@@ -114,25 +102,17 @@ async def chat_diary_for_day(message: Message):
     logging.info(f'{message.peer_id}: I get diary for day')
     chat_id = message.chat_id
 
-    # Создаем клавиатуру
-    keyboard = (
-        Keyboard()
-    )
-
     # Если пользователь выбрал текущую неделю
     if message.payload.startswith('{"cmd":"diary_for_day_'):
         week = get_week()
-        period_in_payload = ''
         day = int(message.payload[22:-2])
     # Если пользователь выбрал предыдущую неделю
     elif message.payload.startswith('{"cmd":"back_diary_for_day_'):
         week = get_back_week()
-        period_in_payload = 'back_'
         day = int(message.payload[27:-2])
     # Если пользователь выбрал следующую неделю
     elif message.payload.startswith('{"cmd":"next_diary_for_day_'):    
         week = get_next_week()
-        period_in_payload = 'next_'
         day = int(message.payload[27:-2])
     
     try:
@@ -150,41 +130,39 @@ async def chat_diary_for_day(message: Message):
         logging.info(f'{message.peer_id}: Incorrect login or password!')
         return
 
-    # Меняем данные о дне в бд
-    db.edit_chat_day(chat_id, day)
-    db.commit()
 
-    #Число, нужное для запоминания, какой урок будет выбран
-    numberOfTimes = -1
-    #Добавляем кнопку с содержанием номера урока, названия урока, оценки
     for lesson in diary['weekDays'][day]['lessons']:
+        marks = ''
+        homework_sgo = ''
+        homework_db = ''
+        try:
+            homework_db = db.get_homework(
+                db.get_account_school(chat_id),
+                db.get_account_class(chat_id),
+                lesson['subjectName']
+            )
+        except: pass
+
         if 'assignments' in lesson:
-            for assignment in lesson['assignments']:
-                if 'mark' in assignment: # Если есть оценка
-                    numberOfTimes += 1
-                    # Добавляем кнопку с уроком
-                    keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson['subjectName'] +
-                                        ' ' + str(assignment['mark']['mark']), {'cmd': f'{period_in_payload}lesson_information_{numberOfTimes}'}))
-                    keyboard.row()
-                    break
-                else: # Если нет оценки:
-                    if assignment == lesson['assignments'][0] and len(lesson['assignments']) > 1: # Если помимо этого задания есть другое, то переходим к нему (например если задано дз, и была работа на уроке)
-                        continue
-                    # Добавляем кнопку с уроком
-                    numberOfTimes += 1
-                    keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson['subjectName'],
-                                    {'cmd': f'{period_in_payload}lesson_information_{numberOfTimes}'}))
-                    keyboard.row()
+            for i in lesson['assignments']:
+                #Если оценка не равна пустоте, то записываем ее
+                if 'mark' in i:
+                    marks += str(i['mark']['mark']) + ' '
 
-        else: # Если заданий вообще нет:
-            numberOfTimes += 1
-            # Добавляем кнопку с уроком
-            keyboard.add(Text(str(numberOfTimes + 1) + '. ' + lesson['subjectName'],
-                            {'cmd': f'{period_in_payload}lesson_information_{numberOfTimes}'}))
-            keyboard.row()
+                #Если тип задание = дз, то записываем
+                if i['typeId'] == 3:
+                    homework_sgo = i['assignmentName']
+                else:
+                    # ЕСли нет дз:
+                    if homework_sgo == '':
+                        homework_sgo = 'не задано'
 
-    # Добавляем кнопку назад
-    keyboard.add(
-        Text("Назад", {'cmd': 'keyboard_diary'}), color=KeyboardButtonColor.NEGATIVE)
-    await message.answer('👆Нажмите на предмет для того, чтобы увидеть информацию о нем', keyboard=keyboard)
-    logging.info(f'{message.peer_id}: Send keyboard for day')
+        await message.answer(f"""
+📚Предмет: {lesson['subjectName']}
+🔎Кабинет: {lesson['room']}
+📅Время проведения урока: {lesson['startTime']} - {lesson['endTime']}
+💬Домашние задание из СГО: {homework_sgo}
+💬Последнее д/з из базы Бота (обновляли сами ученики): {homework_db}
+💢Оценка: {marks}
+        """)
+        logging.info(f'{message.peer_id}: Send lesson information')

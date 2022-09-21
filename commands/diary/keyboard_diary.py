@@ -5,6 +5,7 @@ from ns import get_next_week, get_back_week, get_week, get_diary
 import logging
 from VKRules import PayloadStarts
 from settings import weekDays
+import datetime
 
 
 bp = Blueprint('keyboard_diary')# Объявляем команду
@@ -46,7 +47,7 @@ async def keyboard_diary(message: Message):
     day_number = 0
     for day in diary['weekDays']:
         for i in weekDays:
-            if int(str(day['date'])[8:-9]) - int(str(week[0])[8:]) == i:
+            if (datetime.datetime.strptime(day['date'], '%Y-%m-%dT%H:%M:%S') - datetime.datetime.strptime(diary['weekStart'], '%Y-%m-%dT%H:%M:%S')).days == i:
                 keyboard.add(Text(weekDays[i], {"cmd": f"{period}diary_for_day_{day_number}"}))
                 keyboard.row()
         day_number += 1
@@ -108,7 +109,7 @@ async def keyboard_diary(message: Message):
     day_number = 0
     for day in diary['weekDays']:
         for i in weekDays:
-            if int(str(day['date'])[8:-9]) - int(str(week[0])[8:]) == i:
+            if (datetime.datetime.strptime(day['date'], '%Y-%m-%dT%H:%M:%S') - datetime.datetime.strptime(diary['weekStart'], '%Y-%m-%dT%H:%M:%S')).days == i:
                 keyboard.add(Text(weekDays[i], {"cmd": f"{period}diary_for_day_{day_number}"}))
                 keyboard.row()
         day_number += 1
