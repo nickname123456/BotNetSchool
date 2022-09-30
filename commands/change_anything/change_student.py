@@ -1,10 +1,13 @@
-from vkbottle.bot import Message, Blueprint
-from vkbottle import Keyboard, KeyboardButtonColor, Text
-from PostgreSQLighter import db
-import logging
-import ns
-from VKRules import PayloadStarts
+from database.methods.update import edit_chat_studentId, edit_student_studentId
+from database.methods.get import get_chat_by_vk_id, get_student_by_vk_id
 from commands.change_anything import change_anything_kb
+import ns
+
+from vkbottle import Keyboard, KeyboardButtonColor, Text
+from vkbottle.bot import Message, Blueprint
+from VKRules import PayloadStarts
+
+import logging
 
 
 bp = Blueprint('change_student')# Объявляем команду
@@ -19,15 +22,16 @@ bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 async def private_change_student(message: Message):
     logging.info(f'{message.peer_id}: I get change_student')
     user_id = message.from_id # ID юзера
+    student = get_student_by_vk_id(user_id)
 
     students = await ns.getStudents( # Получаем всех детей, привязанных к аккаунту СГО
-        db.get_account_login(user_id),
-        db.get_account_password(user_id),
-        db.get_account_school(user_id),
-        db.get_account_link(user_id),
-        db.get_account_studentId(user_id)
+        student.login,
+        student.password,
+        student.school,
+        student.link,
+        student.studentId
     )
-    currentStudentId = db.get_account_studentId(user_id) # Получаем выбранного ребенка
+    currentStudentId = student.studentId # Получаем выбранного ребенка
     
     keyboard = Keyboard()
     for i in students: # Перебираем детей
@@ -47,15 +51,16 @@ async def chat_change_student(message: Message):
     logging.info(f'{message.peer_id}: I get change_student')
     # Айди чата:
     chat_id = message.chat_id
+    chat = get_chat_by_vk_id(chat_id)
 
     students = await ns.getStudents( # Получаем всех детей, привязанных к аккаунту СГО
-        db.get_chat_login(chat_id),
-        db.get_chat_password(chat_id),
-        db.get_chat_school(chat_id),
-        db.get_chat_link(chat_id),
-        db.get_chat_studentId(chat_id)
+        chat.login,
+        chat.password,
+        chat.school,
+        chat.link,
+        chat.studentId
     )
-    currentStudentId = db.get_chat_studentId(chat_id) # Получаем выбранного ребенка
+    currentStudentId = chat.studentId # Получаем выбранного ребенка
     
     keyboard = Keyboard()
     for i in students: # Перебираем детей
@@ -78,7 +83,7 @@ async def private_exactly_change_student(message: Message):
 
     studentId = message.payload[23:-2] # Получаем ID ученика, на котого сменили
 
-    db.edit_account_studentId(user_id, studentId) # Меняем в бд выбранного ребенка
+    edit_student_studentId(vk_id=user_id, new_studentId=studentId) # Меняем в бд выбранного ребенка
 
     await message.answer('✅Я успешно сменил выбранного ребенка')
     logging.info(f'{message.peer_id}: I sent change_student with studentId')
@@ -92,7 +97,7 @@ async def chat_exactly_change_student(message: Message):
 
     studentId = message.payload[23:-2] # Получаем ID ученика, на которого сменили
 
-    db.edit_chat_studentId(chat_id, studentId) # Меняем в бд выбранного ребенка
+    edit_chat_studentId(vk_id=chat_id, new_studentId=studentId) # Меняем в бд выбранного ребенка
 
     await message.answer('✅Я успешно сменил выбранного ребенка')
     logging.info(f'{message.peer_id}: I sent change_student with studentId')
