@@ -1,11 +1,13 @@
-from vkbottle.bot import Message, Blueprint
-from vkbottle import Keyboard, KeyboardButtonColor, Text
-from PostgreSQLighter import db
+from database.methods.get import get_chat_by_vk_id, get_student_by_vk_id
 from ns import get_next_week, get_back_week, get_week, get_diary
-import logging
-from VKRules import PayloadStarts
 from settings import weekDays
+
+from vkbottle import Keyboard, KeyboardButtonColor, Text
+from vkbottle.bot import Message, Blueprint
+from VKRules import PayloadStarts
+
 import datetime
+import logging
 
 
 bp = Blueprint('keyboard_diary')# Объявляем команду
@@ -16,6 +18,7 @@ bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 async def keyboard_diary(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard diary')
     userId = message.from_id # ID юзера
+    student = get_student_by_vk_id(userId)
 
     # Какая неделя? текущая, следущая или предыдущая?
     if len(message.payload) <= 24:
@@ -34,12 +37,12 @@ async def keyboard_diary(message: Message):
 
     # Получаем дневник
     diary = await get_diary(
-        db.get_account_login(userId),
-        db.get_account_password(userId),
+        student.login,
+        student.password,
         week,
-        db.get_account_school(userId),
-        db.get_account_link(userId),
-        db.get_account_studentId(userId)
+        student.school,
+        student.link,
+        student.studentId
     )
 
     # Перебирам дни недели и создаем кнопки
@@ -78,6 +81,7 @@ async def keyboard_diary(message: Message):
 async def keyboard_diary(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard diary')
     chat_id = message.chat_id # ID чата
+    chat = get_chat_by_vk_id(chat_id)
 
     # Какая неделя? текущая, следущая или предыдущая?
     if len(message.payload) <= 24:
@@ -96,12 +100,12 @@ async def keyboard_diary(message: Message):
 
     # Получаем дневник
     diary = await get_diary(
-        db.get_chat_login(chat_id),
-        db.get_chat_password(chat_id),
+        chat.login,
+        chat.password,
         week,
-        db.get_chat_school(chat_id),
-        db.get_chat_link(chat_id),
-        db.get_chat_studentId(chat_id)
+        chat.school,
+        chat.link,
+        chat.studentId
     )
 
     # Перебирам дни недели и создаем кнопки

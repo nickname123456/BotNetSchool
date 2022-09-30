@@ -1,10 +1,11 @@
+from database.methods.get import get_chat_by_vk_id, get_homework, get_student_by_vk_id
 from ns import get_back_week, get_next_week, get_week, get_diary
-from vkbottle import Keyboard, KeyboardButtonColor, Text
-from vkbottle.bot import Blueprint, Message
-from PostgreSQLighter import db
 import netschoolapi
-import logging
+
+from vkbottle.bot import Blueprint, Message
 from VKRules import PayloadStarts
+
+import logging
 
 
 bp = Blueprint('diary_for_day') # Объявляем команду
@@ -17,12 +18,7 @@ bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 async def private_diary_for_day(message: Message):
     logging.info(f'{message.peer_id}: I get diary for day')
     userId = message.from_id # ID юзера
-
-    # Если у человека не правильный логин/пароль
-    if db.get_account_correctData(userId) != 1:
-        await message.answer('❌Вы не зарегистрированы! \n🤔Напишите "Начать" \n❌Или у вас неверный логин/пароль')
-        logging.info(f'{message.peer_id}: User not found in db')
-        return
+    student = get_student_by_vk_id(userId)
 
     # Если пользователь выбрал текущую неделю
     if message.payload.startswith('{"cmd":"diary_for_day_'):
@@ -39,12 +35,12 @@ async def private_diary_for_day(message: Message):
     
     try:
         diary = await get_diary( # Получаем дневник
-            db.get_account_login(userId),
-            db.get_account_password(userId),
+            student.login,
+            student.password,
             week,
-            db.get_account_school(userId),
-            db.get_account_link(userId),
-            db.get_account_studentId(userId)
+            student.school,
+            student.link,
+            student.studentId
         )
         logging.info(f'{message.peer_id}: Get diary from NetSchool')
     except netschoolapi.errors.AuthError:
@@ -56,13 +52,9 @@ async def private_diary_for_day(message: Message):
         marks = ''
         homework_sgo = ''
         homework_db = ''
-        try:
-            homework_db = db.get_homework(
-                db.get_account_school(userId),
-                db.get_account_class(userId),
-                lesson['subjectName']
-            )
-        except: pass
+
+        if get_homework(lesson['subjectName'], student.school, student.clas):
+            homework_db = get_homework(lesson['subjectName'], student.school, student.clas).homework
 
         if 'assignments' in lesson:
             for i in lesson['assignments']:
@@ -101,6 +93,7 @@ async def private_diary_for_day(message: Message):
 async def chat_diary_for_day(message: Message):
     logging.info(f'{message.peer_id}: I get diary for day')
     chat_id = message.chat_id
+    chat = get_chat_by_vk_id(chat_id)
 
     # Если пользователь выбрал текущую неделю
     if message.payload.startswith('{"cmd":"diary_for_day_'):
@@ -117,12 +110,12 @@ async def chat_diary_for_day(message: Message):
     
     try:
         diary = await get_diary(
-            db.get_chat_login(chat_id),
-            db.get_chat_password(chat_id),
+            chat.login,
+            chat.password,
             week,
-            db.get_chat_school(chat_id),
-            db.get_chat_link(chat_id),
-            db.get_chat_studentId(chat_id)
+            chat.school,
+            chat.link,
+            chat.studentId
         )
         logging.info(f'{message.peer_id}: Get diary from NetSchool')
     except netschoolapi.errors.AuthError:
@@ -135,13 +128,9 @@ async def chat_diary_for_day(message: Message):
         marks = ''
         homework_sgo = ''
         homework_db = ''
-        try:
-            homework_db = db.get_homework(
-                db.get_account_school(chat_id),
-                db.get_account_class(chat_id),
-                lesson['subjectName']
-            )
-        except: pass
+        
+        if get_homework(lesson['subjectName'], chat.school, chat.clas):
+            homework_db = get_homework(lesson['subjectName'], chat.school, chat.clas).homework
 
         if 'assignments' in lesson:
             for i in lesson['assignments']:
