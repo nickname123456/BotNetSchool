@@ -1,8 +1,9 @@
-from vkbottle.bot import Message, Blueprint
-from PostgreSQLighter import db
+from database.methods.get import get_chat_by_vk_id, get_student_by_vk_id
 from ns import getSettings
-import logging
 
+from vkbottle.bot import Message, Blueprint
+
+import logging
 
 
 bp = Blueprint('information')# Объявляем команду
@@ -15,14 +16,15 @@ async def private_information(message: Message):
     logging.info(f'{message.peer_id}: I get information')
     user_id = message.from_id # ID юзера
 
+    student = get_student_by_vk_id(user_id)
     try:
         result= await getSettings( # Получаем приватные данные из СГО
-            db.get_account_login(user_id),
-            db.get_account_password(user_id),
-            db.get_account_school(user_id),
-            db.get_account_link(user_id),
-            db.get_account_studentId(user_id),
-            db.get_account_class(user_id)
+            student.login,
+            student.password,
+            student.school,
+            student.link,
+            student.studentId,
+            student.clas
         )
     except:
         logging.exception(f'{message.peer_id}: Exception occurred')
@@ -39,14 +41,15 @@ async def chat_information(message: Message):
     # Айди чата:
     chat_id = message.chat_id
 
+    chat = get_chat_by_vk_id(chat_id)
     try:
         result= await getSettings( # Получаем приватные данные СГО
-            db.get_chat_login(chat_id),
-            db.get_chat_password(chat_id),
-            db.get_chat_school(chat_id),
-            db.get_chat_link(chat_id),
-            db.get_chat_studentId(chat_id),
-            db.get_chat_class(chat_id)
+            chat.login,
+            chat.password,
+            chat.school,
+            chat.link,
+            chat.studentId,
+            chat.clas
         )
     except:
         logging.exception(f'{message.peer_id}: Exception occurred')
