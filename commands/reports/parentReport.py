@@ -1,10 +1,11 @@
-from typing import Text
-from vkbottle.bot import Message, Blueprint
-from vkbottle import Keyboard, KeyboardButtonColor, Text
-import logging
+from database.methods.get import get_chat_by_vk_id, get_student_by_vk_id
 import ns
-from PostgreSQLighter import db
+
+from vkbottle import Keyboard, KeyboardButtonColor, Text
+from vkbottle.bot import Message, Blueprint
 from VKRules import PayloadStarts
+
+import logging
 
 
 bp = Blueprint('parentReport') # Объявляем команду
@@ -17,13 +18,14 @@ bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 async def private_parentReport(message: Message):
     logging.info(f'{message.peer_id}: I get parentReport')
     user_id = message.from_id # ID юзера
+    student = get_student_by_vk_id(user_id)
     
     terms = await ns.getTerms( # Получаем триместры/четверти
-        db.get_account_login(user_id),
-        db.get_account_password(user_id),
-        db.get_account_school(user_id),
-        db.get_account_link(user_id),
-        db.get_account_studentId(user_id)
+        student.login,
+        student.password,
+        student.school,
+        student.link,
+        student.studentId
     )
 
     keyboard = Keyboard()
@@ -39,13 +41,14 @@ async def chat_parentReport(message: Message):
     logging.info(f'{message.peer_id}: I get parentReport')
     # Айди чата:
     chat_id = message.chat_id
+    chat = get_chat_by_vk_id(chat_id)
     
     terms = await ns.getTerms( # Получаем триместры/четверти
-        db.get_chat_login(chat_id),
-        db.get_chat_password(chat_id),
-        db.get_chat_school(chat_id),
-        db.get_chat_link(chat_id),
-        db.get_chat_studentId(chat_id)
+        chat.login,
+        chat.password,
+        chat.school,
+        chat.link,
+        chat.studentId
     )
 
     keyboard = Keyboard()
@@ -64,15 +67,16 @@ async def chat_parentReport(message: Message):
 async def private_parentReport_with_term(message: Message):
     logging.info(f'{message.peer_id}: I get parentReport with term')
     user_id = message.from_id # ID юзера
+    student = get_student_by_vk_id(user_id)
 
     termId = message.payload[21:-2] # ID триместра/четверти
     
     parentReport = await ns.getParentReport( # Получаем отчёт
-        db.get_account_login(user_id),
-        db.get_account_password(user_id),
-        db.get_account_school(user_id),
-        db.get_account_link(user_id),
-        db.get_account_studentId(user_id),
+        student.login,
+        student.password,
+        student.school,
+        student.link,
+        student.studentId,
         termId
     )
     for i in parentReport:
@@ -85,15 +89,16 @@ async def chat_parentReport_with_term(message: Message):
     logging.info(f'{message.peer_id}: I get parentReport with term')
     # Айди чата:
     chat_id = message.chat_id
+    chat = get_chat_by_vk_id(chat_id)
     
     termId = message.payload[21:-2] # ID триместра/четверти
     
     parentReport = await ns.getParentReport( # Получаем отчет
-        db.get_chat_login(chat_id),
-        db.get_chat_password(chat_id),
-        db.get_chat_school(chat_id),
-        db.get_chat_link(chat_id),
-        db.get_chat_studentId(chat_id),
+        chat.login,
+        chat.password,
+        chat.school,
+        chat.link,
+        chat.studentId,
         termId
     )
     for i in parentReport:

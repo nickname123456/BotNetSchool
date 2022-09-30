@@ -1,6 +1,6 @@
-from typing import Text
 from vkbottle.bot import Message, Blueprint
 from vkbottle import Keyboard, KeyboardButtonColor, Text
+
 import logging
 
 
