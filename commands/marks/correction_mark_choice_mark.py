@@ -1,9 +1,10 @@
-from typing import Text
+from database.methods.update import edit_chat_correction_lesson, edit_student_correction_lesson
+
 from vkbottle.bot import Message, Blueprint
-from PostgreSQLighter import db
 from vkbottle import Keyboard, KeyboardButtonColor, Text
-import logging
 from VKRules import PayloadStarts
+
+import logging
 
 
 bp = Blueprint('correction_mark_choice_mark') # Объявляем команду
@@ -19,8 +20,7 @@ async def private_correction_mark_choice_mark(message: Message):
 
     lesson = message.payload[31:-2] # Получаем нужный урок
 
-    db.edit_account_correction_lesson(user_id, lesson) # Изменяем урок в бд
-    db.commit()
+    edit_student_correction_lesson(vk_id=user_id, new_correction_lesson=lesson) # Изменяем урок в бд
 
     #Создаем клавиатуру
     keyboard = (
@@ -54,8 +54,7 @@ async def chat_correction_mark_choice_mark(message: Message):
     
     lesson = message.payload[31:-2] # Получаем нужный урок
 
-    db.edit_chat_correction_lesson(chat_id, lesson) # Изменяем урок
-    db.commit()
+    edit_chat_correction_lesson(vk_id=chat_id, new_correction_lesson=lesson) # Изменяем урок
 
     #Создаем клавиатуру
     keyboard = (

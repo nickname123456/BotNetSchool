@@ -1,9 +1,10 @@
-from typing import Text
-from vkbottle.bot import Message, Blueprint
-from vkbottle import Keyboard, KeyboardButtonColor, Text
-import logging
+from database.methods.get import get_chat_by_vk_id, get_student_by_vk_id
 from ns import get_marks
-from PostgreSQLighter import db
+
+from vkbottle import Keyboard, KeyboardButtonColor, Text
+from vkbottle.bot import Message, Blueprint
+
+import logging
 
 
 bp = Blueprint('correction_mark_choice_lesson') # Объявляем команду
@@ -15,14 +16,15 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр сообще
 async def correction_mark_choice_lesson(message: Message):
     logging.info(f'{message.peer_id}: I get correction_mark_choice_lesson')
     user_id = message.from_id # ID юзера
+    student = get_student_by_vk_id(user_id)
 
     keyboard = Keyboard()
     lessons = await get_marks( # Получаем уроки
-        db.get_account_login(user_id),
-        db.get_account_password(user_id),
-        db.get_account_school(user_id),
-        db.get_account_link(user_id),
-        db.get_account_studentId(user_id),
+        student.login,
+        student.password,
+        student.school,
+        student.link,
+        student.studentId,
         onlySubjects= True
     )
 
@@ -47,14 +49,15 @@ async def correction_mark_choice_lesson(message: Message):
     logging.info(f'{message.peer_id}: I get correction_mark_choice_lesson')
     # Айди чата:
     chat_id = message.chat_id
+    chat = get_chat_by_vk_id(chat_id)
 
     keyboard = Keyboard()
     lessons = await get_marks( # Получаем уроки
-        db.get_chat_login(chat_id),
-        db.get_chat_password(chat_id),
-        db.get_chat_school(chat_id),
-        db.get_chat_link(chat_id),
-        db.get_chat_studentId(chat_id),
+        chat.login,
+        chat.password,
+        chat.school,
+        chat.link,
+        chat.studentId,
         onlySubjects= True
     )
 
