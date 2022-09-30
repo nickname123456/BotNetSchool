@@ -1,7 +1,9 @@
-from vkbottle.bot import Message, Blueprint
-from vkbottle import Keyboard, KeyboardButtonColor, Text
+from database.methods.get import get_student_by_vk_id, get_chat_by_vk_id
 from netschoolapi import NetSchoolAPI
-from PostgreSQLighter import db
+
+from vkbottle import Keyboard, KeyboardButtonColor, Text
+from vkbottle.bot import Message, Blueprint
+
 import logging
 
 
@@ -18,14 +20,14 @@ async def private_menu(message: Message):
     logging.info(f'{message.peer_id}: I get menu')
     user_id = message.from_id
 
-    studentId = db.get_account_studentId(user_id)
+    student = get_student_by_vk_id(user_id)
     try:
-        api = NetSchoolAPI(db.get_account_link(user_id)) # Логинимся в СГО
+        api = NetSchoolAPI(student.link) # Логинимся в СГО
         await api.login(
-            db.get_account_login(user_id), 
-            db.get_account_password(user_id), 
-            db.get_account_school(user_id),
-            studentId
+            student.login, 
+            student.password, 
+            student.school,
+            student.studentId
         )
     except:
         logging.exception(f'{message.peer_id}: Exception occurred')
@@ -70,14 +72,14 @@ async def chat_menu(message: Message):
     # Айди чата:
     chat_id = message.chat_id
 
-    studentId = db.get_chat_studentId(chat_id)
+    chat = get_chat_by_vk_id(chat_id)
     try:
-        api = NetSchoolAPI(db.get_chat_link(chat_id)) # Логинимся в СГО
+        api = NetSchoolAPI(chat.link) # Логинимся в СГО
         await api.login(
-            db.get_chat_login(chat_id), 
-            db.get_chat_password(chat_id), 
-            db.get_chat_school(chat_id),
-            studentId
+            chat.login, 
+            chat.password, 
+            chat.school,
+            chat.studentId
         )
     except:
         logging.exception(f'{message.peer_id}: Exception occurred')
