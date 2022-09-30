@@ -1,5 +1,5 @@
 from . import login, menu, not_found, start, information
-from .diary import diary_for_day, keyboard_diary, lesson_information
+from .diary import diary_for_day, keyboard_diary
 from .homework import homework, keyboard_homework, update_homework, homework_for_day
 from .marks import marks, correction_mark_choice_lesson, correction_mark_choice_mark, correction_mark
 from .schedule import keyboard_schedule, schedule_download, schedule_for_day
@@ -15,7 +15,6 @@ bps = [not_found.bp,
        login.bp,
        keyboard_diary.bp,
        diary_for_day.bp,
-       lesson_information.bp,
        schedule_download.bp,
        keyboard_schedule.bp,
        schedule_for_day.bp,
