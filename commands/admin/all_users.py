@@ -1,9 +1,10 @@
+from database.methods.get import get_all_students, get_student_by_vk_id
+
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Message, Blueprint
-from PostgreSQLighter import db
-import logging
 from VKRules import PayloadStarts
 
+import logging
 
 
 bp = Blueprint('all_users')# Объявляем команду
@@ -13,16 +14,17 @@ bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 
 
 @bp.on.private_message(PayloadStarts='{"cmd":"all_users_')
-async def all_users(message: Message, userId=None):
+async def all_users(message: Message):
     logging.info(f'{message.peer_id}: I get all_users')
     user_id = message.from_id # ID юзера
+    student = get_student_by_vk_id(user_id)
 
     # Проверка на админа
-    if db.get_account_isAdmin(user_id) == 0:
+    if not student.isAdmin:
         await message.answer('У тебя нет админских прав!')
         return
 
-    users = db.get_account_all()  # Все пользователи
+    users = get_all_students()  # Все пользователи
     # Делим всех юзеров на ровные части, для того, чтобы их всех можно было уместить в клавиатуры
     users_id = {0:[]}
     counter = 0
@@ -33,7 +35,7 @@ async def all_users(message: Message, userId=None):
             list_counter += 1
             users_id[list_counter] = []
 
-        users_id[list_counter].append(i[0])
+        users_id[list_counter].append(i.vk_id)
         counter += 1
 
     # Делаем Клавиатуру с ФИ всех юзеров

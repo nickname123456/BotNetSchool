@@ -1,7 +1,10 @@
-from vkbottle.bot import Message, Blueprint
-from PostgreSQLighter import db
-import logging
+from database.methods.get import get_student_by_vk_id
+from database.methods.update import switch_student_admin
 from settings import ADM_PASSWORD # Пароль для получения админки
+
+from vkbottle.bot import Message, Blueprint
+
+import logging
 
 
 
@@ -16,11 +19,9 @@ async def give_admin(message: Message):
     logging.info(f'{message.peer_id}: I get give_admin')
     user_id = message.from_id  # ID юзера
 
-    # Проверка на админа
-    if db.get_account_isAdmin(user_id) == 1:
-        db.edit_account_isAdmin(user_id, 0) # Забираем админку
+    switch_student_admin(vk_id=user_id)
+
+    if get_student_by_vk_id(user_id).isAdmin:
+        await message.answer('Поздравляю! У тебя теперь есть админка!')
+    else:
         await message.answer('У тебя уже есть админка! Ну хорошо, я ее с тебя снимаю')
-        return
-    
-    db.edit_account_isAdmin(user_id, 1) # Даем админку
-    await message.answer('Поздравляю! У тебя теперь есть админка!')

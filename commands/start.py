@@ -1,11 +1,15 @@
-import asyncio
-from vkbottle.bot import Message, Blueprint
-from PostgreSQLighter import db
-from ns import get_school
-from vkbottle import BaseStateGroup, CtxStorage, Keyboard, Text, KeyboardButtonColor
-import logging
+from database.methods.update import edit_student_clas, edit_student_link, edit_student_login, edit_student_password, edit_student_school, edit_student_studentId, edit_chat_clas, edit_chat_link, edit_chat_login, edit_chat_password, edit_chat_school, edit_chat_studentId
+from database.methods.get import get_chat_by_vk_id, get_student_by_vk_id
+from database.methods.create import create_chat, create_student
 import ns
+
+from vkbottle import BaseStateGroup, CtxStorage, Keyboard, Text, KeyboardButtonColor
+from vkbottle.bot import Message, Blueprint
 from VKRules import PayloadStarts
+
+import asyncio
+import logging
+
 
 bp = Blueprint('registration')
 bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
@@ -132,7 +136,7 @@ async def registration_inCities(message: Message):
 
     keyboard = Keyboard().add(Text('Назад', {'cmd': 'start'}), color = KeyboardButtonColor.NEGATIVE)
 
-    schools = await get_school(ctx.get('link'), ctx.get('countryId'), ctx.get('provincesId'), cityId)
+    schools = await ns.get_school(ctx.get('link'), ctx.get('countryId'), ctx.get('provincesId'), cityId)
     text = ''
     for i in schools:
         text += f"\n{i['id']} - {i['name']}"
@@ -186,7 +190,8 @@ async def registration_inLogin(message: Message):
 
 @bp.on.private_message(state=NewaccountState.INPASSWORD)
 async def private_registration_inPassword(message: Message):
-    userInfo = await bp.api.users.get(message.from_id) # Информация о юзере
+    userId = message.from_id # ID юзера
+    userInfo =await bp.api.users.get(userId) # Информация о юзере
 
     link = ctx.get('link')
     countryId = ctx.get('countryId')
@@ -197,7 +202,7 @@ async def private_registration_inPassword(message: Message):
     login_without_spaces = ctx.get('login')
     password = message.text
 
-    for i in await get_school(link, countryId, provincesId, cityId):
+    for i in await ns.get_school(link, countryId, provincesId, cityId):
         if i['id'] == int(school):
             school = i['name']
             break
@@ -218,35 +223,19 @@ async def private_registration_inPassword(message: Message):
         await registration(message) # Отправляем обратно вводить все данные
         return
 
-    try:
-        # Если юзера нет в бд:
-        if db.get_account_isFirstLogin(userInfo[0].id) is None:
-            db.add_user(userInfo[0].id, login, password, link, school, clas, studentId)
-            db.commit()
-        logging.info(f'{message.peer_id}: User in database')
-    except TypeError:
-        logging.exception(f'{message.peer_id}: User not in database')
-        db.add_user(userInfo[0].id, login, password, link, school, clas, studentId)
-        db.commit()
+    
+    # Если юзера нет в бд:
+    if get_student_by_vk_id(userId) is None:
+        create_student(vk_id = userId)
+        
+    edit_student_login(vk_id=userId, new_login=login)
+    edit_student_password(vk_id=userId, new_password=password)
+    edit_student_link(vk_id=userId, new_link=link)
+    edit_student_school(vk_id=userId, new_school=school)
+    edit_student_clas(vk_id=userId, new_clas=clas)
+    edit_student_studentId(vk_id=userId, new_studentId=studentId)
 
-    else:
-        db.edit_account_link(userInfo[0].id, link) # Редактируем бд под новые данные
-        logging.info(f'{message.peer_id}: Changed database: link')
-        db.edit_account_school(userInfo[0].id, school) # Редактируем бд под новые данные
-        logging.info(f'{message.peer_id}: Changed database: school')
-        db.edit_account_login(userInfo[0].id, login) # Редактируем бд под новые данные
-        logging.info(f'{message.peer_id}: Changed database: login')
-        db.edit_account_password(userInfo[0].id, password) # Редактируем бд под новые данные
-        logging.info(f'{message.peer_id}: Changed database: password')
-        db.edit_account_class(userInfo[0].id, clas) # Редактируем бд под новые данные
-        logging.info(f'{message.peer_id}: Changed database: clas')
-        db.edit_account_studentId(userInfo[0].id, studentId) # Редактируем бд под новые данные
-        logging.info(f'{message.peer_id}: Changed database: studentId')
-        db.commit()
-
-    db.edit_account_correctData(userInfo[0].id, 1) # Делаем пометку в бд, что у юзера логин и пароль верны
-    db.commit()
-    logging.info(f'{message.peer_id}: We make a note in the database that the user login and password are correct')
+    logging.info(f'{message.peer_id}: User in database')
 
     keyboard = (
         Keyboard()
@@ -276,7 +265,7 @@ async def chat_registration_inPassword(message: Message):
     login_without_spaces = ctx.get('login')
     password = message.text
 
-    for i in await get_school(link, countryId, provincesId, cityId):
+    for i in await ns.get_school(link, countryId, provincesId, cityId):
         if i['id'] == int(school):
             school = i['name']
             break
@@ -297,31 +286,19 @@ async def chat_registration_inPassword(message: Message):
         await registration(message) # Отправляем обратно вводить все данные
         return
 
-    try:
-        # Если юзера нет в бд:
-        if db.get_chat_id(chat_id) is None:
-            db.add_chat(chat_id, login, password, link, school, clas, studentId)
-            db.commit()
-        logging.info(f'{message.peer_id}: User in database')
-    except TypeError:
-        logging.exception(f'{message.peer_id}: User not in database')
-        db.add_chat(chat_id, login, password, link, school, clas, studentId)
-        db.commit()
+    
+    # Если юзера нет в бд:
+    if get_chat_by_vk_id(chat_id) is None:
+        create_chat(vk_id=chat_id)
 
-    else:
-        db.edit_chat_link(chat_id, link) # Редактируем бд под новые данные
-        logging.info(f'{message.peer_id}: Changed database: link')
-        db.edit_chat_school(chat_id, school) # Редактируем бд под новые данные
-        logging.info(f'{message.peer_id}: Changed database: school')
-        db.edit_chat_login(chat_id, login) # Редактируем бд под новые данные
-        logging.info(f'{message.peer_id}: Changed database: login')
-        db.edit_chat_password(chat_id, password) # Редактируем бд под новые данные
-        logging.info(f'{message.peer_id}: Changed database: password')
-        db.edit_chat_class(chat_id, clas) # Редактируем бд под новые данные
-        logging.info(f'{message.peer_id}: Changed database: clas')
-        db.edit_chat_studentId(chat_id, studentId) # Редактируем бд под новые данные
-        logging.info(f'{message.peer_id}: Changed database: studentId')
-        db.commit()
+    edit_chat_login(vk_id=chat_id, new_login=login)
+    edit_chat_password(vk_id=chat_id, new_password=password)
+    edit_chat_link(vk_id=chat_id, new_link=link)
+    edit_chat_school(vk_id=chat_id, new_school=school)
+    edit_chat_clas(vk_id=chat_id, new_clas=clas)
+    edit_chat_studentId(vk_id=chat_id, new_studentId=studentId)
+
+    logging.info(f'{message.peer_id}: User in database')
 
     keyboard = (
         Keyboard()

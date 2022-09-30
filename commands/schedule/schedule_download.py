@@ -1,12 +1,16 @@
-from vkbottle.bot import Message, Blueprint
-from PostgreSQLighter import db
-from vkbottle import CtxStorage, BaseStateGroup
-import logging
-import asyncio
-from vkbottle import Keyboard, KeyboardButtonColor, Text, EMPTY_KEYBOARD
+from database.methods.get import get_all_classes_by_school, get_chats_with_schedule_notification, get_schedule, get_student_by_vk_id, get_students_with_schedule_notification
+from database.methods.update import edit_schedule_photo
+from database.methods.create import create_schedule
+
 from commands.schedule.keyboard_schedule import keyboard_schedule
 from settings import weekDays
 
+from vkbottle import Keyboard, KeyboardButtonColor, Text, EMPTY_KEYBOARD
+from vkbottle import CtxStorage, BaseStateGroup
+from vkbottle.bot import Message, Blueprint
+
+import logging
+import asyncio
 
 
 bp = Blueprint('schedule_download') # Объявляем команду
@@ -88,47 +92,44 @@ async def class_schedule_download(message: Message):
 async def finish_schedule_download(message: Message):
     logging.info(f'{message.peer_id}: I get finish in schedule_download')
     userId = message.from_id # ID юзера
+    student = get_student_by_vk_id(userId)
 
     day = ctx.get('day')
     photo = ctx.get('photo')
-    school = db.get_account_school(userId)
+    school = student.school
     if message.text == 'Это расписание для всей школы':
-        for i in set(db.get_account_any_with_filter('class', 'school', school)):
+        for i in get_all_classes_by_school(student.school):
             clas = i[0]
-            try:
-                old_shedule = db.get_schedule(school, clas, day)
-                db.edit_schedule(school, clas, day, photo)
-            except:
-                db.add_schedule(school, clas, day, photo)
+            if get_schedule(school, clas, day) is None:
+                create_schedule(school, clas, day, photo)
+            else:
+                edit_schedule_photo(school, clas, day, photo)
         clas = 'all'
 
     else: 
         clas = message.text.lower()
 
-        try:
-            old_shedule = db.get_schedule(school, clas, day)
-            db.edit_schedule(school, clas, day, photo)
-        except:
-            db.add_schedule(school, clas, day, photo)
+        if get_schedule(school, clas, day) is None:
+            create_schedule(school, clas, day, photo)
+        else:
+            edit_schedule_photo(school, clas, day, photo)
 
     await message.answer('✅Расписание успешно обновлено!', attachment=photo)
     await bp.state_dispenser.delete(message.from_id)
 
     await keyboard_schedule(message)
 
-    users_with_notification = db.get_accounts_schedule_notification()
-    chats_with_notification = db.get_chats_schedule_notification()
+    users_with_notification = get_students_with_schedule_notification()
+    chats_with_notification = get_chats_with_schedule_notification()
     for i in users_with_notification:
-        i_id = i[0]
-        if db.get_account_school(i_id) == school:
-            if db.get_account_class(i_id) == clas or clas == 'all':
-                await bp.api.messages.send(message='🔄Новое расписание!', user_id=i_id, random_id=0, attachment=photo)
+        if i.school == school:
+            if i.clas == clas or clas == 'all':
+                await bp.api.messages.send(message='🔄Новое расписание!', user_id=i.vk_id, random_id=0, attachment=photo)
                 await asyncio.sleep(1)
 
     for i in chats_with_notification:
-        i_id = i[0]
-        if db.get_chat_school(i_id) == school:
-            if db.get_chat_class(i_id) == clas or clas == 'all':
-                await bp.api.messages.send(message='🔄Новое расписание!', peer_id=2000000000+i_id, random_id=0, attachment=photo)
+        if i.school == school:
+            if i.clas == clas or clas == 'all':
+                await bp.api.messages.send(message='🔄Новое расписание!', peer_id=2000000000+i.vk_id, random_id=0, attachment=photo)
                 await asyncio.sleep(1)
     logging.info(f'{message.peer_id}: I sent success')

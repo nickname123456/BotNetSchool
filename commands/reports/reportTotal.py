@@ -1,7 +1,9 @@
-from vkbottle.bot import Message, Blueprint
-import logging
+from database.methods.get import get_chat_by_vk_id, get_student_by_vk_id
 import ns
-from PostgreSQLighter import db
+
+from vkbottle.bot import Message, Blueprint
+
+import logging
 
 
 bp = Blueprint('reportTotal') # Объявляем команду
@@ -13,13 +15,14 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр сообще
 async def private_reportTotal(message: Message):
     logging.info(f'{message.peer_id}: I get reportTotal')
     user_id = message.from_id # ID юзера
+    student = get_student_by_vk_id(user_id)
 
     reportTotal = await ns.getReportTotal( # Получаем отчет
-        db.get_account_login(user_id),
-        db.get_account_password(user_id),
-        db.get_account_school(user_id),
-        db.get_account_link(user_id),
-        db.get_account_studentId(user_id)
+        student.login,
+        student.password,
+        student.school,
+        student.link,
+        student.studentId
     )
     for i in reportTotal:
         await message.answer(reportTotal[i])
@@ -31,13 +34,14 @@ async def chat_reportTotal(message: Message):
     logging.info(f'{message.peer_id}: I get reportTotal')
     # Айди чата:
     chat_id = message.chat_id
+    chat = get_chat_by_vk_id(chat_id)
     
     reportTotal = await ns.getReportTotal( # Получаем отчет
-        db.get_chat_login(chat_id),
-        db.get_chat_password(chat_id),
-        db.get_chat_school(chat_id),
-        db.get_chat_link(chat_id),
-        db.get_chat_studentId(chat_id)
+        chat.login,
+        chat.password,
+        chat.school,
+        chat.link,
+        chat.studentId
     )
     for i in reportTotal:
         await message.answer(reportTotal[i])

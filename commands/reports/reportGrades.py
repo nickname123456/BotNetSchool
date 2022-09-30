@@ -1,10 +1,11 @@
-from typing import Text
-from vkbottle.bot import Message, Blueprint
-from vkbottle import Keyboard, KeyboardButtonColor, Text
-import logging
+from database.methods.get import get_chat_by_vk_id, get_student_by_vk_id
 import ns
-from PostgreSQLighter import db
+
+from vkbottle import Keyboard, KeyboardButtonColor, Text
+from vkbottle.bot import Message, Blueprint
 from VKRules import PayloadStarts
+
+import logging
 
 
 bp = Blueprint('reportGrades') # Объявляем команду
@@ -17,13 +18,14 @@ bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 async def private_reportGrades(message: Message):
     logging.info(f'{message.peer_id}: I get reportGrades')
     user_id = message.from_id # ID юзера
+    student = get_student_by_vk_id(user_id)
     
     subjects = await ns.getSubjectsId( # Получаем ID урока
-        db.get_account_login(user_id),
-        db.get_account_password(user_id),
-        db.get_account_school(user_id),
-        db.get_account_link(user_id),
-        db.get_account_studentId(user_id)
+        student.login,
+        student.password,
+        student.school,
+        student.link,
+        student.studentId
     )
 
     keyboard = Keyboard()
@@ -45,13 +47,14 @@ async def chat_reportGrades(message: Message):
     logging.info(f'{message.peer_id}: I get reportGrades')
     # Айди чата:
     chat_id = message.chat_id
+    chat = get_chat_by_vk_id(chat_id)
     
     subjects = await ns.getSubjectsId( # Получаем ID урока
-        db.get_chat_login(chat_id),
-        db.get_chat_password(chat_id),
-        db.get_chat_school(chat_id),
-        db.get_chat_link(chat_id),
-        db.get_chat_studentId(chat_id)
+        chat.login,
+        chat.password,
+        chat.school,
+        chat.link,
+        chat.studentId
     )
 
     keyboard = Keyboard()
@@ -74,15 +77,16 @@ async def chat_reportGrades(message: Message):
 async def private_reportGrades_with_sub(message: Message):
     logging.info(f'{message.peer_id}: I get reportGrades with term')
     user_id = message.from_id # ID юзера
+    student = get_student_by_vk_id(user_id)
 
     subjectId = message.payload[21:-2] # Получаем ID урока
     
     reportGrades = await ns.getReportGrades( # Получаем отчеты
-        db.get_account_login(user_id),
-        db.get_account_password(user_id),
-        db.get_account_school(user_id),
-        db.get_account_link(user_id),
-        db.get_account_studentId(user_id),
+        student.login,
+        student.password,
+        student.school,
+        student.link,
+        student.studentId,
         subjectId
     )
     for i in reportGrades:
@@ -94,15 +98,16 @@ async def chat_reportGrades_with_sub(message: Message):
     logging.info(f'{message.peer_id}: I get reportGrades with term')
     # Айди чата:
     chat_id = message.chat_id
+    chat = get_chat_by_vk_id(chat_id)
 
     subjectId = message.payload[21:-2] # Получаем ID урока
     
     reportGrades = await ns.getReportGrades( # Получаем отчет
-        db.get_chat_login(chat_id),
-        db.get_chat_password(chat_id),
-        db.get_chat_school(chat_id),
-        db.get_chat_link(chat_id),
-        db.get_chat_studentId(chat_id),
+        chat.login,
+        chat.password,
+        chat.school,
+        chat.link,
+        chat.studentId,
         subjectId
     )
     for i in reportGrades:

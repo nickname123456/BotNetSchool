@@ -1,5 +1,6 @@
-from vkbottle.bot import Message, Blueprint
 from vkbottle import Keyboard, KeyboardButtonColor, Text
+from vkbottle.bot import Message, Blueprint
+
 import logging
 
 

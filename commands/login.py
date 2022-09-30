@@ -1,8 +1,10 @@
-from vkbottle.bot import Message, Blueprint
-from PostgreSQLighter import db
+from database.methods.update import edit_student_login, edit_student_password, edit_student_studentId, edit_chat_login, edit_chat_password, edit_chat_studentId
+from database.methods.get import get_chat_by_vk_id, get_student_by_vk_id
 import ns
-import logging
 
+from vkbottle.bot import Message, Blueprint
+
+import logging
 
 
 bp = Blueprint('login')# Объявляем команду
@@ -20,46 +22,44 @@ async def private_login(message: Message, userLogin=None, userPassword=None):
     userId = message.from_id # ID юзера
 
     # Если человека нет в бд
-    if db.get_account_isFirstLogin(userId) is None:
+    if get_student_by_vk_id(userId) is None:
         logging.info(f'{message.peer_id}: User not in database')
-        await message.answer("🤔Так... Смотрю вас теще нет в моей бд. Но ничего страшного сейчас все будет!")
+        await message.answer("🤔Так... Смотрю вас еще нет в моей базе данных. Но ничего страшного сейчас все будет!")
         await message.answer('Напишите "Начать"')
         return
 
     #Если пароль и логин введены
     if userLogin != None and userPassword != None:
-        #Записать их в бд
-        db.edit_account_login(userId, userLogin)
-        db.commit()
-        db.edit_account_password(userId, userPassword)
-        db.commit()
-        db.edit_account_studentId(userId, 
-            await ns.getCurrentStudentId(
+        student = get_student_by_vk_id(userId)
+        try:
+            studentId = await ns.getCurrentStudentId(
                 userLogin,
-                userPassword, 
-                db.get_account_school(userId),
-                db.get_account_link(userId)))
-        db.commit()
-        db.edit_account_correctData(userId, 0)
-        db.commit()
+                userPassword,
+                student.school,
+                student.link
+            )
+            logging.info(f'{message.peer_id}: Login in NetSchool')
+        except:
+            logging.exception(f'{message.peer_id}: Exception occurred')
+            await message.answer('❌Неправильный логин или пароль!❌')
+            return
+
+        #Записать в бд
+        edit_student_login(vk_id=userId, new_login=userLogin)
+        edit_student_password(vk_id=userId, new_password=userPassword)
+        edit_student_studentId(vk_id=userId, new_studentId=studentId)
         logging.info(f'{message.peer_id}: Write new data to database')
 
     
-    #Записываем логин из бд в переменную
-    userLogin = db.get_account_login(userId)
-    userPassword = db.get_account_password(userId)
-    userSchool = db.get_account_school(userId)
-    userLink = db.get_account_link(userId)
-    studentId = db.get_account_studentId(userId)
-
+    student = get_student_by_vk_id(userId)
     try:
         #Авторезируемся в Сетевом Городе
         await ns.login(
-            userLogin,
-            userPassword,
-            userSchool,
-            userLink,
-            studentId
+            student.login, 
+            student.password, 
+            student.school,
+            student.link,
+            student.studentId
         )
         logging.info(f'{message.peer_id}: Login in NetSchool')
     except:
@@ -67,65 +67,62 @@ async def private_login(message: Message, userLogin=None, userPassword=None):
         await message.answer('❌Неправильный логин или пароль!❌')
         return
 
-    db.edit_account_correctData(userId, 1) #Подтверждаем правильность логина и пароя в бд
-    db.commit()
-    logging.info(f'{message.peer_id}: Write correctData to database')
-
-    await message.answer(f'✅{userInfo[0].first_name}, вы успешно зашли в систему под логином: {userLogin}')
+    await message.answer(f'✅{userInfo[0].first_name}, вы успешно зашли в систему под логином: {student.login}')
     logging.info(f'{message.peer_id}: login COMPLETED')
 
 
 
 
-@bp.on.chat_message(text=["Вход <userLogin> <userPassword>", "Вход"])
+@bp.on.chat_message(text=["Вход <userLogin> <userPassword>", "Вход", 'Войти', 'Войти <userLogin> <userPassword>'])
 @bp.on.chat_message(payload={'cmd': 'login'})
 async def chat_login(message: Message, userLogin=None, userPassword=None):
     logging.info(f'{message.peer_id}: I get login')
     chat_id = message.chat_id # Чат айди
 
+    # Если чата нет в бд
+    if get_chat_by_vk_id(chat_id) is None:
+        logging.info(f'{message.peer_id}: Chat not in database')
+        await message.answer("🤔Так... Смотрю вас еще нет в моей базе данных. Но ничего страшного сейчас все будет!")
+        await message.answer('Напишите "Начать"')
+        return
+
+    #Если пароль и логин введены
+    if userLogin != None and userPassword != None:
+        chat = get_chat_by_vk_id(chat_id)
+        try:
+            studentId = await ns.getCurrentStudentId(
+                userLogin,
+                userPassword,
+                chat.school,
+                chat.link
+            )
+            logging.info(f'{message.peer_id}: Login in NetSchool')
+        except:
+            logging.exception(f'{message.peer_id}: Exception occurred')
+            await message.answer('❌Неправильный логин или пароль!❌')
+            return
+
+        #Записать в бд
+        edit_chat_login(vk_id=chat_id, new_login=userLogin)
+        edit_chat_password(vk_id=chat_id, new_password=userPassword)
+        edit_chat_studentId(vk_id=chat_id, new_studentId=studentId)
+        logging.info(f'{message.peer_id}: Write new data to database')
+
+    chat = get_chat_by_vk_id(chat_id)
     try:
-
-        #Если пароль и логин введены
-        if userLogin != None and userPassword != None:
-            #Записать их в бд
-            db.edit_chat_login(chat_id, userLogin)
-            db.commit()
-            db.edit_chat_password(chat_id, userPassword)
-            db.commit()
-            db.edit_chat_studentId(chat_id, 
-            await ns.getCurrentStudentId(
-                userLogin,userPassword, 
-                db.get_chat_school(chat_id),
-                db.get_chat_link(chat_id)))
-            logging.info(f'{message.peer_id}: Write new data to database')
-
-        
-        #Записываем данные из бд в переменные
-        chatLogin = db.get_chat_login(chat_id)
-        chatPassword = db.get_chat_password(chat_id)
-        chatSchool = db.get_chat_school(chat_id)
-        chatLink = db.get_chat_link(chat_id)
-        studentId = db.get_chat_studentId(chat_id)
-
         #Авторезируемся в Сетевом Городе
         await ns.login(
-            chatLogin,
-            chatPassword,
-            chatSchool,
-            chatLink,
-            studentId
+            chat.login, 
+            chat.password, 
+            chat.school,
+            chat.link,
+            chat.studentId
         )
         logging.info(f'{message.peer_id}: Login in NetSchool')
-            
-    except TypeError:
-        logging.exception(f'{message.peer_id}: Exception occurred')
-        await message.answer('❌Нужно зарегистрировать беседу. \n🤔Напишите "Начать"')
-        return
-
     except:
         logging.exception(f'{message.peer_id}: Exception occurred')
-        await message.answer('Неправильный логин или пароль!')
+        await message.answer('❌Неправильный логин или пароль!❌')
         return
-
-    await message.answer(f'✅Эта беседа успешно зашла в систему под логином: {chatLogin}')
+    
+    await message.answer(f'✅Вы успешно зашли в систему под логином: {chat.login}')
     logging.info(f'{message.peer_id}: login COMPLETED')

@@ -1,6 +1,9 @@
+from database.methods.get import get_chat_by_vk_id, get_schedule, get_student_by_vk_id
+
 from vkbottle.bot import Message, Blueprint
-from PostgreSQLighter import db
+
 import logging
+
 
 
 bp = Blueprint('schedule_for_day') # Объявляем команду
@@ -11,13 +14,12 @@ bp = Blueprint('schedule_for_day') # Объявляем команду
 async def private_schedule_for_day(message: Message):
     logging.info(f'{message.peer_id}: I get schedule_for_day')
     user_id = message.from_id # ID юзера
+    student = get_student_by_vk_id(user_id)
+    schedule = get_schedule(student.school, student.clas, message.text)
 
-    try:
-        if db.get_schedule(db.get_account_school(user_id),db.get_account_class(user_id), message.text)[0] is not None:
-            await message.answer(attachment=db.get_schedule(db.get_account_school(user_id), db.get_account_class(user_id), message.text))
-        else:
-            await message.answer('❌На этот день еще нет расписания')
-    except:
+    if schedule is not None:
+        await message.answer(attachment=schedule.photo)
+    else:
         await message.answer('❌На этот день еще нет расписания')
 
     logging.info(f'{message.peer_id}: I sent keyboard_schedule')
@@ -28,13 +30,12 @@ async def private_schedule_for_day(message: Message):
 async def chat_schedule_for_day(message: Message):
     logging.info(f'{message.peer_id}: I get schedule_for_day')
     chat_id = message.chat_id
+    chat = get_chat_by_vk_id(chat_id)
+    schedule = get_schedule(chat.school, chat.clas, message.text)
 
-    try:
-        if db.get_schedule(db.get_chat_school(chat_id),db.get_chat_class(chat_id),message.text)[0] is not None:
-            await message.answer(attachment=db.get_schedule(db.get_chat_school(chat_id), db.get_chat_class(chat_id), message.text))
-        else:
-            await message.answer('❌На этот день еще нет расписания')
-    except:
-            await message.answer('❌На этот день еще нет расписания')
+    if schedule is not None:
+        await message.answer(attachment=schedule.photo)
+    else:
+        await message.answer('❌На этот день еще нет расписания')
 
     logging.info(f'{message.peer_id}: I sent keyboard_schedule')
