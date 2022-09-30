@@ -1,11 +1,17 @@
-from vkbottle import Bot
-from commands import bps
-from settings import token
-import logging
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from commands.settings.notification import notification
+from settings import token
+from commands import bps
+import database
+
+from vkbottle import Bot
+
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+import logging
 
 scheduler = AsyncIOScheduler()
+
+# Подключаемся к базе данных
+database.register_models()
 
 # Подключаем бота к нашему токену
 bot = Bot(token=token)
