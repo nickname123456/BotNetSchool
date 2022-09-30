@@ -1,8 +1,10 @@
-from vkbottle.bot import Message, Blueprint
-from vkbottle import Keyboard, KeyboardButtonColor, Text
-import logging
-from PostgreSQLighter import db
+from database.methods.get import get_chat_by_vk_id, get_student_by_vk_id
 import ns
+
+from vkbottle import Keyboard, KeyboardButtonColor, Text
+from vkbottle.bot import Message, Blueprint
+
+import logging
 
 
 bp = Blueprint('keyboard_homework')# Объявляем команду
@@ -14,17 +16,18 @@ bp = Blueprint('keyboard_homework')# Объявляем команду
 async def private_keyboard_homework(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_homework')
     userId = message.from_id # ID юзера
+    student = get_student_by_vk_id(userId)
     
     keyboard = Keyboard()
     keyboard.add(Text("Все дз на 1 день", {'cmd': 'keyboard_homework_for_day'}), color=KeyboardButtonColor.PRIMARY)
     keyboard.row()
 
     lessons = await ns.getSubjectsId(
-        db.get_account_login(userId),
-        db.get_account_password(userId),
-        db.get_account_school(userId),
-        db.get_account_link(userId),
-        db.get_account_studentId(userId)
+        student.login,
+        student.password,
+        student.school,
+        student.link,
+        student.studentId
     )
     counter = 1
     for i in lessons: # Перебираем уроки
@@ -46,17 +49,18 @@ async def private_keyboard_homework(message: Message):
 async def chat_keyboard_homework(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_homework')
     chat_id = message.chat_id
+    chat = get_chat_by_vk_id(chat_id)
     
     keyboard = Keyboard()
     keyboard.add(Text("Все дз на 1 день", {'cmd': 'keyboard_homework_for_day'}), color=KeyboardButtonColor.PRIMARY)
     keyboard.row()
 
     lessons = await ns.getSubjectsId(
-        db.get_chat_login(chat_id),
-        db.get_chat_password(chat_id),
-        db.get_chat_school(chat_id),
-        db.get_chat_link(chat_id),
-        db.get_chat_studentId(chat_id)
+        chat.login,
+        chat.password,
+        chat.school,
+        chat.link,
+        chat.studentId
     )
     counter = 1
     for i in lessons: # Перебираем уроки

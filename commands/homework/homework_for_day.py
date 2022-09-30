@@ -1,12 +1,13 @@
-from vkbottle.bot import Message, Blueprint
-from vkbottle import Keyboard, KeyboardButtonColor, Text
-import logging
-from PostgreSQLighter import db
+from database.methods.get import get_chat_by_vk_id, get_homework, get_student_by_vk_id
 from ns import get_diary, get_week
-import netschoolapi
-from settings import lessons_and_their_reduction
 from settings import weekDays
+import netschoolapi
+
+from vkbottle import Keyboard, KeyboardButtonColor, Text
+from vkbottle.bot import Message, Blueprint
 from VKRules import PayloadStarts
+
+import logging
 
 
 bp = Blueprint('homework_for_day')# Объявляем команду
@@ -19,16 +20,17 @@ bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 async def keyboard_homework_for_day(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_homework_for_day')
     userId = message.from_id
+    student = get_student_by_vk_id(userId)
     week = get_week()
     
     # Получаем дневник
     diary = await get_diary(
-        db.get_account_login(userId),
-        db.get_account_password(userId),
+        student.login,
+        student.password,
         week,
-        db.get_account_school(userId),
-        db.get_account_link(userId),
-        db.get_account_studentId(userId)
+        student.school,
+        student.link,
+        student.studentId
     )
 
     # Перебирам дни недели и создаем кнопки
@@ -49,16 +51,17 @@ async def keyboard_homework_for_day(message: Message):
 async def keyboard_homework_for_day(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_homework_for_day')
     chatId = message.chat_id
+    chat = get_chat_by_vk_id(chatId)
     week = get_week()
     
     # Получаем дневник
     diary = await get_diary(
-        db.get_chat_login(chatId),
-        db.get_chat_password(chatId),
+        chat.login,
+        chat.password,
         week,
-        db.get_chat_school(chatId),
-        db.get_chat_link(chatId),
-        db.get_chat_studentId(chatId)
+        chat.school,
+        chat.link,
+        chat.studentId
     )
 
     # Перебирам дни недели и создаем кнопки
@@ -83,17 +86,18 @@ async def keyboard_homework_for_day(message: Message):
 async def private_homework_for_day(message: Message):
     logging.info(f'{message.peer_id}: I get homework_for_day')
     userId = message.from_id # ID юзера
+    student = get_student_by_vk_id(userId)
     week = get_week() 
     day = int(message.payload[25:-2])
 
     try:
         diary = await get_diary( # Получаем дневник
-            db.get_account_login(userId),
-            db.get_account_password(userId),
+            student.login,
+            student.password,
             week,
-            db.get_account_school(userId),
-            db.get_account_link(userId),
-            db.get_account_studentId(userId)
+            student.school,
+            student.link,
+            student.studentId
         )
         logging.info(f'{message.peer_id}: Get diary in NetSchool')
     except netschoolapi.errors.AuthError:
@@ -105,26 +109,11 @@ async def private_homework_for_day(message: Message):
     for lesson in diary['weekDays'][day]['lessons']:
         lesson = lesson['subjectName']
 
-        try:
-            # Получаем дз
-            homework = db.get_homework(
-                db.get_account_school(userId),
-                db.get_account_class(userId),
-                lesson
-            )
-
-            # Получаем дату обновления дз
-            upd_date = db.get_upd_date(
-                db.get_account_school(userId),
-                db.get_account_class(userId),
-                lesson
-            )
-        except:
-            logging.exception(f'{message.peer_id}: Exception occurred')
-            continue
-
-        await message.answer(f'📚Урок: {lesson} \n🆙Было обновлено: {upd_date} \n💬Задание: {homework}')
-        logging.info(f'{message.peer_id}: Send homework')
+        # Получаем дз
+        homework = get_homework(lesson, student.school, student.clas)
+        if homework:
+            await message.answer(f'📚Урок: {lesson} \n🆙Было обновлено: {homework.upd_date} \n💬Задание: {homework.homework}')
+            logging.info(f'{message.peer_id}: Send homework')
 
     await message.answer('❗Внимание могут быть отправлены не все уроки. В этом случае рекомендуем вручную посмотреть Д/З по оставшимся урокам.')
     logging.info(f'{message.peer_id}: I send homework_for_day')
@@ -136,18 +125,19 @@ async def private_homework_for_day(message: Message):
 @bp.on.chat_message(PayloadStarts='{"cmd":"homework_for_day_')
 async def chat_homework_for_day(message: Message):
     logging.info(f'{message.peer_id}: I get homework_for_day')
-    chatId = message.chat_id # ID юзера
+    chatId = message.chat_id # ID чата
+    chat = get_chat_by_vk_id(chatId)
     week = get_week() 
     day = int(message.payload[25:-2])
 
     try:
         diary = await get_diary( # Получаем дневник
-            db.get_chat_login(chatId),
-            db.get_chat_password(chatId),
+            chat.login,
+            chat.password,
             week,
-            db.get_chat_school(chatId),
-            db.get_chat_link(chatId),
-            db.get_chat_studentId(chatId)
+            chat.school,
+            chat.link,
+            chat.studentId
         )
         logging.info(f'{message.peer_id}: Get diary in NetSchool')
     except netschoolapi.errors.AuthError:
@@ -159,26 +149,11 @@ async def chat_homework_for_day(message: Message):
     for lesson in diary['weekDays'][day]['lessons']:
         lesson = lesson['subjectName']
 
-        try:
-            # Получаем дз
-            homework = db.get_homework(
-                db.get_chat_school(chatId),
-                db.get_chat_class(chatId),
-                lesson
-            )
-
-            # Получаем дату обновления дз
-            upd_date = db.get_upd_date(
-                db.get_chat_school(chatId),
-                db.get_chat_class(chatId),
-                lesson
-            )
-        except:
-            logging.exception(f'{message.peer_id}: Exception occurred')
-            continue
-
-        await message.answer(f'📚Урок: {lesson} \n🆙Было обновлено: {upd_date} \n💬Задание: {homework}')
-        logging.info(f'{message.peer_id}: Send homework')
+        # Получаем дз
+        homework = get_homework(lesson, chat.school, chat.clas)
+        if homework:
+            await message.answer(f'📚Урок: {lesson} \n🆙Было обновлено: {homework.upd_date} \n💬Задание: {homework.homework}')
+            logging.info(f'{message.peer_id}: Send homework')
 
     await message.answer('❗Внимание могут быть отправлены не все уроки. В этом случае рекомендуем вручную посмотреть Д/З по оставшимся урокам.')
     logging.info(f'{message.peer_id}: I send homework_for_day')
