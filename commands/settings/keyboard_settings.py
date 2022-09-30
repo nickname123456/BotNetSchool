@@ -1,6 +1,8 @@
-from vkbottle.bot import Message, Blueprint
+from database.methods.get import get_chat_by_vk_id, get_student_by_vk_id
+
 from vkbottle import Keyboard, KeyboardButtonColor, Text
-from PostgreSQLighter import db
+from vkbottle.bot import Message, Blueprint
+
 import logging
 
 
@@ -13,33 +15,34 @@ bp = Blueprint('keyboard_settings')# Объявляем команду
 async def keyboard_settings_private(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_settings')
     user_id = message.from_id # ID юзера
+    student = get_student_by_vk_id(user_id)
 
     keyboard = Keyboard()
     # 
     # Если человек подписан, то кнопка зеленная, в ином случае - красная
     # 
-    if db.get_account_mark_notification(user_id):
+    if student.mark_notification:
         keyboard.add(Text('Уведомления о новых оценках', {"cmd": "keyboard_mark_notification"}), color=KeyboardButtonColor.POSITIVE)
     else:
         keyboard.add(Text('Уведомления о новых оценках', {"cmd": "keyboard_mark_notification"}), color=KeyboardButtonColor.NEGATIVE)
     
     keyboard.row()
 
-    if db.get_account_schedule_notification(user_id):
+    if student.schedule_notification:
         keyboard.add(Text('Уведомления о новом расписании', {"cmd": "keyboard_schedule_notification"}), color=KeyboardButtonColor.POSITIVE)
     else:
         keyboard.add(Text('Уведомления о новом расписании', {"cmd": "keyboard_schedule_notification"}), color=KeyboardButtonColor.NEGATIVE)
     
     keyboard.row()
 
-    if db.get_account_announcements_notification(user_id):
+    if student.announcements_notification:
         keyboard.add(Text('Уведомления о новых объявлениях', {"cmd": "keyboard_announcements_notification"}), color=KeyboardButtonColor.POSITIVE)
     else:
         keyboard.add(Text('Уведомления о новых объявлениях', {"cmd": "keyboard_announcements_notification"}), color=KeyboardButtonColor.NEGATIVE)
     
     keyboard.row()
 
-    if db.get_account_homework_notification(user_id):
+    if student.homework_notification:
         keyboard.add(Text('Уведомления о новом д/з', {'cmd': 'keyboard_homework_notification'}), color=KeyboardButtonColor.POSITIVE)
     else:
         keyboard.add(Text('Уведомления о новом д/з', {'cmd': 'keyboard_homework_notification'}), color=KeyboardButtonColor.NEGATIVE)
@@ -55,33 +58,34 @@ async def keyboard_settings_chat(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_settings')
     # Айди чата:
     chat_id = message.chat_id
+    chat = get_chat_by_vk_id(chat_id)
 
     keyboard = Keyboard()
     # 
     # Если человек подписан, то кнопка зеленная, в ином случае - красная
     # 
-    if db.get_chat_mark_notification(chat_id):
+    if chat.mark_notification:
         keyboard.add(Text('Уведомления о новых оценках', {'cmd': 'keyboard_mark_notification'}), color=KeyboardButtonColor.POSITIVE)
     else:
         keyboard.add(Text('Уведомления о новых оценках', {'cmd': 'keyboard_mark_notification'}), color=KeyboardButtonColor.NEGATIVE)
     
     keyboard.row()
 
-    if db.get_chat_schedule_notification(chat_id):
+    if chat.schedule_notification:
         keyboard.add(Text('Уведомления о новом расписании', {"cmd": "keyboard_schedule_notification"}), color=KeyboardButtonColor.POSITIVE)
     else:
         keyboard.add(Text('Уведомления о новом расписании', {"cmd": "keyboard_schedule_notification"}), color=KeyboardButtonColor.NEGATIVE)
     
     keyboard.row()
 
-    if db.get_chat_announcements_notification(chat_id):
+    if chat.announcements_notification:
         keyboard.add(Text('Уведомления о новых объявлениях', {'cmd': 'keyboard_announcements_notification'}), color=KeyboardButtonColor.POSITIVE)
     else:
         keyboard.add(Text('Уведомления о новых объявлениях', {'cmd': 'keyboard_announcements_notification'}), color=KeyboardButtonColor.NEGATIVE)
     
     keyboard.row()
 
-    if db.get_chat_homework_notification(chat_id):
+    if chat.homework_notification:
         keyboard.add(Text('Уведомления о новом д/з', {'cmd': 'keyboard_homework_notification'}), color=KeyboardButtonColor.POSITIVE)
     else:
         keyboard.add(Text('Уведомления о новом д/з', {'cmd': 'keyboard_homework_notification'}), color=KeyboardButtonColor.NEGATIVE)
