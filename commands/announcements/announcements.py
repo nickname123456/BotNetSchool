@@ -63,7 +63,7 @@ async def private_announcements(message: Message, amount=3):
 
                 # Отправляем файл
                 attach = await DocMessagesUploader(api=message.ctx_api).upload(file_source = file,title = attachment['name'] ,peer_id=message.peer_id)
-                await message.answer(attachment=attach)
+                await message.answer(attachment['name'], attachment=attach)
                 logging.info(f'{message.peer_id}: Send attachment')
 
             # Делаем пробел между объявлениями
@@ -129,7 +129,7 @@ async def chat_announcements(message: Message, amount=3):
 
                 # Отправляем файл
                 attach = await DocMessagesUploader(api=message.ctx_api).upload(file_source = file,title = attachment['name'] ,peer_id=message.peer_id)
-                await message.answer(attachment=attach)
+                await message.answer(attachment['name'], attachment=attach)
                 logging.info(f'{message.peer_id}: Send attachment')
 
             # Делаем пробел между объявлениями

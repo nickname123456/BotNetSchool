@@ -45,6 +45,5 @@ vkbottle==4.1.6
 vkbottle-types==5.131.131.6
 watchgod==0.7
 yarl==1.7.2
-psycopg2==2.8.6
 html2image==2.0.1
 SQLAlchemy==1.4.41
