@@ -60,7 +60,7 @@ async def notification(bot):
                         file_source = announcement['attachments'][attachment]['file_source'],
                         title = announcement['attachments'][attachment]['title'],
                         peer_id=user_id)
-                    await bot.api.messages.send(attachment=attach,user_id=user_id, random_id=0)
+                    await bot.api.messages.send(message=announcement['attachments'][attachment]['title'], attachment=attach,user_id=user_id, random_id=0)
                 await bot.api.messages.send(message='&#12288;', user_id=user_id, random_id=0)
                 await asyncio.sleep(1)
 
@@ -112,7 +112,7 @@ async def notification(bot):
                         file_source = announcement['attachments'][attachment]['file_source'],
                         title = announcement['attachments'][attachment]['title'],
                         peer_id=2000000000+chat_id)
-                    await bot.api.messages.send(attachment=attach,peer_id=2000000000+chat_id, random_id=0)
+                    await bot.api.messages.send(message=announcement['attachments'][attachment]['title'], attachment=attach,peer_id=2000000000+chat_id, random_id=0)
                 await bot.api.messages.send(message='&#12288;', peer_id=2000000000+chat_id, random_id=0)
                 await asyncio.sleep(1)
 
