@@ -10,7 +10,7 @@ bp = Blueprint('information')# Объявляем команду
 bp.on.vbml_ignore_case = True # Игнорируем регистр
 
 
-
+@bp.on.private_message(text=['/z', '/я', '/профиль', '/ghjabkm', '/profile', '/i'])
 @bp.on.private_message(payload={'cmd': 'information'})
 async def private_information(message: Message):
     logging.info(f'{message.peer_id}: I get information')
@@ -35,6 +35,7 @@ async def private_information(message: Message):
     logging.info(f'{message.peer_id}: I sent information')
 
 
+@bp.on.chat_message(text=['/z', '/я', '/профиль', '/ghjabkm', '/profile', '/i'])
 @bp.on.chat_message(payload={'cmd': 'information'})
 async def chat_information(message: Message):
     logging.info(f'{message.peer_id}: I get information')

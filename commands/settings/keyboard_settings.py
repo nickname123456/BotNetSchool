@@ -11,6 +11,7 @@ bp = Blueprint('keyboard_settings')# Объявляем команду
 
 
 
+@bp.on.message(text=['/settings', '/yfcnhjqrb', '/настройки'])
 @bp.on.private_message(payload={'cmd': 'keyboard_settings'})
 async def keyboard_settings_private(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_settings')
@@ -53,6 +54,7 @@ async def keyboard_settings_private(message: Message):
     await message.answer('🤔Что хотите изменить?', keyboard=keyboard)
 
 
+@bp.on.message(text=['/settings', '/yfcnhjqrb', '/настройки'])
 @bp.on.chat_message(payload={'cmd': 'keyboard_settings'})
 async def keyboard_settings_chat(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_settings')

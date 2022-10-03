@@ -12,6 +12,7 @@ import logging
 
 
 bp = Blueprint('registration')
+bp.on.vbml_ignore_case = True # Игнорируем регистр
 bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 
 
@@ -32,7 +33,8 @@ class NewaccountState(BaseStateGroup):
 
 
 
-@bp.on.message(lev='Начать')
+
+@bp.on.message(text=['начать', '/начать', '/yfxfnm', '/start', '/старт'])
 @bp.on.message(payload={'cmd': 'start'})
 async def registration(message: Message):
     await message.answer('Приветствую!👋🏻 Для начала советую ознакомиться с https://vk.com/@botnetschool-spravka-po-ispolzovaniu-bota')

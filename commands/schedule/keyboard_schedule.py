@@ -8,7 +8,7 @@ bp = Blueprint('keyboard_schedule')# Объявляем команду
 
 
 
-
+@bp.on.message(text=['расписание', '/расписание', '/hfcgbcfybt', '/расп', '/hfcg', '/rasp', 'скиньте расписание', 'дайте расписание'])
 @bp.on.message(payload={'cmd': 'keyboard_schedule'})
 async def keyboard_schedule(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_schedule')

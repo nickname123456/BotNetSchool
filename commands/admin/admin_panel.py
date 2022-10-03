@@ -12,7 +12,8 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр
 
 
 
-@bp.on.private_message(text=["админ", 'админка', 'flvby','admin'])
+@bp.on.private_message(text=["админ", 'админка', 'flvby','admin',
+                            "/админ", '/админка', '/flvby','/admin'])
 @bp.on.private_message(payload={'cmd': 'admin_panel'})
 async def admpanel(message: Message):
     logging.info(f'{message.peer_id}: I get admin_panel')
