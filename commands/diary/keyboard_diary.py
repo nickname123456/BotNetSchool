@@ -14,6 +14,7 @@ bp = Blueprint('keyboard_diary')# Объявляем команду
 bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 
 
+@bp.on.private_message(text=['дневник', 'lytdybr', '/дневник', '/lytdybr'])
 @bp.on.private_message(PayloadStarts='{"cmd":"keyboard_diary')
 async def keyboard_diary(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard diary')
@@ -21,7 +22,7 @@ async def keyboard_diary(message: Message):
     student = get_student_by_vk_id(userId)
 
     # Какая неделя? текущая, следущая или предыдущая?
-    if len(message.payload) <= 24:
+    if message.payload is None or len(message.payload) <= 24:
         period = ''
     else:
         period = message.payload[23:-2]
@@ -77,6 +78,7 @@ async def keyboard_diary(message: Message):
     logging.info(f'{message.peer_id}: I send keyboard diary')
 
 
+@bp.on.chat_message(text=['дневник', 'lytdybr', '/дневник', '/lytdybr'])
 @bp.on.chat_message(PayloadStarts='{"cmd":"keyboard_diary')
 async def keyboard_diary(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard diary')
@@ -84,7 +86,7 @@ async def keyboard_diary(message: Message):
     chat = get_chat_by_vk_id(chat_id)
 
     # Какая неделя? текущая, следущая или предыдущая?
-    if len(message.payload) <= 24:
+    if message.payload is None or len(message.payload) <= 24:
         period = ''
     else:
         period = message.payload[23:-2]

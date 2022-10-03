@@ -14,7 +14,7 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр
 
 
 #Если написали "Меню" или нажали на соответствующую кнопку
-@bp.on.private_message(text=["Меню"])
+@bp.on.private_message(text=["Меню", '/menu', '/vty.', '/меню'])
 @bp.on.private_message(payload={'cmd': 'menu'})
 async def private_menu(message: Message):
     logging.info(f'{message.peer_id}: I get menu')
@@ -65,7 +65,7 @@ async def private_menu(message: Message):
 
 
 #Если написали "Меню" или нажали на соответствующую кнопку
-@bp.on.chat_message(text=["Меню"])
+@bp.on.chat_message(text=["Меню", '/menu', '/vty.', '/меню'])
 @bp.on.chat_message(payload={'cmd': 'menu'})
 async def chat_menu(message: Message):
     logging.info(f'{message.peer_id}: I get menu')

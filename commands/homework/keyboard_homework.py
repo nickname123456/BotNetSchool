@@ -11,7 +11,8 @@ bp = Blueprint('keyboard_homework')# Объявляем команду
 
 
 
-
+@bp.on.private_message(text=['дз', '/дз', 'домашка', 'домашнее задание', 'че задали?', 'что задали?', 'че по дз?', 'что по дз?', 'какое дз?',
+                            'lp', '/lp', 'ljvfirf', 'ljvfiytt pflfybt', 'че задали', 'что задали', 'че по дз', 'что по дз', 'какое дз'])
 @bp.on.private_message(payload={'cmd': 'keyboard_homework'})
 async def private_keyboard_homework(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_homework')
@@ -45,6 +46,8 @@ async def private_keyboard_homework(message: Message):
     logging.info(f'{message.peer_id}: I send keyboard_homework')
 
 
+@bp.on.chat_message(text=['дз', '/дз', 'домашка', 'домашнее задание', 'че задали?', 'что задали?', 'че по дз?', 'что по дз?', 'какое дз?',
+                            'lp', '/lp', 'ljvfirf', 'ljvfiytt pflfybt', 'че задали', 'что задали', 'че по дз', 'что по дз', 'какое дз'])
 @bp.on.chat_message(payload={'cmd': 'keyboard_homework'})
 async def chat_keyboard_homework(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_homework')

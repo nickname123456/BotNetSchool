@@ -10,7 +10,7 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр сообще
 
 
 @bp.on.message(payload={'cmd': 'reports'})
-@bp.on.message(text = 'отчеты')
+@bp.on.message(text=['отчеты', '/отчеты', '/jnxtns', '/reports'])
 async def reports(message: Message):
     logging.info(f'{message.peer_id}: I get reports')
 

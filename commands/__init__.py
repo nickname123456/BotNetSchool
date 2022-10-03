@@ -1,4 +1,4 @@
-from . import login, menu, not_found, start, information
+from . import login, menu, not_found, start, information, help, clear_kb
 from .diary import diary_for_day, keyboard_diary
 from .homework import homework, keyboard_homework, update_homework, homework_for_day
 from .marks import marks, correction_mark_choice_lesson, correction_mark_choice_mark, correction_mark
@@ -33,6 +33,8 @@ bps = [not_found.bp,
        correction_mark_choice_mark.bp,
        correction_mark.bp,
        information.bp,
+       help.bp,
+       clear_kb.bp,
        keyboard_schedule_notification.bp,
        admin_panel.bp,
        give_adm.bp,
