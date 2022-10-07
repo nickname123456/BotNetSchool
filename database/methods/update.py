@@ -155,6 +155,14 @@ def edit_student_correction_mark(vk_id: int = None, telegram_id: int = None, new
         Database().session.query(Student).filter(Student.vk_id == vk_id).update(values={Student.correction_mark: new_correction_mark})
         Database().session.commit()
 
+def edit_student_connect_code(vk_id: int = None, telegram_id: int = None, new_connect_code: str = None) -> None:
+    if telegram_id:
+        Database().session.query(Student).filter(Student.telegram_id == telegram_id).update(values={Student.connect_code: new_connect_code})
+        Database().session.commit()
+    elif vk_id:
+        Database().session.query(Student).filter(Student.vk_id == vk_id).update(values={Student.connect_code: new_connect_code})
+        Database().session.commit()
+
 
 
 # `````````````````````````````````````````````````CHATS```````````````````````````````````````````````````````````
@@ -301,6 +309,14 @@ def edit_chat_correction_mark(vk_id: int = None, telegram_id: int = None, new_co
         Database().session.commit()
     elif vk_id:
         Database().session.query(Chat).filter(Chat.vk_id == vk_id).update(values={Chat.correction_mark: new_correction_mark})
+        Database().session.commit()
+
+def edit_chat_connect_code(vk_id: int = None, telegram_id: int = None, new_connect_code: str = None) -> None:
+    if telegram_id:
+        Database().session.query(Chat).filter(Chat.telegram_id == telegram_id).update(values={Chat.connect_code: new_connect_code})
+        Database().session.commit()
+    elif vk_id:
+        Database().session.query(Chat).filter(Chat.vk_id == vk_id).update(values={Chat.connect_code: new_connect_code})
         Database().session.commit()
 
 

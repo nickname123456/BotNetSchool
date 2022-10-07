@@ -24,6 +24,7 @@ class Student(Database.BASE):
     old_announcements = Column(String, default='[]')
     correction_lesson = Column(String)
     correction_mark = Column(String)
+    connect_code = Column(Integer)
 
 
 class Chat(Database.BASE):
@@ -46,6 +47,7 @@ class Chat(Database.BASE):
     old_announcements = Column(String, default='[]')
     correction_lesson = Column(String)
     correction_mark = Column(String)
+    connect_code = Column(Integer)
 
 
 class Schedule(Database.BASE):
