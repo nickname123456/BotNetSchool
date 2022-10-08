@@ -49,10 +49,13 @@ async def registration(message: Message):
 @bp.on.chat_message(text=['начать', '/начать', '/yfxfnm', '/start', '/старт'])
 @bp.on.chat_message(payload={'cmd': 'start'})
 async def registration(message: Message):
+    keyboard = Keyboard().add(Text('✔Импорт настроек из Личных Сообщений', {'cmd': f'import_data_from_private'}))
+
     await message.answer('Приветствую!👋🏻 Для начала советую ознакомиться с https://vk.com/@botnetschool-spravka-po-ispolzovaniu-bota')
     await message.answer('Продолжая пользоваться этим ботом вы автоматически соглашаетесь с Политикой в отношении обработки персональных данных (https://vk.com/@botnetschool-politika-v-otnoshenii-obrabotki-personalnyh-dannyh)')
-    await message.answer('🔗Введите адрес сетевого города (Пример: "https://sgo.edu-74.ru/").')
+    await message.answer('🔗Введите адрес сетевого города (Пример: "https://sgo.edu-74.ru/").', keyboard=keyboard)
     await bp.state_dispenser.set(message.peer_id, NewaccountState.INLINK)
+
 
 
 @bp.on.private_message(payload={'cmd': 'import_data_from_tg'})
@@ -76,6 +79,37 @@ async def import_data_from_tg_with_code(message: Message):
                 await bp.state_dispenser.delete(message.from_id)
                 return
     await message.answer('❌Не нашел аккаунта с таким кодом, попробуйте еще раз')
+
+@bp.on.chat_message(payload={'cmd': 'import_data_from_private'})
+async def import_data_from_private(message: Message):
+    await message.answer('🔒Напишите мне в Личные Сообщения "/code" и введите код, который я вам отправлю в ответ.\n\n🔑После этого я смогу получить данные из вашего аккаунта.')
+    await bp.state_dispenser.set(message.peer_id, ConnectCodeState.INCODE)
+
+@bp.on.chat_message(state=ConnectCodeState.INCODE)
+async def import_data_from_private_with_code(message: Message):
+    if message.text and len(message.text) == 6 and message.text.isdigit():
+        chat_id = message.chat_id
+        code = int(message.text)
+
+        for student in get_all_students():
+            if student.connect_code == code:
+                if get_chat_by_vk_id(chat_id) is None:
+                    create_chat(vk_id=chat_id)
+                edit_chat_login(vk_id=chat_id, new_login=student.login)
+                edit_chat_password(vk_id=chat_id, new_password=student.password)
+                edit_chat_link(vk_id=chat_id, new_link=student.link)
+                edit_chat_school(vk_id=chat_id, new_school=student.school)
+                edit_chat_clas(vk_id=chat_id, new_clas=student.clas)
+                edit_chat_studentId(vk_id=chat_id, new_studentId=student.studentId)
+                logging.info(f'{chat_id}: Chat in database')
+
+                keyboard = Keyboard().add(Text('Главное меню', {'cmd': 'menu'}), KeyboardButtonColor.POSITIVE)
+
+                await message.answer('✅Вы успешно зарегистрировались!', keyboard=keyboard)
+                await bp.state_dispenser.delete(message.peer_id)
+                return
+    await message.answer('❌Не нашел аккаунта с таким кодом, попробуйте еще раз')
+
 
 
 @bp.on.message(state=NewaccountState.INLINK)

@@ -245,21 +245,21 @@ async def start_back(message: Message , callback_query: CallbackQuery = None):
 
 
 def register_user_start_handlers(dp: Dispatcher):
-    dp.register_message_handler(start_back, content_types=['text'], text=['назад', 'Назад', '🔙Назад'], state='*')
+    dp.register_message_handler(start_back, content_types=['text'], text=['назад', 'Назад', '🔙Назад'], state='*', chat_type='private')
 
-    dp.register_callback_query_handler(import_data_from_vk, lambda c: c.data and c.data.startswith('import_data_from_vk'), state='*')
-    dp.register_message_handler(import_data_from_vk_with_code, state=ConnectCodeStates.INCODE)
+    dp.register_callback_query_handler(import_data_from_vk, lambda c: c.data and c.data.startswith('import_data_from_vk'), state='*', chat_type='private')
+    dp.register_message_handler(import_data_from_vk_with_code, state=ConnectCodeStates.INCODE, chat_type='private')
 
-    dp.register_callback_query_handler(start_back, lambda c: c.data and c.data == 'start_back', state='*')
-    dp.register_message_handler(registration, content_types=['text'], text=['начать', '/начать', '/yfxfnm', '/start', '/старт'])
-    dp.register_message_handler(registration_inLink, state=StartStates.INLINK)
-    dp.register_callback_query_handler(registration_inCountries, lambda c: c.data and c.data.startswith('start_countries_'), state=StartStates.INCOUNTRIES)
-    dp.register_callback_query_handler(registration_inProvinces, lambda c: c.data and c.data.startswith('start_provinces_'), state=StartStates.INPROVINCES)
-    dp.register_callback_query_handler(registration_inCities, lambda c: c.data and c.data.startswith('start_cities_'), state=StartStates.INCITIES)
-    dp.register_message_handler(registration_inSchools, state=StartStates.INSCHOOL)
-    dp.register_message_handler(registration_inClass, state=StartStates.INCLASS)
-    dp.register_message_handler(registration_inLogin, state=StartStates.INLOGIN)
-    dp.register_message_handler(registration_inPassword, state=StartStates.INPASSWORD)
+    dp.register_callback_query_handler(start_back, lambda c: c.data and c.data == 'start_back', state='*', chat_type='private')
+    dp.register_message_handler(registration, content_types=['text'], text=['начать', '/начать', '/yfxfnm', '/start', '/старт'], chat_type='private')
+    dp.register_message_handler(registration_inLink, state=StartStates.INLINK, chat_type='private')
+    dp.register_callback_query_handler(registration_inCountries, lambda c: c.data and c.data.startswith('start_countries_'), state=StartStates.INCOUNTRIES, chat_type='private')
+    dp.register_callback_query_handler(registration_inProvinces, lambda c: c.data and c.data.startswith('start_provinces_'), state=StartStates.INPROVINCES, chat_type='private')
+    dp.register_callback_query_handler(registration_inCities, lambda c: c.data and c.data.startswith('start_cities_'), state=StartStates.INCITIES, chat_type='private')
+    dp.register_message_handler(registration_inSchools, state=StartStates.INSCHOOL, chat_type='private')
+    dp.register_message_handler(registration_inClass, state=StartStates.INCLASS, chat_type='private')
+    dp.register_message_handler(registration_inLogin, state=StartStates.INLOGIN, chat_type='private')
+    dp.register_message_handler(registration_inPassword, state=StartStates.INPASSWORD, chat_type='private')
 
 
 

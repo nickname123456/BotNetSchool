@@ -1,1 +1,2 @@
-from .start import register_user_start_handlers
+from .private_start import register_user_start_handlers
+from .chat_start import register_chat_start_handlers
