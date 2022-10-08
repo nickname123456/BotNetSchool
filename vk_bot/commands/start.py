@@ -1,6 +1,7 @@
-from database.methods.update import edit_student_clas, edit_student_link, edit_student_login, edit_student_password, edit_student_school, edit_student_studentId, edit_chat_clas, edit_chat_link, edit_chat_login, edit_chat_password, edit_chat_school, edit_chat_studentId
-from database.methods.get import get_chat_by_vk_id, get_student_by_vk_id
+from database.methods.update import edit_student_clas, edit_student_link, edit_student_login, edit_student_password, edit_student_school, edit_student_studentId, edit_chat_clas, edit_chat_link, edit_chat_login, edit_chat_password, edit_chat_school, edit_chat_studentId, edit_student_vk_id
+from database.methods.get import get_all_students, get_chat_by_vk_id, get_student_by_vk_id
 from database.methods.create import create_chat, create_student
+from database.methods.delete import delete_student
 import ns
 
 from vkbottle import BaseStateGroup, CtxStorage, Keyboard, Text, KeyboardButtonColor
@@ -29,18 +30,52 @@ class NewaccountState(BaseStateGroup):
     INLOGIN = 17
     INPASSWORD = 18
    
+class ConnectCodeState(BaseStateGroup):
+    INCODE = 19
 
 
 
 
+@bp.on.private_message(text=['начать', '/начать', '/yfxfnm', '/start', '/старт'])
+@bp.on.private_message(payload={'cmd': 'start'})
+async def registration(message: Message):
+    keyboard = Keyboard().add(Text('✔Я уже пользовался "Сетевой Город в ТГ"', {'cmd': f'import_data_from_tg'}))
 
-@bp.on.message(text=['начать', '/начать', '/yfxfnm', '/start', '/старт'])
-@bp.on.message(payload={'cmd': 'start'})
+    await message.answer('Приветствую!👋🏻 Для начала советую ознакомиться с https://vk.com/@botnetschool-spravka-po-ispolzovaniu-bota')
+    await message.answer('Продолжая пользоваться этим ботом вы автоматически соглашаетесь с Политикой в отношении обработки персональных данных (https://vk.com/@botnetschool-politika-v-otnoshenii-obrabotki-personalnyh-dannyh)')
+    await message.answer('🔗Введите адрес сетевого города (Пример: "https://sgo.edu-74.ru/").', keyboard=keyboard)
+    await bp.state_dispenser.set(message.peer_id, NewaccountState.INLINK)
+
+@bp.on.chat_message(text=['начать', '/начать', '/yfxfnm', '/start', '/старт'])
+@bp.on.chat_message(payload={'cmd': 'start'})
 async def registration(message: Message):
     await message.answer('Приветствую!👋🏻 Для начала советую ознакомиться с https://vk.com/@botnetschool-spravka-po-ispolzovaniu-bota')
     await message.answer('Продолжая пользоваться этим ботом вы автоматически соглашаетесь с Политикой в отношении обработки персональных данных (https://vk.com/@botnetschool-politika-v-otnoshenii-obrabotki-personalnyh-dannyh)')
     await message.answer('🔗Введите адрес сетевого города (Пример: "https://sgo.edu-74.ru/").')
     await bp.state_dispenser.set(message.peer_id, NewaccountState.INLINK)
+
+
+@bp.on.private_message(payload={'cmd': 'import_data_from_tg'})
+async def import_data_from_tg(message: Message):
+    await message.answer('🔒Напишите Боту в телеграме "/code" и скопируйте код из сообщения сюда')
+    await bp.state_dispenser.set(message.peer_id, ConnectCodeState.INCODE)
+
+@bp.on.private_message(state=ConnectCodeState.INCODE)
+async def import_data_from_tg_with_code(message: Message):
+    if message.text and len(message.text) == 6 and message.text.isdigit():
+        userId = message.from_id
+        code = int(message.text)
+
+        for student in get_all_students():
+            if student.connect_code == code:
+                delete_student(vk_id=userId)
+                edit_student_vk_id(telegram_id=student.telegram_id, new_vk_id=userId)
+
+                keyboard = Keyboard().add(Text('Главное меню', {'cmd': 'menu'}), KeyboardButtonColor.POSITIVE)
+                await message.answer('✅Вы успешно подключили свой аккаунт ВКонтакте к боту!', keyboard=keyboard)
+                await bp.state_dispenser.delete(message.from_id)
+                return
+    await message.answer('❌Не нашел аккаунта с таким кодом, попробуйте еще раз')
 
 
 @bp.on.message(state=NewaccountState.INLINK)

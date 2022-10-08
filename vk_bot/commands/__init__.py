@@ -8,6 +8,7 @@ from .announcements import announcements
 from .admin import admin_panel, give_adm, all_users, view_user
 from .reports import reports, reportTotal, reportAverageMark, parentReport, reportAverageMarkDyn, reportGrades
 from .change_anything import change_anything_kb, change_student
+from .get_connect_code import get_connect_code
 
 
 bps = [not_found.bp,
@@ -47,5 +48,6 @@ bps = [not_found.bp,
        reportAverageMarkDyn.bp,
        reportGrades.bp,
        change_anything_kb.bp,
-       change_student.bp
+       change_student.bp,
+       get_connect_code.bp
        ]

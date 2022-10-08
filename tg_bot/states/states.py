@@ -10,3 +10,6 @@ class StartStates(StatesGroup):
     INCLASS = State()
     INLOGIN = State()
     INPASSWORD = State()
+
+class ConnectCodeStates(StatesGroup):
+    INCODE = State()

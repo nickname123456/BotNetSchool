@@ -1,8 +1,9 @@
-from database.methods.update import edit_student_clas, edit_student_link, edit_student_login, edit_student_password, edit_student_school, edit_student_studentId
-from database.methods.get import get_student_by_telegram_id
+from database.methods.delete import delete_student
+from database.methods.update import edit_student_clas, edit_student_link, edit_student_login, edit_student_password, edit_student_school, edit_student_studentId, edit_student_telegram_id
+from database.methods.get import get_all_students, get_student_by_telegram_id
 from database.methods.create import create_student
 
-from tg_bot.states import StartStates
+from tg_bot.states import StartStates, ConnectCodeStates
 import ns
 
 from aiogram.types import Message, InlineKeyboardMarkup, KeyboardButton, CallbackQuery
@@ -16,7 +17,7 @@ import logging
 async def registration(message: Message):
     bot = message.bot
     user_id = message.from_user.id
-    kb = InlineKeyboardMarkup().add(KeyboardButton('✔Я уже пользовался "Сетевой Город в ВК"', callback_data='impot_data_from_vk'))
+    kb = InlineKeyboardMarkup().add(KeyboardButton('✔Я уже пользовался "Сетевой Город в ВК"', callback_data='import_data_from_vk'))
 
     await bot.send_message(user_id, 'Приветствую!👋🏻 Для начала советую ознакомиться с https://vk.com/@botnetschool-spravka-po-ispolzovaniu-bota')
     await bot.send_message(user_id, 'Продолжая пользоваться этим ботом вы автоматически соглашаетесь с Политикой в отношении обработки персональных данных (https://vk.com/@botnetschool-politika-v-otnoshenii-obrabotki-personalnyh-dannyh)')
@@ -209,9 +210,28 @@ async def registration_inPassword(message: Message, state: FSMContext):
 
 
 
+async def import_data_from_vk(callback_query: CallbackQuery, state: FSMContext):
+    message = callback_query.message
+    await ConnectCodeStates.INCODE.set()
+    await message.answer('🔒Напишите в ЛС Боту ВКонтакте "/code" и скопируйте код из сообщения сюда')
 
+async def import_data_from_vk_with_code(message: Message, state: FSMContext):
+    if message.text and len(message.text) == 6 and message.text.isdigit():
+        userId = message.from_user.id
+        code = int(message.text)
 
+        for student in get_all_students():
+            if student.connect_code == code:
+                delete_student(telegram_id=userId)
+                edit_student_telegram_id(vk_id=student.vk_id, new_telegram_id=userId)
 
+                keyboard = InlineKeyboardMarkup(resize_keyboard=True)
+                keyboard.add(KeyboardButton('🏠Главное меню', callback_data='main_menu'))
+
+                await message.answer('✅Вы успешно подключили свой аккаунт ВКонтакте к боту!', reply_markup=keyboard)
+                await state.finish()
+                return
+    await message.answer('❌Не нашел аккаунта с таким кодом, попробуйте еще раз')
 
 
 
@@ -226,6 +246,10 @@ async def start_back(message: Message , callback_query: CallbackQuery = None):
 
 def register_user_start_handlers(dp: Dispatcher):
     dp.register_message_handler(start_back, content_types=['text'], text=['назад', 'Назад', '🔙Назад'], state='*')
+
+    dp.register_callback_query_handler(import_data_from_vk, lambda c: c.data and c.data.startswith('import_data_from_vk'), state='*')
+    dp.register_message_handler(import_data_from_vk_with_code, state=ConnectCodeStates.INCODE)
+
     dp.register_callback_query_handler(start_back, lambda c: c.data and c.data == 'start_back', state='*')
     dp.register_message_handler(registration, content_types=['text'], text=['начать', '/начать', '/yfxfnm', '/start', '/старт'])
     dp.register_message_handler(registration_inLink, state=StartStates.INLINK)
