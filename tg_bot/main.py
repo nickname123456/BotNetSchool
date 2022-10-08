@@ -16,7 +16,7 @@ async def __on_start_up(dp: Dispatcher) -> None:
 
 def start_tg_bot():
     logging.basicConfig(level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+        format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', filename='logs_tg_bot.log')
 
     print('')
     print('-------------------------------')

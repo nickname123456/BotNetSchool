@@ -1,5 +1,7 @@
 settings.py
 database.db
 log.log
+logs_vk_bot.log
+logs_tg_bot.log
 ../__pycache__/
 __pycache__/

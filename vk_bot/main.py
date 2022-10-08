@@ -20,7 +20,7 @@ def start_vk_bot():
     bot = Bot(token=vk_token)
 
     logging.basicConfig(level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+        format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', filename='logs_vk_bot.log')
 
 
 
