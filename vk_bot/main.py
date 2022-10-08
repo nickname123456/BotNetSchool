@@ -41,6 +41,6 @@ def start_vk_bot():
     logging.info('Bot started.')
 
     scheduler.start()
-    scheduler.add_job(notification, "interval", minutes=60, args=(bot,))
+    scheduler.add_job(notification, "interval", minutes=10, args=(bot,))
 
     bot.run_forever()

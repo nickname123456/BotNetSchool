@@ -116,7 +116,7 @@ async def notification(bot):
                 await bot.api.messages.send(message='&#12288;', peer_id=2000000000+chat_id, random_id=0)
                 await asyncio.sleep(1)
 
-            logging.info(f'I sleep for 60 minutes')
+            logging.info(f'I sleep for 10 minutes')
 
     except Exception as e:
         await bot.api.messages.send(message=f'У нас тут это... Ошибка в РАССЫЛКЕ!!! \n{e} \nЧЕКАЙ ХЕРОКУ ЛОГИ', user_id=admin_id, random_id=0)
