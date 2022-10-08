@@ -5,6 +5,7 @@ import logging
 
 
 bp = Blueprint('keyboard_schedule')# Объявляем команду
+bp.on.vbml_ignore_case = True # Игнорируем регистр
 
 
 

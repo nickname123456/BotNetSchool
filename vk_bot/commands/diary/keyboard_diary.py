@@ -11,6 +11,7 @@ import logging
 
 
 bp = Blueprint('keyboard_diary')# Объявляем команду
+bp.on.vbml_ignore_case = True # Игнорируем регистр
 bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 
 
