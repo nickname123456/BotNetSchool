@@ -46,7 +46,7 @@ async def private_announcements(message: Message, amount=3):
         # Приводим объявления в нужный вид
         announcement = ''
         for i in announcements:
-            date = datetime.strptime(i['postDate'], '%Y-%m-%dT%H:%M:%S.%f')
+            date = datetime.strptime(i['postDate'].split(".")[0], '%Y-%m-%dT%H:%M:%S')
             date = f'{date.hour}:{date.minute} {date.day}.{date.month}.{date.year}'
             announcement = f"📅Дата: {date} \n👩‍💼Автор: {i['author']['fio']} \n🔎Тема: {i['name']} \n💬Текст: {i['description']}"
 
@@ -112,7 +112,7 @@ async def chat_announcements(message: Message, amount=3):
         # Приводим объявления в нужный вид
         announcement = ''
         for i in announcements:
-            date = datetime.strptime(i['postDate'], '%Y-%m-%dT%H:%M:%S.%f')
+            date = datetime.strptime(i['postDate'].split(".")[0], '%Y-%m-%dT%H:%M:%S')
             date = f'{date.hour}:{date.minute} {date.day}.{date.month}.{date.year}'
             announcement = f"📅Дата: {date} \n👩‍💼Автор: {i['author']['fio']} \n🔎Тема: {i['name']} \n💬Текст: {i['description']}"
 

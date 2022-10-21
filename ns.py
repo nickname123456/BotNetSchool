@@ -234,7 +234,7 @@ async def getAnnouncementsNotify(login, password, school, url, studentId, old_an
             announcementId = i['id']
             needed_announcements[announcementId] = {}
 
-            date = datetime.datetime.strptime(i['postDate'], '%Y-%m-%dT%H:%M:%S.%f')
+            date = datetime.datetime.strptime(i['postDate'].split(".")[0], '%Y-%m-%dT%H:%M:%S')
             date = f'{date.hour}:{date.minute} {date.day}.{date.month}.{date.year}'
             announcement_text = f"❗Новое объявление \n📅Дата: {date} \n👩‍💼Автор: {i['author']['fio']} \n🔎Тема: {i['name']} \n💬Текст: {i['description']}"
 
