@@ -1,1 +1,1 @@
-from .send_telegram_msg import send_telegram_msg
+from .send_telegram_msg import send_telegram_msg, send_telegram_bytes_file
