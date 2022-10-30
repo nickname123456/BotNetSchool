@@ -118,8 +118,8 @@ async def private_edit_hamework(message: Message, state: FSMContext):
                     except VKAPIError: # Если не получилось отправить
                         logging.info(f'{vk_id}: vk notification error')
                         if vk_id and telegram_id: # Если есть аккаунт вк и телеграм
-                            await message.bot.send_message(telegram_id, '❌Я не могу отправить вам сообщение в ВК, т.к. вы заблокировали меня. Я буду отправлять вам сообщения только в телеграмме')
                             edit_student_vk_id(telegram_id=telegram_id, new_vk_id=None) # Удаляем аккаунт вк
+                            await message.bot.send_message(telegram_id, '❌Я не могу отправить вам сообщение в ВК, т.к. вы заблокировали меня. Я буду отправлять вам сообщения только в телеграмме')
                             logging.info(f'{telegram_id}: delete vk account')
                 if telegram_id: # Если есть аккаунт телеграм
                     try: # Отправляем уведомление
@@ -128,8 +128,8 @@ async def private_edit_hamework(message: Message, state: FSMContext):
                     except aiogram.exceptions.BotBlocked: # Если не получилось отправить
                         logging.info(f'{telegram_id}: telegram notification error')
                         if vk_id and telegram_id: # Если есть аккаунт вк и телеграм
-                            await send_vk_msg(vk_bot, vk_id, f'❌Я не могу отправить вам сообщение в телеграмме, т.к. вы заблокировали меня. Я буду отправлять вам сообщения только в ВК')
                             edit_student_telegram_id(vk_id=vk_id, new_telegram_id=None) # Удаляем аккаунт телеграм
+                            await send_vk_msg(vk_bot, vk_id, f'❌Я не могу отправить вам сообщение в телеграмме, т.к. вы заблокировали меня. Я буду отправлять вам сообщения только в ВК')
                             logging.info(f'{vk_id}: delete telegram account')
                 await asyncio.sleep(1) # Отдыхаем, чтобы не спамить
 
