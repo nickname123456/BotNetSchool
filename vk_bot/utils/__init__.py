@@ -1,0 +1,1 @@
+from .send_vk_msg import send_vk_msg

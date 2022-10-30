@@ -13,3 +13,7 @@ class StartStates(StatesGroup):
 
 class ConnectCodeStates(StatesGroup):
     INCODE = State()
+
+class HomeworkStates(StatesGroup):
+    INLESSON = State()
+    INHOMEWORK = State()
