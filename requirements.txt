@@ -1,3 +1,4 @@
+aiogram==2.18
 aiofiles==0.8.0
 aiosignal==1.2.0
 anyio==3.4.0
