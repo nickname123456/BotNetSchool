@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, LargeBinary
 
 from .main import Database
 
@@ -57,7 +57,7 @@ class Schedule(Database.BASE):
     school = Column(String)
     clas = Column(String)
     day = Column(String)
-    photo = Column(String)
+    photo = Column(LargeBinary)
 
 
 class Homework(Database.BASE):

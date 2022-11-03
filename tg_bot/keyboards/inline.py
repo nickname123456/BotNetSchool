@@ -21,6 +21,15 @@ kb_schedule.add(InlineKeyboardButton('Суббота', callback_data='schedule_f
 kb_schedule.add(InlineKeyboardButton('🔄Обновить', callback_data='schedule_download'),
                 InlineKeyboardButton('↩️Назад', callback_data='main_menu'))
 
+kb_schedule_download = InlineKeyboardMarkup(resize_keyboard=True, row_width=2)
+kb_schedule_download.add(InlineKeyboardButton('Понедельник', callback_data='update_schedule_monday'))
+kb_schedule_download.add(InlineKeyboardButton('Вторник', callback_data='update_schedule_tuesday'))
+kb_schedule_download.add(InlineKeyboardButton('Среда', callback_data='update_schedule_wednesday'))
+kb_schedule_download.add(InlineKeyboardButton('Четверг', callback_data='update_schedule_thursday'))
+kb_schedule_download.add(InlineKeyboardButton('Пятница', callback_data='update_schedule_friday'))
+kb_schedule_download.add(InlineKeyboardButton('Суббота', callback_data='update_schedule_saturday'))
+kb_schedule_download.add(InlineKeyboardButton('↩️Назад', callback_data='keyboard_schedule'))
+
 
 def get_homework_kb(lessons: dict) -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(resize_keyboard=True, row_width=4)

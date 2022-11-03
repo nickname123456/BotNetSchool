@@ -17,3 +17,8 @@ class ConnectCodeStates(StatesGroup):
 class HomeworkStates(StatesGroup):
     INLESSON = State()
     INHOMEWORK = State()
+
+class UpdScheduleStates(StatesGroup):
+    INPHOTO = State()
+    INCLASS = State()
+    END = State()

@@ -1,0 +1,3 @@
+from .keyboard_schedule import register_schedule_handlers
+from .schedule_for_day import register_schedule_for_day_handlers
+from .schedule_download import register_schedule_download

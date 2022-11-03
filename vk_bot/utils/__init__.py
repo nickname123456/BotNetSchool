@@ -1,1 +1,2 @@
 from .send_vk_msg import send_vk_msg
+from .download_photo_as_bytes import download_photo_as_bytes

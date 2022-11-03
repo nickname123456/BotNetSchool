@@ -1,1 +1,1 @@
-from .states import StartStates, ConnectCodeStates, HomeworkStates
+from .states import StartStates, ConnectCodeStates, HomeworkStates, UpdScheduleStates
