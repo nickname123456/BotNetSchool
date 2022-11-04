@@ -12,10 +12,10 @@ import logging
 
 async def private_schedule_for_day(message: Message):
     if isinstance(message, CallbackQuery):
-        unfinished_day = message.data.split('_')[3]
+        unfinished_day = message.data.split('_')[-1]
         message = message.message
     else:
-        unfinished_day = message.text.split(' ')[2]
+        unfinished_day = message.text.split(' ')[-1]
     logging.info(f'{message.chat.id}: i get schedule for day' )
     
     user_id = message.chat.id
@@ -41,10 +41,10 @@ async def private_schedule_for_day(message: Message):
 
 async def chat_schedule_for_day(message: Message):
     if isinstance(message, CallbackQuery):
-        unfinished_day = message.data.split('_')[3]
+        unfinished_day = message.data.split('_')[-1]
         message = message.message
     else:
-        unfinished_day = message.text.split(' ')[2]
+        unfinished_day = message.text.split(' ')[-1]
     logging.info(f'{message.chat.id}: i get schedule for day' )
 
     chat_id = message.chat.id
@@ -72,10 +72,12 @@ async def chat_schedule_for_day(message: Message):
 
 def register_schedule_for_day_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(private_schedule_for_day, lambda c: c.data and c.data.startswith('schedule_for_day_'), state='*', chat_type='private')
-    dp.register_message_handler(private_schedule_for_day, content_types=['text'], text_startswith=['расписание на ', 'hfcgbcfybt yf '
-                                                                                                        'Расписание на ', 'Hfcgbcfybt yf '], chat_type='private')
+    dp.register_message_handler(private_schedule_for_day, content_types=['text'], text_startswith=['расписание на ', 'Расписание на ',
+                                                                                                    'скиньте расписание на', 'Скиньте расписание на',
+                                                                                                    'скинь расписание на', 'Скинь расписание на'], chat_type='private')
     
     dp.register_callback_query_handler(chat_schedule_for_day, lambda c: c.data and c.data.startswith('schedule_for_day_'), state='*', chat_type='group')
-    dp.register_message_handler(chat_schedule_for_day, content_types=['text'], text_startswith=['расписание на ', 'hfcgbcfybt yf '
-                                                                                                        'Расписание на ', 'Hfcgbcfybt yf '], chat_type='group')
+    dp.register_message_handler(chat_schedule_for_day, content_types=['text'], text_startswith=['расписание на ', 'Расписание на ',
+                                                                                                'скиньте расписание на', 'Скиньте расписание на',
+                                                                                                'скинь расписание на', 'Скинь расписание на'], chat_type='group')
     

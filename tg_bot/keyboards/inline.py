@@ -1,15 +1,21 @@
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 from settings import weekDays
 
 
 
 
-kb_menu = InlineKeyboardMarkup(resize_keyboard=True)
-kb_menu.add(InlineKeyboardButton('📢Объявления', callback_data='announcements'))
-kb_menu.add(InlineKeyboardButton('📖Дневник', callback_data='keyboard_diary'),
+kb_menu_inline = InlineKeyboardMarkup(resize_keyboard=True)
+kb_menu_inline.add(InlineKeyboardButton('📢Объявления', callback_data='announcements'))
+kb_menu_inline.add(InlineKeyboardButton('📖Дневник', callback_data='keyboard_diary'),
             InlineKeyboardButton('📄Отчеты', callback_data='reports'))
-kb_menu.add(InlineKeyboardButton('🏠Домашнее задание', callback_data='keyboard_homework'),
+kb_menu_inline.add(InlineKeyboardButton('🏠Домашнее задание', callback_data='keyboard_homework'),
             InlineKeyboardButton('📚Расписание', callback_data='keyboard_schedule'))
+
+kb_menu = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
+kb_menu.add(KeyboardButton('📢Объявления'))
+kb_menu.add(KeyboardButton('📖Дневник'), KeyboardButton('📄Отчеты'))
+kb_menu.add(KeyboardButton('🏠Домашнее задание'), KeyboardButton('📚Расписание'))
+
 
 kb_schedule = InlineKeyboardMarkup(resize_keyboard=True, row_width=2)
 kb_schedule.add(InlineKeyboardButton('Понедельник', callback_data='schedule_for_day_monday'))

@@ -1,7 +1,7 @@
 from aiogram.types import Message, CallbackQuery
 from aiogram import Dispatcher
 
-from tg_bot.keyboards import kb_menu
+from tg_bot.keyboards import kb_menu, kb_menu_inline
 
 import logging
 
@@ -32,7 +32,7 @@ async def chat_menu(message: Message, callback=None):
     chat_id = message.chat.id
     bot = message.bot
 
-    keyboard = kb_menu
+    keyboard = kb_menu_inline
     
     #Ответ в чат
     if callback:
