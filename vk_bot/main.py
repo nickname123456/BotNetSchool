@@ -19,7 +19,7 @@ def start_vk_bot():
     # Подключаем бота к нашему токену
     bot = Bot(token=vk_token)
 
-    logging.basicConfig(level=logging.INFO,
+    logging.basicConfig(level=logging.WARNING,
         format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', filename='logs_vk_bot.log')
 
 

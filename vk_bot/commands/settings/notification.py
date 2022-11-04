@@ -233,3 +233,4 @@ async def notification(bot):
     except Exception as e:
         logging.error(f'Error in notification: {e}')
         await bot.api.messages.send(message=f'У нас тут это... Ошибка в РАССЫЛКЕ!!! \n{e} \nЧЕКАЙ ЛОГИ', user_id=admin_id, random_id=0)
+        raise
