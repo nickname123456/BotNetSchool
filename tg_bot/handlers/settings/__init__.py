@@ -1,0 +1,3 @@
+from .change_settings_notification import register_change_settings_notification_handlers
+from .exit_from_settings import register_exit_from_settings_handlers
+from .keyboard_settings import register_keyboard_settings_handlers
