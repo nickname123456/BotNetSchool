@@ -1,0 +1,1 @@
+from .announcements import register_announcements_handlers

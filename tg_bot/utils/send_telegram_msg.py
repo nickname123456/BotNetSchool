@@ -1,4 +1,5 @@
 from aiogram import Bot
+from aiogram.types import MediaGroup
 from io import BytesIO
 
 async def send_telegram_msg(bot: Bot, chat_id: int, message: str, ):
@@ -14,3 +15,6 @@ async def send_telegram_bytes_photo(bot: Bot, chat_id: int, photo: bytes, captio
     obj = BytesIO(photo)
     obj.name = f'{caption}.jpg'
     return (await bot.send_photo(chat_id=chat_id, photo=photo, caption=caption))
+
+async def send_telegram_media_group(bot: Bot, chat_id: int, media: MediaGroup, reply_to_message_id: int = None):
+    return (await bot.send_media_group(chat_id=chat_id, media=media, reply_to_message_id=reply_to_message_id))
