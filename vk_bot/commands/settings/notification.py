@@ -5,7 +5,6 @@ from database.methods.update import edit_student_old_announcements, edit_student
 from ns import getMarkNotify, getAnnouncementsNotify
 
 from tg_bot.utils import send_telegram_msg, send_telegram_bytes_file
-from netschoolapi.errors import AuthError
 
 from settings import admin_id
 from settings import tg_token
@@ -15,8 +14,6 @@ import aiogram
 
 import asyncio
 import logging
-import requests
-import httpx
 
 tg_bot = aiogram.Bot(token=tg_token, parse_mode='HTML')
 
@@ -36,15 +33,7 @@ async def notification(bot):
                     user.link,
                     user.old_mark
                 )
-            except AuthError: # Если неправильный логин/пароль
-                if vk_id: 
-                    await bot.api.messages.send(message='❌При рассылке новых оценок было выявлено, что у вас неправильный логин или пароль! \n🤔Настоятельно рекомендую написать "Начать", чтобы пройти регистрацию еще раз', peer_id=vk_id, random_id=0)
-                elif telegram_id:
-                    await tg_bot.send_message(bot=tg_bot, chat_id=telegram_id, message='❌При рассылке новых оценок было выявлено, что у вас неправильный логин или пароль! \n🤔Настоятельно рекомендую написать "Начать", чтобы пройти регистрацию еще раз')
-                continue
-            except requests.exceptions.ReadTimeout:
-                continue
-            except httpx.HTTPStatusError:
+            except:
                 continue
 
             if vk_id:
@@ -84,15 +73,7 @@ async def notification(bot):
                     user.studentId,
                     user.old_announcements
                 )
-            except AuthError: # Если не правильный логин или пароль
-                if vk_id:
-                    await bot.api.messages.send(message='❌При рассылке новых оценок было выявлено, что у вас неправильный логин или пароль! \n🤔Настоятельно рекомендую написать "Начать", чтобы пройти регистрацию еще раз', peer_id=vk_id, random_id=0)
-                elif telegram_id:
-                    await tg_bot.send_message(bot=tg_bot, chat_id=telegram_id, message='❌При рассылке новых оценок было выявлено, что у вас неправильный логин или пароль! \n🤔Настоятельно рекомендую написать "Начать", чтобы пройти регистрацию еще раз')
-                continue
-            except requests.exceptions.ReadTimeout:
-                continue
-            except httpx.HTTPStatusError:
+            except:
                 continue
 
             if vk_id:
@@ -143,15 +124,7 @@ async def notification(bot):
                     chat.link,
                     chat.old_mark
                 )
-            except AuthError: # Если не правильный логин или пароль
-                if vk_id:
-                    await bot.api.messages.send(message='❌При рассылке новых оценок было выявлено, что у вас неправильный логин или пароль! \n🤔Настоятельно рекомендую написать "Начать", чтобы пройти регистрацию еще раз', peer_id=2000000000+vk_id, random_id=0)
-                elif telegram_id:
-                    await tg_bot.send_message(bot=tg_bot, chat_id=telegram_id, message='❌При рассылке новых оценок было выявлено, что у вас неправильный логин или пароль! \n🤔Настоятельно рекомендую написать "Начать", чтобы пройти регистрацию еще раз')
-                continue
-            except requests.exceptions.ReadTimeout:
-                continue
-            except httpx.HTTPStatusError:
+            except:
                 continue
 
             if vk_id:
@@ -189,15 +162,7 @@ async def notification(bot):
                     chat.studentId,
                     chat.old_announcements
                 )
-            except AuthError: # Если не правильный логин или пароль
-                if vk_id:
-                    await bot.api.messages.send(message='❌При рассылке новых оценок было выявлено, что у вас неправильный логин или пароль! \n🤔Настоятельно рекомендую написать "Начать", чтобы пройти регистрацию еще раз', peer_id=vk_id, random_id=0)
-                elif telegram_id:
-                    await tg_bot.send_message(bot=tg_bot, chat_id=telegram_id, message='❌При рассылке новых оценок было выявлено, что у вас неправильный логин или пароль! \n🤔Настоятельно рекомендую написать "Начать", чтобы пройти регистрацию еще раз')
-                continue
-            except requests.exceptions.ReadTimeout:
-                continue
-            except httpx.HTTPStatusError:
+            except:
                 continue
             
             if vk_id:
