@@ -8,7 +8,7 @@ from vkbottle.bot import Message, Blueprint
 from misc.VKRules import PayloadStarts
 
 import logging
-
+import datetime
 
 bp = Blueprint('homework_for_day')# Объявляем команду
 bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
@@ -38,7 +38,7 @@ async def keyboard_homework_for_day(message: Message):
     day_number = 0
     for day in diary['weekDays']:
         for i in weekDays:
-            if int(str(day['date'])[8:-9]) - int(str(week[0])[8:]) == i:
+            if (datetime.datetime.strptime(day['date'], '%Y-%m-%dT%H:%M:%S') - datetime.datetime.strptime(diary['weekStart'], '%Y-%m-%dT%H:%M:%S')).days == i:
                 keyboard.add(Text(weekDays[i], {"cmd": f"homework_for_day_{day_number}"}))
                 keyboard.row()
         day_number += 1
@@ -69,7 +69,7 @@ async def keyboard_homework_for_day(message: Message):
     day_number = 0
     for day in diary['weekDays']:
         for i in weekDays:
-            if int(str(day['date'])[8:-9]) - int(str(week[0])[8:]) == i:
+            if (datetime.datetime.strptime(day['date'], '%Y-%m-%dT%H:%M:%S') - datetime.datetime.strptime(diary['weekStart'], '%Y-%m-%dT%H:%M:%S')).days == i:
                 keyboard.add(Text(weekDays[i], {"cmd": f"homework_for_day_{day_number}"}))
                 keyboard.row()
         day_number += 1

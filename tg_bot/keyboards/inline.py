@@ -1,6 +1,7 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 from database.models import Student
 from settings import weekDays
+import datetime
 
 
 
@@ -61,7 +62,7 @@ def get_homework_for_day_kb(diary, week) -> InlineKeyboardMarkup:
     day_number = 0
     for day in diary['weekDays']:
         for i in weekDays:
-            if int(str(day['date'])[8:-9]) - int(str(week[0])[8:]) == i:
+            if (datetime.datetime.strptime(day['date'], '%Y-%m-%dT%H:%M:%S') - datetime.datetime.strptime(diary['weekStart'], '%Y-%m-%dT%H:%M:%S')).days == i:
                 kb.add(InlineKeyboardButton(weekDays[i], callback_data=f'for_day_homework_{day_number}'))
         day_number += 1
     kb.add(InlineKeyboardButton('↩️Назад', callback_data='keyboard_homework'))
