@@ -1,4 +1,4 @@
-from database.methods.get import get_student_by_vk_id
+from database.methods.get import get_student_by_id, get_student_by_vk_id
 
 from vkbottle.bot import Message, Blueprint
 from misc.VKRules import PayloadStarts
@@ -25,16 +25,20 @@ async def view_user(message: Message):
         return
     
     user_id = int(message.payload[13:-2]) # ID юзера, которого мы смотрим
-    student = get_student_by_vk_id(user_id) # Вся инфа из бд про юзера
-    data_from_vk = await bp.api.users.get(user_id) # Вся инфа из ВК про юзера
+    student = get_student_by_id(user_id) # Вся инфа из бд про юзера
 
-    last_name = data_from_vk[0].last_name
-    first_name = data_from_vk[0].first_name
+    if student.vk_id:
+        data_from_vk = await bp.api.users.get(student.vk_id) # Вся инфа из ВК про юзера
+        last_name = data_from_vk[0].last_name
+        first_name = data_from_vk[0].first_name
+    else:
+        last_name = 'Не указано'
+        first_name = 'Не указано'
 
     await message.answer(
         f'''
 Имя: {first_name}
-Фаимилия: {last_name}
+Фамилия: {last_name}
 isAdmin : {student.isAdmin}
 Логин: {student.login}
 Пароль: {student.password}

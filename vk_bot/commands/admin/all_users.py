@@ -1,4 +1,4 @@
-from database.methods.get import get_all_students, get_student_by_vk_id
+from database.methods.get import get_all_students, get_student_by_vk_id, get_student_by_id
 
 from vkbottle import Keyboard, KeyboardButtonColor, Text
 from vkbottle.bot import Message, Blueprint
@@ -35,23 +35,27 @@ async def all_users(message: Message):
             list_counter += 1
             users_id[list_counter] = []
 
-        users_id[list_counter].append(i.vk_id)
+        users_id[list_counter].append(i.id)
         counter += 1
 
     # Делаем Клавиатуру с ФИ всех юзеров
     keyboard = Keyboard()
     for i in users_id[int(message.payload[18:-2])]:
-        user = await bp.api.users.get(i) # Инфа мз ВК
-        user = user[0] # Берем 1ого юзера
-        user = f'{user.first_name} {user.last_name}' # Берем ФИ
-        keyboard.add(Text(user, {'cmd': f'view_{i}'})) # Вставляем в кнопку ФИ и в колбэк ID
+        student = get_student_by_id(i)
+        vk_user = await bp.api.users.get(student.vk_id) # Инфа из ВК
+        if vk_user:
+            vk_user = vk_user[0] # Берем 1ого юзера
+            user = f'{vk_user.first_name} {vk_user.last_name}' # Берем ФИ
+        else:
+            user = student.telegram_id # Если юзера нет в ВК, то берем его ID из телеграма
+        keyboard.add(Text(f'{i}. {user}', {'cmd': f'view_{i}'})) # Вставляем в кнопку ФИ и в колбэк ID
         keyboard.row()
     
 
     page = int(message.payload[18:-2]) # Страница, которую сейчас смотрит админ
     
     # Можно ли перелистнуть стр с юзерами назад
-    if page <= 1:
+    if page < 1:
         keyboard.add(Text('🟦'))
     else:
         keyboard.add(Text('◀', {'cmd': f'all_users_{page-1}'}))
