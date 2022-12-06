@@ -56,7 +56,7 @@ async def start_schedule_download(message: Message):
         .row()
         .add(Text('Суббота'))
         .row()
-        .add(Text('Назад', {'cmd': 'menu'}), color=KeyboardButtonColor.NEGATIVE)
+        .add(Text('Назад', {'cmd': 'keyboard_schedule'}), color=KeyboardButtonColor.NEGATIVE)
     )
 
     await bp.state_dispenser.set(message.peer_id, ScheduleData.PHOTO) # Говорим, что следующий шаг - выбор фото
@@ -69,12 +69,19 @@ async def photo_schedule_download(message: Message):
     logging.info(f'{message.peer_id}: I get day in schedule_download')
     if message.text in weekDays.values(): # Проверяем, что юзер ввел день недели
         ctx.set('day', message.text) # Загружаем во внутренне хранилище день недели
+    elif message.text.lower() == 'назад':
+        await keyboard_schedule(message)
+        return
     else:
         logging.info(f'{message.peer_id}: I get wrong day in schedule_download')
         await message.answer('❌Не нашел в вашем сообщении данные, введите еще раз')
         return
     await bp.state_dispenser.set(message.peer_id, ScheduleData.CLAS) # Говорим, что следующий шаг - выбор класса
-    await message.answer("📅Отправьте фото расписания", keyboard=EMPTY_KEYBOARD)
+    keyboard = ( # Создаем клавиатуру с кнопкой назад
+        Keyboard()
+        .add(Text('Назад', {'cmd': 'keyboard_schedule'}), color=KeyboardButtonColor.NEGATIVE)
+    )
+    await message.answer("📅Отправьте фото расписания", keyboard=keyboard)
     logging.info(f'{message.peer_id}: I send question about photo')
 
 
@@ -84,6 +91,9 @@ async def class_schedule_download(message: Message):
 
     if message.attachments and message.attachments[0].photo: # Проверяем, что юзер отправил фото
         photo = message.attachments[0].photo
+    elif message.text.lower() == 'назад':
+        await keyboard_schedule(message)
+        return
     else:
         logging.info(f'{message.peer_id}: I get wrong photo in schedule_download')
         await message.answer('❌Не нашел в вашем сообщении фото, отправьте еще раз')

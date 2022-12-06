@@ -19,6 +19,10 @@ async def private_homework(message: Message):
     userId = message.from_id # ID юзера
     student = get_student_by_vk_id(userId)
 
+    if (await bp.state_dispenser.get(message.from_id)): 
+        if message.from_id == (await bp.state_dispenser.get(message.from_id)).peer_id:
+            await bp.state_dispenser.delete(message.from_id) # Удаляем цепочку состояний
+
     lessons = await ns.getSubjectsId(
         student.login,
         student.password,

@@ -13,6 +13,9 @@ bp.on.vbml_ignore_case = True # Игнорируем регистр
 @bp.on.message(payload={'cmd': 'keyboard_schedule'})
 async def keyboard_schedule(message: Message):
     logging.info(f'{message.peer_id}: I get keyboard_schedule')
+    if (await bp.state_dispenser.get(message.peer_id)): 
+        if message.from_id == (await bp.state_dispenser.get(message.peer_id)).peer_id:
+            await bp.state_dispenser.delete(message.peer_id) # Удаляем цепочку состояний
     keyboard = (
         Keyboard()
         #Добавить кнопку
