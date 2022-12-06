@@ -5,7 +5,7 @@ from database.methods.delete import delete_chat
 from netschoolapi import netschoolapi
 
 from tg_bot.handlers.homework.keyboard_homework import private_keyboard_homework
-from tg_bot.keyboards.inline import get_update_homework_kb
+from tg_bot.keyboards.inline import get_update_homework_kb, kb_back_to_homework
 from tg_bot.states import HomeworkStates
 from vk_bot.utils import send_vk_msg
 from settings import vk_token
@@ -62,7 +62,7 @@ async def get_new_homework(callback_query: CallbackQuery, state: FSMContext):
     await state.update_data(lesson=callback_query.data[16:])
     await HomeworkStates.next()
 
-    await callback_query.message.answer('📝Введите новое задание')
+    await callback_query.message.answer('📝Введите новое задание', reply_markup=kb_back_to_homework)
     logging.info(f'{callback_query.message.chat.id}: send question about new homework') 
 
 

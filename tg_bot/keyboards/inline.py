@@ -40,6 +40,13 @@ kb_schedule_download.add(InlineKeyboardButton('Суббота', callback_data='u
 kb_schedule_download.add(InlineKeyboardButton('↩️Назад', callback_data='keyboard_schedule'))
 
 
+kb_back_to_schedule = InlineKeyboardMarkup(resize_keyboard=True)
+kb_back_to_schedule.add(InlineKeyboardButton('↩️Назад', callback_data='keyboard_schedule'))
+
+kb_back_to_homework = InlineKeyboardMarkup(resize_keyboard=True)
+kb_back_to_homework.add(InlineKeyboardButton('↩️Назад', callback_data='keyboard_homework'))
+
+
 def get_homework_kb(lessons: dict) -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(resize_keyboard=True, row_width=4)
     for i in lessons:

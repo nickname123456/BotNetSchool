@@ -13,7 +13,7 @@ from vkbottle import Bot, VKAPIError
 
 from .keyboard_schedule import keyboard_schedule
 from tg_bot.utils import send_telegram_msg, send_telegram_bytes_photo
-from tg_bot.keyboards.inline import kb_schedule_download
+from tg_bot.keyboards.inline import kb_schedule_download, kb_back_to_schedule
 from tg_bot.states import UpdScheduleStates
 
 from vk_bot.utils import send_vk_msg
@@ -53,6 +53,7 @@ async def photo_schedule_download(callback: CallbackQuery, state: FSMContext):
         return
     await UpdScheduleStates.next() # Переходим к следующему шагу
     await callback.message.edit_text('📅Отправьте фото расписания')
+    await callback.message.edit_reply_markup(reply_markup=kb_back_to_schedule)
     logging.info(f'{callback.message.chat.id}: I send schedule download question about photo')
 
 async def class_schedule_download(message: Message, state: FSMContext):
@@ -63,7 +64,7 @@ async def class_schedule_download(message: Message, state: FSMContext):
 
     await state.update_data(photo=photo) # Обновляем данные
     await UpdScheduleStates.next() # Переходим к следующему шагу
-    kb = InlineKeyboardMarkup().add(InlineKeyboardButton('Это расписание для всей школы', callback_data='ItsSheduleForAllSchool'))
+    kb = InlineKeyboardMarkup().add(InlineKeyboardButton('Это расписание для всей школы', callback_data='ItsSheduleForAllSchool')).add(InlineKeyboardButton('↩️Назад', callback_data='keyboard_schedule'))
     await message.answer('❓Теперь отправьте класс, на который загружаете расписание', reply_markup=kb)
     logging.info(f'{message.chat.id}: I send schedule download question about class')
 
