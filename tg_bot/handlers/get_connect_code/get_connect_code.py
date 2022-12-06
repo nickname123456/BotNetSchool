@@ -28,3 +28,4 @@ async def private_connect_code(message: Message , callback_query: CallbackQuery 
 def register_user_connect_code_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(private_connect_code, lambda c: c.data and c.data =='get_connect_code')
     dp.register_message_handler(private_connect_code, content_types=['text'], text=['/connect', '/code', '/connectcode', '/connect_code'])
+    dp.register_message_handler(private_connect_code, commands=['code'])

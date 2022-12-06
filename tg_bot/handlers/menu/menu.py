@@ -46,6 +46,8 @@ async def chat_menu(message: Message, callback=None):
 def register_user_menu_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(private_menu, lambda c: c.data and c.data =='main_menu', chat_type='private')
     dp.register_message_handler(private_menu, content_types=['text'], text=['Меню', 'меню', 'гм', 'Vty.', 'vty.', 'uv', '/menu'], chat_type='private')
+    dp.register_message_handler(private_menu, commands=['menu'], chat_type='private')
     
     dp.register_callback_query_handler(chat_menu, lambda c: c.data and c.data =='main_menu', chat_type='group')
     dp.register_message_handler(chat_menu, chat_type='group', content_types=['text'], text=['Меню', 'меню', 'гм', 'Vty.', 'vty.', 'uv', '/menu'])
+    dp.register_message_handler(private_menu, commands=['menu'], chat_type='group')

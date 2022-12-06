@@ -251,6 +251,7 @@ async def start_back(message: Message , callback_query: CallbackQuery = None):
 
 def register_chat_start_handlers(dp: Dispatcher):
     dp.register_message_handler(start_back, content_types=['text'], text=['назад', 'Назад', '🔙Назад'], state='*', chat_type='group')
+    dp.register_message_handler(start_back, commands=['start'], state='*', chat_type='group')
 
     dp.register_callback_query_handler(import_data_from_private, lambda c: c.data and c.data.startswith('import_data_from_private'), state='*', chat_type='group')
     dp.register_message_handler(import_data_from_private_with_code, state=ConnectCodeStates.INCODE, chat_type='group')

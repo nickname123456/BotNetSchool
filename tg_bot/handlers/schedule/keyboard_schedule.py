@@ -18,4 +18,5 @@ async def keyboard_schedule(message: Message, callback: CallbackQuery=None):
 
 def register_schedule_handlers(dp: Dispatcher):
     dp.register_message_handler(keyboard_schedule, content_types=['text'], text=['расписание', '/расписание', '/hfcgbcfybt', '/расп', '/hfcg', '/rasp', 'скиньте расписание', 'дайте расписание', '📚Расписание'], state='*')
+    dp.register_message_handler(keyboard_schedule, commands=['schedule'], state='*')
     dp.register_callback_query_handler(keyboard_schedule, lambda c: c.data == 'keyboard_schedule', state='*')
