@@ -308,7 +308,7 @@ async def correction_mark(login, password, school, url, studentId, subject, mark
             elif i == 3:
                 len_3 += 1
     
-    return f'Для твоей цели нужны такие оценки: \n 5️⃣: {len_5} \nили\n4️⃣: {len_4} \nили\n 3️⃣: {len_3}'
+    return f'Для исправления оценки по {subject} нужны оценки: \n5️⃣: {len_5} \nили\n4️⃣: {len_4} \nили\n3️⃣: {len_3}'
 
 
 

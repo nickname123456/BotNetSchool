@@ -22,3 +22,7 @@ class UpdScheduleStates(StatesGroup):
     INPHOTO = State()
     INCLASS = State()
     END = State()
+
+class CorrectionMark(StatesGroup):
+    INLESSON = State()
+    INMARK = State()

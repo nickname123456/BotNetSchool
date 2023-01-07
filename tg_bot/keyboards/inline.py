@@ -20,6 +20,17 @@ kb_menu.add(KeyboardButton('🏠Домашнее задание'), KeyboardButto
 kb_menu.add(KeyboardButton('📢Объявления'), KeyboardButton('⚙Настройки'))
 
 
+kb_reports = InlineKeyboardMarkup(resize_keyboard=True)
+kb_reports.add(InlineKeyboardButton('Средний балл (БЕТА)', callback_data='marks'))
+kb_reports.add(InlineKeyboardButton('Итоговые отметки', callback_data='reportTotal'), InlineKeyboardButton('Средний балл', callback_data='reportAverageMark'))
+kb_reports.add(InlineKeyboardButton('Информационное письмо для родителей', callback_data='parentReport'), InlineKeyboardButton('Динамика среднего балла ученика', callback_data='reportAverageMarkDyn'))
+kb_reports.add(InlineKeyboardButton('Итоги успеваемости и качества знаний', callback_data='reportGrades'))
+kb_reports.add(InlineKeyboardButton('↩️Назад', callback_data='main_menu'))
+
+kb_marks = InlineKeyboardMarkup(resize_keyboard=True)
+kb_marks.add(InlineKeyboardButton('Исправление оценок', callback_data='correction_mark_choice_lesson'))
+kb_marks.add(InlineKeyboardButton('↩️Назад', callback_data='reports'))
+
 kb_schedule = InlineKeyboardMarkup(resize_keyboard=True, row_width=2)
 kb_schedule.add(InlineKeyboardButton('Понедельник', callback_data='schedule_for_day_monday'))
 kb_schedule.add(InlineKeyboardButton('Вторник', callback_data='schedule_for_day_tuesday'))
@@ -100,3 +111,18 @@ def get_settings_kb(student: Student) -> InlineKeyboardMarkup:
     kb.add(InlineKeyboardButton('↩️Назад', callback_data='exit_from_settings'))
     
     return kb
+
+def get_correction_lessons(lessons: dict) -> InlineKeyboardMarkup:
+    counter = 0
+    kb = InlineKeyboardMarkup(resize_keyboard=True, row_width=4)
+    for i in lessons:
+        kb.insert(InlineKeyboardButton(i[:40], callback_data=f'correction_choice_mark_{counter}'))
+        counter += 1
+    kb.add(InlineKeyboardButton('↩️Назад', callback_data='marks'))
+    return kb
+
+kb_choice_mark = InlineKeyboardMarkup(resize_keyboard=True)
+kb_choice_mark.add(InlineKeyboardButton('5️⃣', callback_data='choice_mark_5'))
+kb_choice_mark.add(InlineKeyboardButton('4️⃣', callback_data='choice_mark_4'))
+kb_choice_mark.add(InlineKeyboardButton('3️⃣', callback_data='choice_mark_3'))
+kb_choice_mark.add(InlineKeyboardButton('↩️Назад', callback_data='correction_mark_choice_lesson_EDIT'))
