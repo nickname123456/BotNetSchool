@@ -10,6 +10,7 @@ from aiogram.types import Message, InlineKeyboardMarkup, KeyboardButton, Callbac
 from aiogram.dispatcher import FSMContext
 from aiogram import Dispatcher
 
+from urllib.parse import urlparse
 import logging
 
 
@@ -29,7 +30,7 @@ async def registration(message: Message):
 async def registration_inLink(message: Message, state: FSMContext):
     bot = message.bot
     user_id = message.from_user.id
-    link = message.text
+    link = f'https://{urlparse(message.text).netloc}'
 
     try:
         countries = await ns.get_countries(link)
