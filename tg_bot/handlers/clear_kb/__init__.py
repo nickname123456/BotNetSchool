@@ -1,0 +1,1 @@
+from .clear_kb import register_clear_kb_handlers
