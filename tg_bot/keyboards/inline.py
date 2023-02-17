@@ -5,6 +5,9 @@ import datetime
 
 
 
+kb_back_to_start_from_code = InlineKeyboardMarkup(resize_keyboard=True)
+kb_back_to_start_from_code.add(InlineKeyboardButton('↩️Назад', callback_data='start_back'))
+
 
 kb_menu_inline = InlineKeyboardMarkup(resize_keyboard=True)
 kb_menu_inline.add(InlineKeyboardButton('📖Дневник', callback_data='keyboard_diary'),

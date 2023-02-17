@@ -3,6 +3,7 @@ from database.methods.update import edit_chat_clas, edit_chat_link, edit_chat_lo
 from database.methods.get import get_all_chats, get_all_students, get_chat_by_telegram_id
 from database.methods.create import create_chat
 
+from tg_bot.keyboards.inline import kb_back_to_start_from_code
 from tg_bot.states import StartStates, ConnectCodeStates
 import ns
 
@@ -10,6 +11,8 @@ from aiogram.types import Message, InlineKeyboardMarkup, KeyboardButton, Callbac
 from aiogram.dispatcher import FSMContext
 from aiogram import Dispatcher
 
+
+from urllib.parse import urlparse
 import logging
 
 
@@ -29,12 +32,13 @@ async def registration(message: Message):
 async def registration_inLink(message: Message, state: FSMContext):
     bot = message.bot
     chat_id = message.chat.id
-    link = message.text
+    link = urlparse(message.text)
+    link = f'{link.scheme}://{link.netloc}'
 
     try:
         countries = await ns.get_countries(link)
     except:
-        await bot.send_message(chat_id, '❌Не нашел в твоем сообщении данные, введи еще раз')
+        await bot.send_message(chat_id, '❌Не нашел в твоем сообщении данные, введи еще раз', reply_markup=kb_back_to_start_from_code)
         return
 
     keyboard = InlineKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -236,22 +240,22 @@ async def import_data_from_private_with_code(message: Message, state: FSMContext
                 await message.answer('✅Вы успешно зарегистрировались!', reply_markup=keyboard)
                 await state.finish()
                 return
-    await message.answer('❌Не нашел аккаунта с таким кодом, попробуйте еще раз')
+    await message.answer('❌Не нашел аккаунта с таким кодом, попробуйте еще раз', reply_markup=kb_back_to_start_from_code)
 
 
 
-async def start_back(message: Message , callback_query: CallbackQuery = None):
+async def start_back(message: Message = None, callback_query: CallbackQuery = None):
     bot = message.bot
+    if isinstance(message, CallbackQuery):
+        message = message.message
     chat_id = message.chat.id
-    if callback_query is not None:
-        message = callback_query.message
     await bot.send_message(chat_id, '🔙Возвращаемся назад...')
     await registration(message)
 
 
 def register_chat_start_handlers(dp: Dispatcher):
     dp.register_message_handler(start_back, content_types=['text'], text=['назад', 'Назад', '🔙Назад'], state='*', chat_type='group')
-    dp.register_message_handler(start_back, commands=['start'], state='*', chat_type='group')
+    dp.register_message_handler(start_back, commands=['start_back'], state='*', chat_type='group')
 
     dp.register_callback_query_handler(import_data_from_private, lambda c: c.data and c.data.startswith('import_data_from_private'), state='*', chat_type='group')
     dp.register_message_handler(import_data_from_private_with_code, state=ConnectCodeStates.INCODE, chat_type='group')
