@@ -3,6 +3,7 @@ from database.methods.update import edit_student_clas, edit_student_link, edit_s
 from database.methods.get import get_all_students, get_student_by_telegram_id
 from database.methods.create import create_student
 
+from tg_bot.keyboards.inline import kb_back_to_start_from_code
 from tg_bot.states import StartStates, ConnectCodeStates
 import ns
 
@@ -30,12 +31,13 @@ async def registration(message: Message):
 async def registration_inLink(message: Message, state: FSMContext):
     bot = message.bot
     user_id = message.from_user.id
-    link = f'https://{urlparse(message.text).netloc}'
+    link = urlparse(message.text)
+    link = f'{link.scheme}://{link.netloc}'
 
     try:
         countries = await ns.get_countries(link)
     except:
-        await bot.send_message(user_id, '❌Не нашел в твоем сообщении данные, введи еще раз')
+        await bot.send_message(user_id, '❌Не нашел в твоем сообщении данные, введи еще раз', reply_markup=kb_back_to_start_from_code)
         return
 
     keyboard = InlineKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -232,15 +234,15 @@ async def import_data_from_vk_with_code(message: Message, state: FSMContext):
                 await message.answer('✅Вы успешно подключили свой аккаунт ВКонтакте к боту!', reply_markup=keyboard)
                 await state.finish()
                 return
-    await message.answer('❌Не нашел аккаунта с таким кодом, попробуйте еще раз')
+    await message.answer('❌Не нашел аккаунта с таким кодом, попробуйте еще раз', reply_markup=kb_back_to_start_from_code)
 
 
 
-async def start_back(message: Message , callback_query: CallbackQuery = None):
+async def start_back(message: Message = None, callback_query: CallbackQuery = None):
     bot = message.bot
+    if isinstance(message, CallbackQuery):
+        message = message.message
     user_id = message.from_user.id
-    if callback_query is not None:
-        message = callback_query.message
     await bot.send_message(user_id, '🔙Возвращаемся назад...')
     await registration(message)
 

@@ -8,6 +8,7 @@ from vkbottle import BaseStateGroup, CtxStorage, Keyboard, Text, KeyboardButtonC
 from vkbottle.bot import Message, Blueprint
 from misc.VKRules import PayloadStarts
 
+from urllib.parse import urlparse
 import asyncio
 import logging
 
@@ -60,7 +61,8 @@ async def registration(message: Message):
 
 @bp.on.private_message(payload={'cmd': 'import_data_from_tg'})
 async def import_data_from_tg(message: Message):
-    await message.answer('🔒Напишите Боту в телеграме "/code" и скопируйте код из сообщения сюда')
+    keyboard = Keyboard().add(Text('Назад', {'cmd': 'start'}), color = KeyboardButtonColor.NEGATIVE)
+    await message.answer('🔒Напишите Боту в телеграме "/code" и скопируйте код из сообщения сюда', keyboard=keyboard)
     await bp.state_dispenser.set(message.peer_id, ConnectCodeState.INCODE)
 
 @bp.on.private_message(state=ConnectCodeState.INCODE)
@@ -82,7 +84,8 @@ async def import_data_from_tg_with_code(message: Message):
 
 @bp.on.chat_message(payload={'cmd': 'import_data_from_private'})
 async def import_data_from_private(message: Message):
-    await message.answer('🔒Напишите мне в Личные Сообщения "/code" и введите код, который я вам отправлю в ответ.\n\n🔑После этого я смогу получить данные из вашего аккаунта.')
+    keyboard = Keyboard().add(Text('Назад', {'cmd': 'start'}), color = KeyboardButtonColor.NEGATIVE)
+    await message.answer('🔒Напишите мне в Личные Сообщения "/code" и введите код, который я вам отправлю в ответ.\n\n🔑После этого я смогу получить данные из вашего аккаунта.', keyboard=keyboard)
     await bp.state_dispenser.set(message.peer_id, ConnectCodeState.INCODE)
 
 @bp.on.chat_message(state=ConnectCodeState.INCODE)
@@ -116,11 +119,13 @@ async def import_data_from_private_with_code(message: Message):
 async def registration_inLink(message: Message):
     if message.attachments:
         if message.attachments[0].link:
-            link = 'https://' + str(message.attachments[0].link.caption) + '/'
+            link = urlparse(message.attachments[0].link.url)
+            link = f'{link.scheme}://{link.netloc}'
 
     if message.text or link:
             if message.text:
-                link = message.text
+                link = urlparse(message.text)
+                link = f'{link.scheme}://{link.netloc}'
 
             ctx.set('link', link) # Загружаем во временное хранилище ссылку
             
@@ -333,20 +338,13 @@ async def chat_registration_inPassword(message: Message):
     cityId = ctx.get('cityId')
     school = ctx.get('school')
     clas = ctx.get('clas')
-    login_without_spaces = ctx.get('login')
+    login = ctx.get('login')
     password = message.text
 
     for i in await ns.get_school(link, countryId, provincesId, cityId):
         if i['id'] == int(school):
             school = i['name']
             break
-
-    login = ''
-    for i in str(login_without_spaces):
-        if i == '~':
-            login+=' '
-        else:
-            login+=i
             
     try:
         studentId = await ns.getCurrentStudentId(login, password, school, link)
