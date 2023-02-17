@@ -18,7 +18,7 @@ import logging
 
 async def registration(message: Message):
     bot = message.bot
-    user_id = message.from_user.id
+    user_id = message.chat.id
     kb = InlineKeyboardMarkup().add(KeyboardButton('✔Я уже пользовался "Сетевой Город в ВК"', callback_data='import_data_from_vk'))
 
     await bot.send_message(user_id, 'Приветствую!👋🏻 Для начала советую ознакомиться с https://vk.com/@botnetschool-spravka-po-ispolzovaniu-bota')
