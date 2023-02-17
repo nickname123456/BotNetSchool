@@ -242,7 +242,7 @@ async def start_back(message: Message = None, callback_query: CallbackQuery = No
     bot = message.bot
     if isinstance(message, CallbackQuery):
         message = message.message
-    user_id = message.from_user.id
+    user_id = message.chat.id
     await bot.send_message(user_id, '🔙Возвращаемся назад...')
     await registration(message)
 
