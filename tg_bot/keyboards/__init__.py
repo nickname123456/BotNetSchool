@@ -1,1 +1,1 @@
-from .inline import kb_menu, kb_schedule, get_homework_kb, get_homework_for_day_kb, kb_schedule_download, kb_menu_inline, get_settings_kb, kb_back_to_schedule, kb_back_to_homework, kb_reports, kb_marks, get_correction_lessons, kb_choice_mark, kb_back_to_start_from_code
+from .inline import kb_menu, kb_schedule, get_homework_kb, get_homework_for_day_kb, kb_schedule_download, kb_menu_inline, get_settings_kb, kb_back_to_schedule, kb_back_to_homework, kb_reports, kb_marks, get_correction_lessons, kb_choice_mark, kb_back_to_start_from_code, admin_kb

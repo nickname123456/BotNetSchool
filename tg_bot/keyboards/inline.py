@@ -23,6 +23,13 @@ kb_menu.add(KeyboardButton('🏠Домашнее задание'), KeyboardButto
 kb_menu.add(KeyboardButton('📢Объявления'), KeyboardButton('⚙Настройки'))
 
 
+admin_kb = InlineKeyboardMarkup(resize_keyboard=True)
+admin_kb.add(InlineKeyboardButton('📈Статистика', callback_data='admin_stats'),
+            InlineKeyboardButton('📤Рассылка', callback_data='admin_mailing'),
+            InlineKeyboardButton('🔎Поиск', callback_data='admin_search'))
+admin_kb.add(InlineKeyboardButton('↩️Назад', callback_data='main_menu'))
+
+
 kb_reports = InlineKeyboardMarkup(resize_keyboard=True)
 kb_reports.add(InlineKeyboardButton('Средний балл (БЕТА)', callback_data='marks'))
 kb_reports.add(InlineKeyboardButton('Итоговые отметки', callback_data='reportTotal'), InlineKeyboardButton('Средний балл', callback_data='reportAverageMark'))

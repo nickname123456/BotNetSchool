@@ -119,9 +119,25 @@ def get_chat_by_vk_id(vk_id: int) -> Chat:
         return None
 
 
+
+
+def get_all_schedules() -> list[Schedule]:
+    try:
+        return Database().session.query(Schedule).all()
+    except exc.NoResultFound:
+        return None
+    
 def get_schedule(school: str, clas: str, day: str) -> Schedule:
     try:
         return Database().session.query(Schedule).filter(Schedule.school == school, Schedule.clas == clas, Schedule.day == day).one()
+    except exc.NoResultFound:
+        return None
+
+
+
+def get_all_homeworks() -> list[Homework]:
+    try:
+        return Database().session.query(Homework).all()
     except exc.NoResultFound:
         return None
 
