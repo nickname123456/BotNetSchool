@@ -22,17 +22,18 @@ bp.labeler.custom_rules["PayloadStarts"] = PayloadStarts
 ctx = CtxStorage() # объявляем временное хранилище
 
 class NewaccountState(BaseStateGroup):
-    INLINK = 11
-    INCOUNTRIES = 12
-    INPROVINCES = 13
-    INCITIES = 14
-    INSCHOOL = 15
-    INCLASS = 16
-    INLOGIN = 17
-    INPASSWORD = 18
+    INPOLICY = 11
+    INLINK = 12
+    INCOUNTRIES = 13
+    INPROVINCES = 14
+    INCITIES = 15
+    INSCHOOL = 16
+    INCLASS = 17
+    INLOGIN = 18
+    INPASSWORD = 19
    
 class ConnectCodeState(BaseStateGroup):
-    INCODE = 19
+    INCODE = 20
 
 
 
@@ -40,12 +41,17 @@ class ConnectCodeState(BaseStateGroup):
 @bp.on.private_message(text=['начать', '/начать', '/yfxfnm', '/start', '/старт'])
 @bp.on.private_message(payload={'cmd': 'start'})
 async def registration(message: Message):
-    keyboard = Keyboard().add(Text('✔Я уже пользовался "Сетевой Город в ТГ"', {'cmd': f'import_data_from_tg'}))
+    keyboard = Keyboard().add(Text('✅Я согласен', {'cmd': 'agree_policy'}))
 
-    await message.answer('Приветствую!👋🏻 Для начала советую ознакомиться с https://vk.com/@botnetschool-spravka-po-ispolzovaniu-bota')
-    await message.answer('Продолжая пользоваться этим ботом вы автоматически соглашаетесь с Политикой в отношении обработки персональных данных (https://vk.com/@botnetschool-politika-v-otnoshenii-obrabotki-personalnyh-dannyh)')
+    await message.answer('Продолжая пользоваться этим ботом вы автоматически соглашаетесь с Политикой в отношении обработки персональных данных (https://vk.com/@botnetschool-politika-v-otnoshenii-obrabotki-personalnyh-dannyh)', keyboard=keyboard)
+    await bp.state_dispenser.set(message.peer_id, NewaccountState.INPOLICY)
+
+@bp.on.private_message(payload={'cmd': 'agree_policy'})
+async def registration_inPolicy(message: Message):
+    keyboard = Keyboard().add(Text('✔Я уже пользовался "Сетевой Город в ТГ"', {'cmd': f'import_data_from_tg'}))
     await message.answer('🔗Введите адрес сетевого города (Пример: "https://sgo.edu-74.ru/").', keyboard=keyboard)
     await bp.state_dispenser.set(message.peer_id, NewaccountState.INLINK)
+
 
 @bp.on.chat_message(text=['начать', '/начать', '/yfxfnm', '/start', '/старт'])
 @bp.on.chat_message(payload={'cmd': 'start'})

@@ -2,6 +2,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
 class StartStates(StatesGroup):
+    INPOLICY = State()
     INLINK = State()
     INCOUNTRIES = State()
     INPROVINCES = State()

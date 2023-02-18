@@ -19,11 +19,21 @@ import logging
 async def registration(message: Message):
     bot = message.bot
     user_id = message.chat.id
+
+    kb = InlineKeyboardMarkup().add(KeyboardButton('✅Я согласен', callback_data='agree_policy'))
+
+    await bot.send_message(user_id, '❗Продолжая пользоваться этим ботом вы автоматически соглашаетесь с Политикой в отношении обработки персональных данных (https://vk.com/@botnetschool-politika-v-otnoshenii-obrabotki-personalnyh-dannyh)', reply_markup=kb, disable_web_page_preview=True)
+
+    await StartStates.INPOLICY.set()
+
+
+async def registration_inPolicy(callback_query: CallbackQuery):
+    message = callback_query.message
+
     kb = InlineKeyboardMarkup().add(KeyboardButton('✔Я уже пользовался "Сетевой Город в ВК"', callback_data='import_data_from_vk'))
 
-    await bot.send_message(user_id, 'Приветствую!👋🏻 Для начала советую ознакомиться с https://vk.com/@botnetschool-spravka-po-ispolzovaniu-bota')
-    await bot.send_message(user_id, 'Продолжая пользоваться этим ботом вы автоматически соглашаетесь с Политикой в отношении обработки персональных данных (https://vk.com/@botnetschool-politika-v-otnoshenii-obrabotki-personalnyh-dannyh)')
-    await bot.send_message(user_id, '🔗Введите адрес сетевого города (Пример: "https://sgo.edu-74.ru/"). \nЕсли вы уже пользовались "Сетевой Город в ВК", то нажмите на кнопку ниже.', reply_markup=kb)
+    await message.edit_text('🔗Введите адрес сетевого города (Пример: "https://sgo.edu-74.ru/"). \nЕсли вы уже пользовались "Сетевой Город в ВК", то нажмите на кнопку ниже.')
+    await message.edit_reply_markup(kb)
 
     await StartStates.INLINK.set()
 
@@ -216,7 +226,7 @@ async def registration_inPassword(message: Message, state: FSMContext):
 async def import_data_from_vk(callback_query: CallbackQuery, state: FSMContext):
     message = callback_query.message
     await ConnectCodeStates.INCODE.set()
-    await message.answer('🔒Напишите в ЛС Боту ВКонтакте "/code" и скопируйте код из сообщения сюда')
+    await message.answer('🔒Напишите в ЛС Боту ВКонтакте "/code" и скопируйте код из сообщения сюда', reply_markup=kb_back_to_start_from_code)
 
 async def import_data_from_vk_with_code(message: Message, state: FSMContext):
     if message.text and len(message.text) == 6 and message.text.isdigit():
@@ -256,6 +266,7 @@ def register_user_start_handlers(dp: Dispatcher):
 
     dp.register_callback_query_handler(start_back, lambda c: c.data and c.data == 'start_back', state='*', chat_type='private')
     dp.register_message_handler(registration, content_types=['text'], text=['начать', '/начать', '/yfxfnm', '/start', '/старт'], chat_type='private')
+    dp.register_callback_query_handler(registration_inPolicy, lambda c: c.data and c.data == 'agree_policy', state=StartStates.INPOLICY, chat_type='private')
     dp.register_message_handler(registration_inLink, state=StartStates.INLINK, chat_type='private')
     dp.register_callback_query_handler(registration_inCountries, lambda c: c.data and c.data.startswith('start_countries_'), state=StartStates.INCOUNTRIES, chat_type='private')
     dp.register_callback_query_handler(registration_inProvinces, lambda c: c.data and c.data.startswith('start_provinces_'), state=StartStates.INPROVINCES, chat_type='private')
