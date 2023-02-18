@@ -9,6 +9,7 @@ from tg_bot.handlers.settings import register_keyboard_settings_handlers, regist
 from tg_bot.handlers.announcements import register_announcements_handlers
 from tg_bot.handlers.reports import register_handlers_reports, register_handlers_marks, register_handlers_correction_mark
 from tg_bot.handlers.clear_kb import register_clear_kb_handlers
+from tg_bot.handlers.diary import register_keyboard_diary_handlers
 
 def register_all_handlers(dp: Dispatcher) -> None:
     handlers = (
@@ -31,6 +32,7 @@ def register_all_handlers(dp: Dispatcher) -> None:
         register_handlers_marks,
         register_handlers_correction_mark,
         register_clear_kb_handlers,
+        register_keyboard_diary_handlers,
     )
     for handler in handlers:
         handler(dp)
