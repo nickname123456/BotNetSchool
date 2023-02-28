@@ -156,7 +156,7 @@ async def finish_schedule_download(message: Message, state: FSMContext):
 
 
 def register_schedule_download(dp: Dispatcher):
-    dp.register_callback_query_handler(chat_start_schedule_download, lambda callback: callback.data == 'schedule_download', state='*', chat_type='group')
+    dp.register_callback_query_handler(chat_start_schedule_download, lambda callback: callback.data == 'schedule_download', state='*', chat_type=['group', 'supergroup'])
     dp.register_callback_query_handler(private_start_schedule_download, lambda callback: callback.data == 'schedule_download', state='*', chat_type='private')
 
     dp.register_callback_query_handler(photo_schedule_download, lambda callback: callback.data.startswith('update_schedule_'), state=UpdScheduleStates.INPHOTO)

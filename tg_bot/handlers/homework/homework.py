@@ -83,4 +83,4 @@ async def chat_homework(message: Message, callback=None):
 def register_homework_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(private_homework, lambda c: c.data.startswith('homework_'), chat_type='private')
     
-    dp.register_callback_query_handler(chat_homework, lambda c: c.data.startswith('homework_'), chat_type='group')
+    dp.register_callback_query_handler(chat_homework, lambda c: c.data.startswith('homework_'), chat_type=['group', 'supergroup'])

@@ -86,7 +86,7 @@ async def private_finish(callback: CallbackQuery, state: FSMContext):
 
 
 def register_handlers_correction_mark(dp: Dispatcher):
-    dp.register_callback_query_handler(chat_choice_lesson, lambda callback: callback.data == 'correction_mark_choice_lesson', state='*', chat_type='group')
+    dp.register_callback_query_handler(chat_choice_lesson, lambda callback: callback.data == 'correction_mark_choice_lesson', state='*', chat_type=['group', 'supergroup'])
     dp.register_callback_query_handler(private_choice_lesson, lambda callback: callback.data == 'correction_mark_choice_lesson', state='*', chat_type='private')
     dp.register_callback_query_handler(private_choice_lesson, lambda callback: callback.data == 'correction_mark_choice_lesson_EDIT', state='*', chat_type='private')
     dp.register_callback_query_handler(private_choice_mark, lambda callback: callback.data.startswith('correction_choice_mark_'), state=CorrectionMark.INLESSON)

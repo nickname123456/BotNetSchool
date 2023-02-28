@@ -76,8 +76,8 @@ def register_schedule_for_day_handlers(dp: Dispatcher):
                                                                                                     'скиньте расписание на', 'Скиньте расписание на',
                                                                                                     'скинь расписание на', 'Скинь расписание на'], chat_type='private')
     
-    dp.register_callback_query_handler(chat_schedule_for_day, lambda c: c.data and c.data.startswith('schedule_for_day_'), state='*', chat_type='group')
+    dp.register_callback_query_handler(chat_schedule_for_day, lambda c: c.data and c.data.startswith('schedule_for_day_'), state='*', chat_type=['group', 'supergroup'])
     dp.register_message_handler(chat_schedule_for_day, content_types=['text'], text_startswith=['расписание на ', 'Расписание на ',
                                                                                                 'скиньте расписание на', 'Скиньте расписание на',
-                                                                                                'скинь расписание на', 'Скинь расписание на'], chat_type='group')
+                                                                                                'скинь расписание на', 'Скинь расписание на'], chat_type=['group', 'supergroup'])
     

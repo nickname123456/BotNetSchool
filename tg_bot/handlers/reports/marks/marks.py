@@ -65,6 +65,6 @@ def register_handlers_marks(dp: Dispatcher):
     dp.register_callback_query_handler(private_marks, lambda c: c.data == 'marks', state='*', chat_type='private')
 
 
-    dp.register_message_handler(chat_marks, commands=['marks'], state='*', chat_type='group')
-    dp.register_message_handler(chat_marks, content_types=['text'], text_startswith=['оценки', 'Оценки'], state='*', chat_type='group')
-    dp.register_callback_query_handler(chat_marks, lambda c: c.data == 'marks', state='*', chat_type='group')
+    dp.register_message_handler(chat_marks, commands=['marks'], state='*', chat_type=['group', 'supergroup'])
+    dp.register_message_handler(chat_marks, content_types=['text'], text_startswith=['оценки', 'Оценки'], state='*', chat_type=['group', 'supergroup'])
+    dp.register_callback_query_handler(chat_marks, lambda c: c.data == 'marks', state='*', chat_type=['group', 'supergroup'])

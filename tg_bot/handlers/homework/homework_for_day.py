@@ -137,7 +137,7 @@ async def chat_homework_for_day(message: Message, callback=None):
 
 def register_handlers_homework_for_day(dp: Dispatcher):
     dp.register_callback_query_handler(private_keyboard_homework_for_day, lambda callback: callback.data.startswith('keyboard_homework_for_day'), state='*', chat_type='private')
-    dp.register_callback_query_handler(chat_keyboard_homework_for_day, lambda callback: callback.data.startswith('keyboard_homework_for_day'), state='*', chat_type='group')
+    dp.register_callback_query_handler(chat_keyboard_homework_for_day, lambda callback: callback.data.startswith('keyboard_homework_for_day'), state='*', chat_type=['group', 'supergroup'])
 
     dp.register_callback_query_handler(private_homework_for_day, lambda callback: callback.data.startswith('for_day_homework_'), state='*', chat_type='private')
     dp.register_callback_query_handler(chat_homework_for_day, lambda callback: callback.data.startswith('for_day_homework_'), state='*', chat_type='group')

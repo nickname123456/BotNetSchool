@@ -161,7 +161,7 @@ async def private_edit_hamework(message: Message, state: FSMContext):
 
 
 def register_update_homework_handlers(dp: Dispatcher):
-    dp.register_callback_query_handler(chat_keyboard_update_homework, lambda c: c.data and c.data == 'update_homework', state='*', chat_type='group')
+    dp.register_callback_query_handler(chat_keyboard_update_homework, lambda c: c.data and c.data == 'update_homework', state='*', chat_type=['group', 'supergroup'])
     
     dp.register_callback_query_handler(private_keyboard_update_homework, lambda c: c.data and c.data == 'update_homework', state='*', chat_type='private')
     dp.register_callback_query_handler(get_new_homework, lambda c: c.data and c.data.startswith('update_homework_'), state=HomeworkStates.INLESSON)

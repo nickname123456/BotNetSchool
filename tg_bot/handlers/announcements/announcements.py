@@ -172,9 +172,9 @@ def register_announcements_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(private_announcements, lambda c: c.data == 'announcements', state='*', chat_type='private')
 
     
-    dp.register_message_handler(chat_announcements, commands=['announcements'], state='*', chat_type='group')
+    dp.register_message_handler(chat_announcements, commands=['announcements'], state='*', chat_type=['group', 'supergroup'])
     dp.register_message_handler(chat_announcements, content_types=['text'], text_startswith=['объявления', 'объявление',
                                                                                                 'Объявления', 'Объявление',
                                                                                                 '📢Объявления',
-                                                                                                'j,]adktybz', 'j,]zdktybt'], state='*', chat_type='group')
-    dp.register_callback_query_handler(chat_announcements, lambda c: c.data == 'announcements', state='*', chat_type='group')
+                                                                                                'j,]adktybz', 'j,]zdktybt'], state='*', chat_type=['group', 'supergroup'])
+    dp.register_callback_query_handler(chat_announcements, lambda c: c.data == 'announcements', state='*', chat_type=['group', 'supergroup'])

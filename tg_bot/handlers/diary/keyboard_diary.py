@@ -26,7 +26,7 @@ async def chat_keyboard_diary(message: Message, callback=None):
 
 def register_keyboard_diary_handlers(dp: Dispatcher):
     dp.register_message_handler(private_keyboard_diary, content_types=['text'], text=['📖Дневник', 'Дневник', 'дневник', '/diary'], state='*', chat_type='private')
-    dp.register_message_handler(chat_keyboard_diary, content_types=['text'], text=['📖Дневник', 'Дневник', 'дневник', '/diary'], state='*', chat_type='group')
+    dp.register_message_handler(chat_keyboard_diary, content_types=['text'], text=['📖Дневник', 'Дневник', 'дневник', '/diary'], state='*', chat_type=['group', 'supergroup'])
     
     dp.register_callback_query_handler(private_keyboard_diary, lambda c: c.data == 'keyboard_diary', state='*', chat_type='private')
-    dp.register_callback_query_handler(chat_keyboard_diary, lambda c: c.data == 'keyboard_diary', state='*', chat_type='group')
+    dp.register_callback_query_handler(chat_keyboard_diary, lambda c: c.data == 'keyboard_diary', state='*', chat_type=['group', 'supergroup'])

@@ -131,13 +131,13 @@ async def switch_homework_notification_chat(callback: CallbackQuery):
 
 def register_change_settings_notification_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(switch_mark_notification_private, lambda c: c.data and c.data =='change_mark_notification', chat_type='private')
-    dp.register_callback_query_handler(switch_mark_notification_chat, lambda c: c.data and c.data =='change_mark_notification', chat_type='group')
+    dp.register_callback_query_handler(switch_mark_notification_chat, lambda c: c.data and c.data =='change_mark_notification', chat_type=['group', 'supergroup'])
 
     dp.register_callback_query_handler(switch_schedule_notification_private, lambda c: c.data and c.data =='change_schedule_notification', chat_type='private')
-    dp.register_callback_query_handler(switch_schedule_notification_chat, lambda c: c.data and c.data =='change_schedule_notification', chat_type='group')
+    dp.register_callback_query_handler(switch_schedule_notification_chat, lambda c: c.data and c.data =='change_schedule_notification', chat_type=['group', 'supergroup'])
 
     dp.register_callback_query_handler(switch_announcements_notification_private, lambda c: c.data and c.data =='change_announcements_notification', chat_type='private')
-    dp.register_callback_query_handler(switch_announcements_notification_chat, lambda c: c.data and c.data =='change_announcements_notification', chat_type='group')
+    dp.register_callback_query_handler(switch_announcements_notification_chat, lambda c: c.data and c.data =='change_announcements_notification', chat_type=['group', 'supergroup'])
 
     dp.register_callback_query_handler(switch_homework_notification_private, lambda c: c.data and c.data =='change_homework_notification', chat_type='private')
-    dp.register_callback_query_handler(switch_homework_notification_chat, lambda c: c.data and c.data =='change_homework_notification', chat_type='group')
+    dp.register_callback_query_handler(switch_homework_notification_chat, lambda c: c.data and c.data =='change_homework_notification', chat_type=['group', 'supergroup'])

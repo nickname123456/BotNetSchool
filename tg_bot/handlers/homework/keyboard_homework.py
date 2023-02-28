@@ -75,7 +75,7 @@ def register_keyboard_homework_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(private_keyboard_homework, lambda c: c.data == 'keyboard_homework', state='*', chat_type='private')
 
 
-    dp.register_message_handler(chat_keyboard_homework, commands=['homework'], state='*', chat_type='group')
+    dp.register_message_handler(chat_keyboard_homework, commands=['homework'], state='*', chat_type=['group', 'supergroup'])
     dp.register_message_handler(chat_keyboard_homework, content_types=['text'], text_startswith=['дз', '/дз', 'домашка', 'домашнее задание', 'че задали?', 'что задали?', 'че по дз?', 'что по дз?', 'какое дз?', 'что по', 'че по', '🏠Домашнее задание',
-                                                                                'lp', '/lp', 'ljvfirf', 'ljvfiytt pflfybt', 'че задали', 'что задали', 'че по дз', 'что по дз', 'какое дз', 'что по', 'че по'], state='*', chat_type='group')
-    dp.register_callback_query_handler(chat_keyboard_homework, lambda c: c.data == 'keyboard_homework', state='*', chat_type='group')
+                                                                                'lp', '/lp', 'ljvfirf', 'ljvfiytt pflfybt', 'че задали', 'что задали', 'че по дз', 'что по дз', 'какое дз', 'что по', 'че по'], state='*', chat_type=['group', 'supergroup'])
+    dp.register_callback_query_handler(chat_keyboard_homework, lambda c: c.data == 'keyboard_homework', state='*', chat_type=['group', 'supergroup'])

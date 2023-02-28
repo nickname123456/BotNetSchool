@@ -24,8 +24,17 @@ async def private_connect_code(message: Message , callback_query: CallbackQuery 
     edit_student_connect_code(telegram_id=user_id, new_connect_code=None)
     logging.info(f'{user_id}: Send connect code')
 
+async def chat_connect_code(message: Message , callback_query: CallbackQuery = None):
+    logging.info(f'{message.chat.id}: I get get_connect_code')
+    await message.answer('❗Данная команда доступна только в личных сообщениях бота!')
+    logging.info(f'{message.chat.id}: Send connect code')
+
 
 def register_user_connect_code_handlers(dp: Dispatcher):
-    dp.register_callback_query_handler(private_connect_code, lambda c: c.data and c.data =='get_connect_code')
-    dp.register_message_handler(private_connect_code, content_types=['text'], text=['/connect', '/code', '/connectcode', '/connect_code'])
-    dp.register_message_handler(private_connect_code, commands=['code'])
+    dp.register_callback_query_handler(private_connect_code, lambda c: c.data and c.data =='get_connect_code', chat_type='private')
+    dp.register_message_handler(private_connect_code, content_types=['text'], text=['/connect', '/code', '/connectcode', '/connect_code'], chat_type='private')
+    dp.register_message_handler(private_connect_code, commands=['code'], chat_type='private')
+
+    dp.register_callback_query_handler(chat_connect_code, lambda c: c.data and c.data =='get_connect_code', chat_type=['group', 'supergroup'])
+    dp.register_message_handler(chat_connect_code, content_types=['text'], text=['/connect', '/code', '/connectcode', '/connect_code'])
+    dp.register_message_handler(chat_connect_code, commands=['code'], chat_type=['group', 'supergroup'])

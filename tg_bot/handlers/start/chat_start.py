@@ -264,23 +264,23 @@ async def start_back(message: Message = None, callback_query: CallbackQuery = No
 
 
 def register_chat_start_handlers(dp: Dispatcher):
-    dp.register_message_handler(start_back, content_types=['text'], text=['назад', 'Назад', '🔙Назад'], state='*', chat_type='group')
-    dp.register_message_handler(start_back, commands=['start_back'], state='*', chat_type='group')
+    dp.register_message_handler(start_back, content_types=['text'], text=['назад', 'Назад', '🔙Назад'], state='*', chat_type=['group', 'supergroup'])
+    dp.register_message_handler(registration, commands=['start'], state='*', chat_type=['group', 'supergroup'])
 
-    dp.register_callback_query_handler(import_data_from_private, lambda c: c.data and c.data.startswith('import_data_from_private'), state='*', chat_type='group')
-    dp.register_message_handler(import_data_from_private_with_code, state=ConnectCodeStates.INCODE, chat_type='group')
+    dp.register_callback_query_handler(import_data_from_private, lambda c: c.data and c.data.startswith('import_data_from_private'), state='*', chat_type=['group', 'supergroup'])
+    dp.register_message_handler(import_data_from_private_with_code, state=ConnectCodeStates.INCODE, chat_type=['group', 'supergroup'])
 
-    dp.register_callback_query_handler(start_back, lambda c: c.data and c.data == 'start_back', state='*', chat_type='group')
-    dp.register_message_handler(registration, content_types=['text'], text=['начать', '/начать', '/yfxfnm', '/start', '/старт'], chat_type='group')
-    dp.register_callback_query_handler(registration_inPolicy, lambda c: c.data and c.data == 'agree_policy', state=StartStates.INPOLICY, chat_type='group')
-    dp.register_message_handler(registration_inLink, state=StartStates.INLINK, chat_type='group')
-    dp.register_callback_query_handler(registration_inCountries, lambda c: c.data and c.data.startswith('start_countries_'), state=StartStates.INCOUNTRIES, chat_type='group')
-    dp.register_callback_query_handler(registration_inProvinces, lambda c: c.data and c.data.startswith('start_provinces_'), state=StartStates.INPROVINCES, chat_type='group')
-    dp.register_callback_query_handler(registration_inCities, lambda c: c.data and c.data.startswith('start_cities_'), state=StartStates.INCITIES, chat_type='group')
-    dp.register_message_handler(registration_inSchools, state=StartStates.INSCHOOL, chat_type='group')
-    dp.register_message_handler(registration_inClass, state=StartStates.INCLASS, chat_type='group')
-    dp.register_message_handler(registration_inLogin, state=StartStates.INLOGIN, chat_type='group')
-    dp.register_message_handler(registration_inPassword, state=StartStates.INPASSWORD, chat_type='group')
+    dp.register_callback_query_handler(start_back, lambda c: c.data and c.data == 'start_back', state='*', chat_type=['group', 'supergroup'])
+    dp.register_message_handler(registration, chat_type='supergroup', content_types=['text'], text=['начать', '/начать', '/yfxfnm', '/start', '/старт'])
+    dp.register_callback_query_handler(registration_inPolicy, lambda c: c.data and c.data == 'agree_policy', state=StartStates.INPOLICY, chat_type=['group', 'supergroup'])
+    dp.register_message_handler(registration_inLink, state=StartStates.INLINK, chat_type=['group', 'supergroup'])
+    dp.register_callback_query_handler(registration_inCountries, lambda c: c.data and c.data.startswith('start_countries_'), state=StartStates.INCOUNTRIES, chat_type=['group', 'supergroup'])
+    dp.register_callback_query_handler(registration_inProvinces, lambda c: c.data and c.data.startswith('start_provinces_'), state=StartStates.INPROVINCES, chat_type=['group', 'supergroup'])
+    dp.register_callback_query_handler(registration_inCities, lambda c: c.data and c.data.startswith('start_cities_'), state=StartStates.INCITIES, chat_type=['group', 'supergroup'])
+    dp.register_message_handler(registration_inSchools, state=StartStates.INSCHOOL, chat_type=['group', 'supergroup'])
+    dp.register_message_handler(registration_inClass, state=StartStates.INCLASS, chat_type=['group', 'supergroup'])
+    dp.register_message_handler(registration_inLogin, state=StartStates.INLOGIN, chat_type=['group', 'supergroup'])
+    dp.register_message_handler(registration_inPassword, state=StartStates.INPASSWORD, chat_type=['group', 'supergroup'])
 
 
 

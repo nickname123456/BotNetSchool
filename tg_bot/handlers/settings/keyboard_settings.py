@@ -38,6 +38,6 @@ def register_keyboard_settings_handlers(dp: Dispatcher):
     dp.register_message_handler(keyboard_settings_private, content_types=['text'], text=['Настройки', 'настройки', 'settings', 'Settings', '⚙Настройки'], chat_type='private')
     dp.register_message_handler(keyboard_settings_private, commands=['settings'], chat_type='private')
 
-    dp.register_callback_query_handler(keyboard_settings_chat, lambda c: c.data and c.data =='settings', chat_type='group')
-    dp.register_message_handler(keyboard_settings_chat, chat_type='group', content_types=['text'], text=['Настройки', 'настройки', 'settings', 'Settings', '⚙Настройки'])
-    dp.register_message_handler(keyboard_settings_chat, chat_type='group', commands=['settings'])
+    dp.register_callback_query_handler(keyboard_settings_chat, lambda c: c.data and c.data =='settings', chat_type=['group', 'supergroup'])
+    dp.register_message_handler(keyboard_settings_chat, chat_type=['group', 'supergroup'], content_types=['text'], text=['Настройки', 'настройки', 'settings', 'Settings', '⚙Настройки'])
+    dp.register_message_handler(keyboard_settings_chat, chat_type=['group', 'supergroup'], commands=['settings'])
