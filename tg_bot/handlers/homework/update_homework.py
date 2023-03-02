@@ -115,22 +115,14 @@ async def private_edit_hamework(message: Message, state: FSMContext):
                     try: # Отправляем уведомление
                         await send_vk_msg(bot=vk_bot, user_id=vk_id, message=f'🔄Новое домашнее задание по {lesson}!\n🆙Было обновлено: {upd_date}\n💬Задание: {homework}')
                         logging.info(f'{vk_id}: send vk notification')
-                    except VKAPIError: # Если не получилось отправить
-                        logging.info(f'{vk_id}: vk notification error')
-                        if vk_id and telegram_id: # Если есть аккаунт вк и телеграм
-                            edit_student_vk_id(telegram_id=telegram_id, new_vk_id=None) # Удаляем аккаунт вк
-                            await message.bot.send_message(telegram_id, '❌Я не могу отправить вам сообщение в ВК, т.к. вы заблокировали меня. Я буду отправлять вам сообщения только в телеграмме')
-                            logging.info(f'{telegram_id}: delete vk account')
+                    except: # Если не получилось отправить
+                        logging.info(f'I cannot send homework to vk user. Id: {i.vk_id}')
                 if telegram_id: # Если есть аккаунт телеграм
                     try: # Отправляем уведомление
                         await message.bot.send_message(telegram_id, f'🔄Новое домашнее задание по {lesson}!\n🆙Было обновлено: {upd_date}\n💬Задание: {homework}')
                         logging.info(f'{telegram_id}: send telegram notification')
-                    except aiogram.exceptions.BotBlocked: # Если не получилось отправить
-                        logging.info(f'{telegram_id}: telegram notification error')
-                        if vk_id and telegram_id: # Если есть аккаунт вк и телеграм
-                            edit_student_telegram_id(vk_id=vk_id, new_telegram_id=None) # Удаляем аккаунт телеграм
-                            await send_vk_msg(vk_bot, vk_id, f'❌Я не могу отправить вам сообщение в телеграмме, т.к. вы заблокировали меня. Я буду отправлять вам сообщения только в ВК')
-                            logging.info(f'{vk_id}: delete telegram account')
+                    except: # Если не получилось отправить
+                        logging.info(f'I cannot send homework to telegram user. Id: {i.telegram_id}')
                 await asyncio.sleep(1) # Отдыхаем, чтобы не спамить
 
     logging.info(f'{message.chat.id}: start mailing for chats')
@@ -143,18 +135,14 @@ async def private_edit_hamework(message: Message, state: FSMContext):
                     try: # отправляем уведомление
                         await send_vk_msg(bot=vk_bot, chat_id=vk_id, message=f'🔄Новое домашнее задание по {lesson}!\n🆙Было обновлено: {upd_date}\n💬Задание: {homework}')
                         logging.info(f'{telegram_id}: send vk notification')
-                    except VKAPIError: # Если не получилось отправить
-                        logging.info(f'{telegram_id}: vk notification error')
-                        delete_chat(vk_id=vk_id) # Удаляем чат из базы данных
-                        logging.info(f'{telegram_id}: delete chat from database')
+                    except: # Если не получилось отправить
+                        logging.info(f'I cannot send homework to vk chat. Id: {i.vk_id}')
                 if telegram_id: # Если есть аккаунт телеграм
                     try: # Отправляем уведомление
                         await message.bot.send_message(telegram_id, f'🔄Новое домашнее задание по {lesson}!\n🆙Было обновлено: {upd_date}\n💬Задание: {homework}')
                         logging.info(f'{telegram_id}: send telegram notification')
-                    except aiogram.exceptions.BotKicked: # Если не получилось отправить
-                        logging.info(f'{telegram_id}: telegram notification error')
-                        delete_chat(telegram_id=telegram_id) # Удаляем чат из базы данных
-                        logging.info(f'{telegram_id}: delete chat from database')
+                    except: # Если не получилось отправить
+                        logging.info(f'I cannot send homework to tg chat. Id: {i.telegram_id}')
                 await asyncio.sleep(1) # Отдыхаем, чтобы не спамить
     logging.info(f'{message.chat.id}: end mailing')
 

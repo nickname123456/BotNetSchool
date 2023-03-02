@@ -113,21 +113,14 @@ async def finish_schedule_download(message: Message, state: FSMContext):
                     try: # Пытаемся отправить расписание в ВК
                         await send_vk_bytes_photo(bot=vk_bot, photo=photo_as_bytes, user_id=i.vk_id, caption=f'🔄Новое расписание на {day}!')
                         logging.info(f'I send schedule to vk user. Id: {i.vk_id}')
-                    except VKAPIError: # Если не получилось
-                        logging.info(f'I can not send schedule to vk user. Id: {i.vk_id}')
-                        if i.vk_id and i.telegram_id: # Если у пользователя есть аккаунт ВК и Телеграм
-                            edit_student_vk_id(telegram_id=i.telegram_id, new_vk_id=None) # Удаляем аккаунт ВК
-                            await send_telegram_msg(bot=message.bot, chat_id=i.telegram_id, text='❌Я не могу отправить вам сообщение в ВК, т.к. вы заблокировали меня. Я буду отправлять вам сообщения только в телеграмме')
+                    except: # Если не получилось
+                        logging.info(f'I cannot send schedule to vk user. Id: {i.vk_id}')
                 if i.telegram_id:
                     try: # Пытаемся отправить расписание в телеграмм
                         await send_telegram_bytes_photo(bot=message.bot, chat_id=i.telegram_id, caption=f'🔄Новое расписание на {day}!', photo=photo_as_bytes)
                         logging.info(f'I send schedule to telegram user. Id: {i.telegram_id}')
-                    except aiogram.utils.exceptions.BotBlocked: # Если не получилось
-                        logging.info(f'I can not send schedule to telegram user. Id: {i.telegram_id}')
-                        if i.vk_id and i.telegram_id: # Если у пользователя есть аккаунт ВК и Телеграм
-                            edit_student_telegram_id(vk_id=i.vk_id, new_telegram_id=None) # Удаляем аккаунт Телеграм
-                            await send_vk_msg(bot=vk_bot, user_id=i.vk_id, message='❌Я не могу отправить вам сообщение в телеграмме, т.к. вы заблокировали меня. Я буду отправлять вам сообщения только в ВК')
-                await asyncio.sleep(1)
+                    except : # Если не получилось
+                        logging.info(f'I cannot send schedule to telegram user. Id: {i.telegram_id}')
     
     for i in chats_with_notification: # Перебираем чаты, которые подписаны на уведомления
         if i.school == school: # Если чат из этой школы
@@ -136,16 +129,14 @@ async def finish_schedule_download(message: Message, state: FSMContext):
                     try: # Пытаемся отправить расписание в ВК
                         await send_vk_bytes_photo(bot=vk_bot, photo=photo_as_bytes, chat_id=i.vk_id, caption=f'🔄Новое расписание на {day}!')
                         logging.info(f'I send schedule to vk chat. Id: {i.vk_id}')
-                    except VKAPIError:  # Если не получилось
-                        delete_chat(vk_id=i.vk_id) # Удаляем чат из базы данных
-                        logging.info(f'I can not send schedule to vk chat and delete it. Id: {i.vk_id}')
+                    except:  # Если не получилось
+                        logging.info(f'I cannot send schedule to vk chat. Id: {i.vk_id}')
                 if i.telegram_id: # Если у пользователя есть аккаунт ВК и Телеграм
                     try: # Пытаемся отправить расписание в телеграмм
                         await send_telegram_bytes_photo(bot=message.bot, chat_id=i.telegram_id, caption=f'🔄Новое расписание на {day}!', photo=photo_as_bytes)
                         logging.info(f'I send schedule to telegram chat. Id: {i.telegram_id}')
-                    except aiogram.utils.exceptions.BotKicked: # Если не получилось
-                        delete_chat(telegram_id=i.telegram_id) # Удаляем чат из базы данных
-                        logging.info(f'I can not send schedule to telegram chat and delete it. Id: {i.telegram_id}')
+                    except:
+                        logging.info(f'I cannot send schedule to telegram chat. Id: {i.telegram_id}')
                 await asyncio.sleep(1)
     logging.info(f'{message.chat.id}: I done mailing in schedule_download')
 

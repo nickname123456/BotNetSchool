@@ -156,20 +156,14 @@ async def finish_schedule_download(message: Message):
                     try: # Пытаемся отправить уведомление
                         await bp.api.messages.send(message=f'🔄Новое расписание на {day}!', user_id=i.vk_id, random_id=0, attachment=photo)
                         logging.info(f'{i.vk_id}: I send schedule notification')
-                    except VKAPIError: # Если не получилось
-                        logging.info(f'{i.vk_id}: I cant send schedule notification')
-                        if i.vk_id and i.telegram_id: # Если есть аккаунт ВК и Телеграм
-                            edit_student_vk_id(telegram_id=i.telegram_id, new_vk_id=None) # Удаляем аккаунт ВК
-                            await send_telegram_msg(bot=tg_bot, chat_id=i.telegram_id, text='❌Я не могу отправить вам сообщение в ВК, т.к. вы заблокировали меня. Я буду отправлять вам сообщения только в телеграмме')
+                    except: # Если не получилось
+                        logging.info(f'I cannot send schedule to vk user. Id: {i.vk_id}')
                 if i.telegram_id: # Если есть аккаунт Телеграм
                     try: # Пытаемся отправить уведомление
                         await send_telegram_bytes_photo(bot=tg_bot, chat_id=i.telegram_id, caption=f'🔄Новое расписание на {day}!', photo=photo_as_bytes)
                         logging.info(f'{i.telegram_id}: I send schedule notification')
-                    except aiogram.utils.exceptions.BotBlocked: # Если не получилось
-                        logging.info(f'{i.telegram_id}: I cant send schedule notification')
-                        if i.vk_id and i.telegram_id: # Если есть аккаунт ВК и Телеграм
-                            edit_student_telegram_id(vk_id=i.vk_id, new_telegram_id=None) # Удаляем аккаунт Телеграм
-                            await bp.api.messages.send(message='❌Я не могу отправить вам сообщение в телеграмме, т.к. вы заблокировали меня. Я буду отправлять вам сообщения только в ВК', user_id=i.vk_id, random_id=0)
+                    except: # Если не получилось
+                        logging.info(f'I cannot send schedule to telegram user. Id: {i.telegram_id}')
                 await asyncio.sleep(1)
 
     for i in chats_with_notification: # Перебираем все чаты
@@ -179,15 +173,13 @@ async def finish_schedule_download(message: Message):
                     try: # Пытаемся отправить уведомление
                         await bp.api.messages.send(message=f'🔄Новое расписание на {day}!', peer_id=2000000000+i.vk_id, random_id=0, attachment=photo)
                         logging.info(f'{2000000000+i.vk_id}: I send schedule notification')
-                    except VKAPIError: # Если не получилось
-                        delete_chat(vk_id=i.vk_id) # Удаляем чат
-                        logging.info(f'{2000000000+i.vk_id}: I cant send schedule notification and delete chat')
+                    except: # Если не получилось
+                        logging.info(f'I cannot send schedule to vk chat. Id: {i.vk_id}')
                 if i.telegram_id: # Если есть аккаунт Телеграм
                     try: # Пытаемся отправить уведомление
                         await send_telegram_bytes_photo(bot=tg_bot, chat_id=i.telegram_id, caption=f'🔄Новое расписание на {day}!', photo=photo_as_bytes)
                         logging.info(f'{i.telegram_id}: I send schedule notification')
-                    except aiogram.utils.exceptions.BotKicked: # Если не получилось
-                        delete_chat(telegram_id=i.telegram_id) # Удаляем чат
-                        logging.info(f'{i.telegram_id}: I cant send schedule notification and delete chat')
+                    except: # Если не получилось
+                        logging.info(f'I cannot send schedule to telegram chat. Id: {i.telegram_id}')
                 await asyncio.sleep(1)
     logging.info(f'{message.peer_id}: I done mailing in schedule_download')
