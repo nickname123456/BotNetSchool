@@ -33,7 +33,9 @@ async def notification(bot):
                     user.link,
                     user.old_mark
                 )
+                logging.info(f'I got {len(result)} new marks for user vk_id={vk_id}, telegram_id={telegram_id}')
             except:
+                logging.error(f'Error while getting marks for user vk_id={vk_id}, telegram_id={telegram_id}')
                 continue
 
             if vk_id:
@@ -45,18 +47,18 @@ async def notification(bot):
                 if vk_id:
                     try: # Пытаемся отправить оценку в вк
                         await bot.api.messages.send(message=mark, user_id=vk_id, random_id=0)
-                    except VKAPIError: # Если не получилось отправить
-                        if vk_id and telegram_id: # Если есть аккаунт вк и телеграм
-                            edit_student_vk_id(telegram_id=telegram_id, new_vk_id=None) # Удаляем аккаунт вк
-                            await send_telegram_msg(bot=tg_bot, chat_id=telegram_id, message='❌Я не могу отправить вам сообщение в ВК, т.к. вы заблокировали меня. Я буду отправлять вам сообщения только в телеграмме')
+                        logging.info(f'I send mark notify to vk user. Id: {vk_id}')
+                    except: # Если не получилось отправить
+                        logging.error(f'I cannot send mark notify to vk user. Id: {vk_id}')
+                        continue
                     await asyncio.sleep(1)
                 if telegram_id:
                     try: # Пытаемся отправить оценку в телеграм
                         await send_telegram_msg(bot=tg_bot, chat_id=telegram_id, message=mark)
-                    except aiogram.utils.exceptions.BotBlocked:
-                        if vk_id and telegram_id: # Если есть аккаунт вк и телеграм
-                            edit_student_telegram_id(vk_id=vk_id, new_telegram_id=None) # Удаляем аккаунт телеграм
-                            await bot.api.messages.send(message='❌Я не могу отправить вам сообщение в телеграмме, т.к. вы заблокировали меня. Я буду отправлять вам сообщения только в ВК', user_id=vk_id, random_id=0)
+                        logging.info(f'I send mark notify to telegram user. Id: {telegram_id}')
+                    except:
+                        logging.error(f'I cannot send mark notify to telegram user. Id: {telegram_id}')
+                        continue
                     await asyncio.sleep(1)
         
 
@@ -73,7 +75,9 @@ async def notification(bot):
                     user.studentId,
                     user.old_announcements
                 )
+                logging.info(f'I got {len(result)} new announcements for chat vk_id={vk_id}, telegram_id={telegram_id}')
             except:
+                logging.error(f'Error while getting new announcements for chat vk_id={vk_id}, telegram_id={telegram_id}')
                 continue
 
             if vk_id:
@@ -92,20 +96,20 @@ async def notification(bot):
                                 peer_id=vk_id)
                             await bot.api.messages.send(message=announcement['attachments'][attachment]['title'], attachment=attach,user_id=vk_id, random_id=0)
                         await bot.api.messages.send(message='&#12288;', user_id=vk_id, random_id=0)
-                    except VKAPIError: # Если не получилось отправить
-                        if vk_id and telegram_id: # Если есть аккаунт вк и телеграм
-                            edit_student_vk_id(telegram_id=telegram_id, new_vk_id=None) # Удаляем аккаунт вк
-                            await send_telegram_msg(bot=tg_bot, chat_id=telegram_id, message='❌Я не могу отправить вам сообщение в ВК, т.к. вы заблокировали меня. Я буду отправлять вам сообщения только в телеграмме')
+                        logging.info(f'I send announcement notify to vk user. Id: {vk_id}')
+                    except: # Если не получилось отправить
+                        logging.error(f'I cannot send announcement notify to vk user. Id: {vk_id}')
+                        continue
                     await asyncio.sleep(1)
                 if telegram_id:
                     try: # Пытаемся отправить объявление в телеграм
                         reply_to_message_id = (await send_telegram_msg(bot=tg_bot, chat_id=telegram_id, message=announcement['text']))['message_id']
                         for attachment in announcement['attachments']: # отправить вложения
                             await send_telegram_bytes_file(bot=tg_bot, chat_id=telegram_id, file=announcement['attachments'][attachment]['file_source'], caption=announcement['attachments'][attachment]['title'], reply_to_message_id=reply_to_message_id)
-                    except aiogram.utils.exceptions.BotBlocked: # Если не получилось отправить
-                        if vk_id and telegram_id: # Если есть аккаунт вк и телеграм
-                            edit_student_telegram_id(vk_id=vk_id, new_telegram_id=None) # Удаляем аккаунт телеграм
-                            await bot.api.messages.send(message='❌Я не могу отправить вам сообщение в телеграмме, т.к. вы заблокировали меня. Я буду отправлять вам сообщения только в ВК', user_id=vk_id, random_id=0)
+                        logging.info(f'I send announcement notify to telegram user. Id: {telegram_id}')
+                    except: # Если не получилось отправить
+                        logging.error(f'I cannot send announcement notify to telegram user. Id: {telegram_id}')
+                        continue
                     await asyncio.sleep(1)
 
 
@@ -124,7 +128,9 @@ async def notification(bot):
                     chat.link,
                     chat.old_mark
                 )
+                logging.info(f'I got {len(result)} new marks for chat vk_id={vk_id}, telegram_id={telegram_id}')
             except:
+                logging.error(f'Error while getting marks for chat vk_id={vk_id}, telegram_id={telegram_id}')
                 continue
 
             if vk_id:
@@ -136,14 +142,18 @@ async def notification(bot):
                 if vk_id:
                     try: # Пытаемся отправить оценку в вк
                         await bot.api.messages.send(message=mark, peer_id=2000000000+vk_id, random_id=0)
-                    except VKAPIError: # Если не получилось отправить
-                        delete_chat(vk_id=vk_id) # Удаляем чат
+                        logging.info(f'I send mark notify to vk chat. Id: {vk_id}')
+                    except: # Если не получилось отправить
+                        logging.error(f'I cannot send mark notify to vk chat. Id: {vk_id}')
+                        continue
                     await asyncio.sleep(1)
                 if telegram_id:
                     try: # Пытаемся отправить оценку в телеграм
                         await send_telegram_msg(bot=tg_bot, chat_id=telegram_id, message=mark)
-                    except aiogram.exceptions.BotKicked: # Если не получилось отправить
-                        delete_chat(telegram_id=telegram_id) # Удаляем чат
+                        logging.info(f'I send mark notify to telegram chat. Id: {telegram_id}')
+                    except: # Если не получилось отправить
+                        logging.error(f'I cannot send mark notify to telegram chat. Id: {telegram_id}')
+                        continue
                     await asyncio.sleep(1)       
         
 
@@ -162,7 +172,9 @@ async def notification(bot):
                     chat.studentId,
                     chat.old_announcements
                 )
+                logging.info(f'I got {len(result)} new announcements for chat vk_id={vk_id}, telegram_id={telegram_id}')
             except:
+                logging.error(f'Error while getting announcements for chat vk_id={vk_id}, telegram_id={telegram_id}')
                 continue
             
             if vk_id:
@@ -181,16 +193,20 @@ async def notification(bot):
                                 peer_id=2000000000+vk_id)
                             await bot.api.messages.send(message=announcement['attachments'][attachment]['title'], attachment=attach,peer_id=2000000000+vk_id, random_id=0)
                         await bot.api.messages.send(message='&#12288;', peer_id=2000000000+vk_id, random_id=0)
-                    except VKAPIError: # Если не получилось отправить
-                        delete_chat(vk_id=vk_id) # Удаляем чат
+                        logging.info(f'I send announcement notify to vk chat. Id: {vk_id}')
+                    except: # Если не получилось отправить
+                        logging.error(f'I cannot send announcement notify to vk chat. Id: {vk_id}')
+                        continue
                     await asyncio.sleep(1)
                 if telegram_id:
                     try: # Пытаемся отправить объявление в телеграм
                         reply_to_message_id = (await send_telegram_msg(bot=tg_bot, chat_id=telegram_id, message=announcement['text']))['message_id']
                         for attachment in announcement['attachments']: # отправить вложения
                             await send_telegram_bytes_file(bot=tg_bot, chat_id=telegram_id, file=announcement['attachments'][attachment]['file_source'], caption=announcement['attachments'][attachment]['title'], reply_to_message_id=reply_to_message_id)
-                    except aiogram.exceptions.BotKicked: # Если не получилось отправить
-                        delete_chat(telegram_id=telegram_id) # Удаляем чат
+                        logging.info(f'I send announcement notify to telegram chat. Id: {telegram_id}')
+                    except: # Если не получилось отправить
+                        logging.error(f'I cannot send announcement notify to telegram chat. Id: {telegram_id}')
+                        continue
                     await asyncio.sleep(1)
 
         logging.info(f'I sleep for 10 minutes')
