@@ -202,7 +202,9 @@ async def getMarkNotify(login, password, school, url, oldmarks):
                         if 'mark' in assignment.keys() and 'mark' in assignment['mark']:
                             if assignment['mark']['mark']:
                                 date = datetime.datetime.strptime(assignment['dueDate'], '%Y-%m-%dT%H:%M:%S')
-                                result = html2markdown.convert(f"❗У ученика {studentNick} новая оценка по предмету {lesson['subjectName']}: {assignment['mark']['mark']} за {assignment['assignmentName']}. Дата: {date.day}.{date.month}.{date.year}")
+                                all_marks = await get_marks(login, password, school, url, studentId, lesson['subjectName'])
+                                average_mark = float(round(sum(all_marks) / len(all_marks), 2)) # Считаем ср. балл
+                                result = html2markdown.convert(f"❗У ученика {studentNick} новая оценка по предмету {lesson['subjectName']}: {assignment['mark']['mark']} за {assignment['assignmentName']}. Дата: {date.day}.{date.month}.{date.year} \n📊Текущий ср. балл: {average_mark}")
                                 clean = re.compile(r'([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
                                 result = re.sub(clean, '', result)
                                 marks.append(result)
